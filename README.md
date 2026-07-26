@@ -1,32 +1,13 @@
-# React + TypeScript + Vite
+# Maple Hatch Pet
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+메이플스토리 캐릭터를 기반으로 Codex Pet 스프라이트를 생성하고 설치하는 서비스의 제품 명세 저장소입니다.
 
-Currently, two official plugins are available:
+현재 구현 코드는 포함하지 않으며, 제품 계약과 생성·설치 흐름을 먼저 정의하고 있습니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 문서
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+- [제품 명세 인덱스](docs/product-spec/index.md)
+- [MVP 명세](docs/product-spec/mvp.md)
+- [Pet 생성 흐름](docs/product-spec/pet-generation-flow.md)
+- [설치 계약](docs/product-spec/installation-contract.md)
+- [결정 조정 계획](docs/superpowers/plans/2026-07-26-product-contract-reconciliation.md)
