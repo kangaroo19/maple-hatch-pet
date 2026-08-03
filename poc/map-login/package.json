@@ -1,0 +1,14 @@
+{
+  "name": "map-login-wz-poc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Browser proof of concept for the KMS v43 MapLogin WZ scene",
+  "scripts": {
+    "extract": "node extract.cjs",
+    "serve": "node serve.cjs",
+    "verify": "node verify.cjs"
+  },
+  "dependencies": {
+    "@tybys/wz": "1.7.1"
+  }
+}
