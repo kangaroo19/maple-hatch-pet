@@ -8,7 +8,7 @@
 
 이 문서는 생성이 완료된 Codex sprite v1 Pet을 ChatGPT 데스크톱 앱에 설치하는 외부 계약을 정의한다.
 
-외부 API와 웹 문서에서는 설치·결과 조회 식별자를 `petId`라고 부른다. 일반 문장에서는 Pet ID, CLI 자리표시자와 경로 예시에서는 `<pet-id>`를 사용한다. 로컬 `pet.json`의 `id`는 Codex 매니페스트가 요구하는 필드 이름이므로 예외로 유지하되 값은 `petId`와 같아야 한다.
+외부 API와 웹 문서에서는 설치 식별자를 `petId`라고 부른다. 일반 문장에서는 Pet ID, CLI 자리표시자와 경로 예시에서는 `<pet-id>`를 사용한다. 로컬 `pet.json`의 `id`는 Codex 매니페스트가 요구하는 필드 이름이므로 예외로 유지하되 값은 `petId`와 같아야 한다.
 
 ## 2. 지원 표면
 
@@ -46,7 +46,7 @@ codex://pets/install?name=<encoded-name>&imageUrl=<encoded-https-url>&descriptio
 - `spriteVersionNumber`는 `1`을 명시한다.
 - 모든 쿼리 값은 각각 URI 인코딩한다.
 - 공식 허용 파라미터 외의 값이나 추가 경로를 넣지 않는다.
-- 딥링크를 열 수 없을 때 결과 화면에 있는 CLI 명령을 대체 경로로 안내한다.
+- 딥링크를 열 수 없을 때 같은 생성 화면의 설치 영역에 있는 CLI 명령을 대체 경로로 안내한다.
 
 ## 5. npx 설치 도구 계약
 
