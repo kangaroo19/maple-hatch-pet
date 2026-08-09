@@ -1,6 +1,8 @@
 'use strict'
 
 const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const path = require('node:path')
 
 const {
   frameAtTime,
@@ -52,4 +54,33 @@ assert.deepEqual(
   { x: 291, y: 253 }
 )
 
-console.log('scene utility verification passed')
+const generatedDir = path.join(__dirname, 'public', 'generated')
+const notice = JSON.parse(fs.readFileSync(path.join(generatedDir, 'notice.json'), 'utf8'))
+
+assert.equal(notice.formatVersion, 1)
+assert.equal(notice.source.notice, 'UI.wz/Login.img/Notice')
+assert.deepEqual(
+  [notice.frame.width, notice.frame.height],
+  [362, 219]
+)
+assert.deepEqual(
+  [notice.frame.background.width, notice.frame.background.height, notice.frame.background.source],
+  [362, 219, 'UI.wz/Login.img/Notice/backgrnd/1']
+)
+
+for (const [state, dimensions] of Object.entries({
+  normal: [75, 32],
+  mouseOver: [75, 34],
+  pressed: [75, 34]
+})) {
+  const button = notice.confirm[state]
+  assert.deepEqual([button.width, button.height], dimensions)
+  assert.equal(button.source, `UI.wz/Login.img/Notice/BtYes/${state}/0`)
+}
+
+for (const asset of [notice.frame.background, ...Object.values(notice.confirm)]) {
+  const relativePath = asset.asset.replace(/^generated\//, '')
+  assert.equal(fs.existsSync(path.join(generatedDir, relativePath)), true)
+}
+
+console.log('scene utility and Notice manifest verification passed')

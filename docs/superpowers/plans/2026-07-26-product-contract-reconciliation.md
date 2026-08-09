@@ -1,5 +1,7 @@
 # Product Contract Reconciliation Implementation Plan
 
+> **보관 상태:** 완료된 역사적 실행 계획이다. 현재 제품 계약과 문서 읽기 순서는 [제품 명세 인덱스](../../product-spec/index.md)를 따른다. 아래 체크박스는 당시 계획 형식을 보존한 것이며 현재 작업 상태를 나타내지 않는다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 확정된 제품 결정 1~10을 기존 제품 문서와 설치 계약에 모순 없이 반영한다.

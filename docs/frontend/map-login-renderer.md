@@ -12,6 +12,7 @@ PoC는 완성된 맵 이미지를 추출하지 않는다. Node.js 추출기가 W
 
 ```text
 UI.wz/MapLogin.img        맵 크기, 배경과 오브젝트 배치
+UI.wz/Login.img           Notice 배경과 확인 버튼
 Map.wz/Back/login.img     배경 Canvas와 애니메이션
 Map.wz/Obj/login.img      오브젝트 Canvas와 애니메이션
           │
@@ -19,29 +20,30 @@ Map.wz/Obj/login.img      오브젝트 Canvas와 애니메이션
 extract.cjs
           │
           ├─ public/generated/scene.json
+          ├─ public/generated/notice.json
           └─ public/generated/assets/*.png
                               │
                               ▼
                   scene-utils.js + app.js
                               │
                               ▼
-                  스크롤 가능한 Canvas 장면
+                  Canvas 장면 + Notice 경고 UI
 ```
 
-실제 로그인 입력, 월드 선택과 인증 UI는 이 계약에 포함되지 않는다.
+실제 로그인 패널의 외형, 월드 선택과 인증 UI는 이 계약에 포함되지 않는다. PoC의 CSS 입력 폼은 조회 상태와 공통 경고 동작만 검증하며 제품 로그인 패널의 시각 기준으로 사용하지 않는다.
 
 ## 2. 파일별 책임
 
 | 파일 | 책임 |
 |---|---|
-| [`extract.cjs`](../../poc/map-login/extract.cjs) | WZ 파싱, 링크 해석, PNG 추출, `scene.json` 생성 |
+| [`extract.cjs`](../../poc/map-login/extract.cjs) | WZ 파싱, 링크 해석, PNG 추출, `scene.json`·`notice.json` 생성 |
 | [`public/scene-utils.js`](../../poc/map-login/public/scene-utils.js) | 프레임 선택, 배경 type 판정, 배경 좌표 계산 |
-| [`public/app.js`](../../poc/map-login/public/app.js) | 에셋 로드, Canvas 크기·카메라 계산, 장면 합성 루프 |
-| [`public/index.html`](../../poc/map-login/public/index.html) | 스크롤 뷰포트, sticky Canvas와 상태 UI |
+| [`public/app.js`](../../poc/map-login/public/app.js) | 에셋 로드, Canvas 합성, 모의 조회 상태와 Notice 다이얼로그 관리 |
+| [`public/index.html`](../../poc/map-login/public/index.html) | 스크롤 뷰포트, sticky Canvas, 모의 로그인 폼과 경고 UI |
 | [`serve.cjs`](../../poc/map-login/serve.cjs) | `public/` 아래 정적 파일만 제공하는 로컬 서버 |
-| [`verify.cjs`](../../poc/map-login/verify.cjs) | 프레임 경계, type 판정과 대표 배경 좌표 계산 검증 |
+| [`verify.cjs`](../../poc/map-login/verify.cjs) | 장면 계산과 추출된 Notice manifest·PNG 계약 검증 |
 
-추출 단계와 브라우저 런타임 사이의 유일한 데이터 계약은 `scene.json`과 이 파일이 참조하는 PNG다. 브라우저는 WZ 파일이나 `@tybys/wz`를 직접 읽지 않는다.
+추출 단계와 브라우저 런타임 사이의 데이터 계약은 `scene.json`, `notice.json`과 두 manifest가 참조하는 PNG다. 브라우저는 WZ 파일이나 `@tybys/wz`를 직접 읽지 않는다.
 
 ## 3. WZ 추출 과정
 
@@ -52,6 +54,7 @@ extract.cjs
 다음 이미지를 순서대로 파싱한다.
 
 - `UI.wz/MapLogin.img`
+- `UI.wz/Login.img`
 - `Map.wz/Back/login.img`
 - `Map.wz/Obj/login.img`
 
@@ -199,6 +202,41 @@ layer 오름차순 → z 오름차순 → 원본 배치 order 오름차순
 
 `stats`에는 배경, 오브젝트, 고유 PNG, 애니메이션, 이동 배경과 링크 프레임 수가 기록된다. UI 상태와 추출 진단에 사용할 수 있지만 렌더링 분기를 통계값에 의존시키지 않는다.
 
+### 4.4 `notice.json` 계약
+
+공통 경고 UI는 `scene.json`과 독립된 `notice.json`을 사용한다. 기존 장면 계약은 변경하지 않는다.
+
+```ts
+type NoticeAsset = {
+  asset: string
+  width: number
+  height: number
+  source: string
+}
+
+type NoticeManifest = {
+  formatVersion: 1
+  source: {
+    notice: 'UI.wz/Login.img/Notice'
+    patchVersion: 43
+    keySource: 'ZLZ.dll'
+    library: '@tybys/wz@1.7.1'
+  }
+  frame: {
+    width: 362
+    height: 219
+    background: NoticeAsset
+  }
+  confirm: {
+    normal: NoticeAsset
+    mouseOver: NoticeAsset
+    pressed: NoticeAsset
+  }
+}
+```
+
+배경은 `Notice/backgrnd/1`, 버튼은 `Notice/BtYes`의 세 상태를 사용한다. 오류 문구는 WZ의 `Notice/text/*`를 추출하지 않고 고정된 메시지 영역에 최대 세 줄의 plain text로 렌더링한다.
+
 ## 5. 브라우저 레이아웃과 세로 스크롤
 
 `#viewport`는 고정된 화면 높이와 `overflow: auto`를 가진다. `#scroll-space`의 CSS 높이는 `scene.map.height × scale`이며 전체 맵의 스크롤 범위를 만든다.
@@ -240,7 +278,7 @@ screenX = object.x - camera.left
 screenY = object.y - camera.top
 ```
 
-배경은 type에 따른 이동과 패럴랙스를 먼저 계산한 뒤 `camera.left`, `camera.top`을 뺀다. 자동 카메라 왕복은 없다. 카메라의 세로 위치는 사용자 스크롤만으로 바뀐다.
+배경은 type에 따른 이동과 패럴랙스를 먼저 계산한 뒤 `camera.left`, `camera.top`을 뺀다. 현재 PoC 렌더러 자체에는 자동 카메라 왕복이나 제품 화면 전환이 없으므로 카메라의 세로 위치는 사용자 스크롤만으로 바뀐다. 제품 통합에서는 조회 성공과 `다른 캐릭터 찾기`에 한해 [제품 구현 가이드](./implementation-guide.md#제품-ui-계약)의 일회성 자동 스크롤을 추가한다.
 
 ## 7. 애니메이션과 alpha
 
@@ -330,13 +368,13 @@ y += camera.centerY × (100 + ry) / 100
 
 ## 10. 로딩과 오류 처리
 
-브라우저는 `generated/scene.json`을 `no-store`로 요청하고 manifest가 참조하는 고유 PNG 경로를 모두 먼저 로드한다. 모든 이미지 로드가 끝난 뒤에만 렌더 루프를 시작한다.
+브라우저는 `generated/scene.json`과 `generated/notice.json`을 `no-store`로 요청하고 manifest가 참조하는 고유 PNG 경로를 모두 먼저 로드한다. 모든 이미지 로드가 끝난 뒤에만 렌더 루프와 모의 로그인 폼을 시작한다.
 
 manifest 또는 PNG 로드에 실패하면 다음 동작을 한다.
 
 - 오류를 console에 기록한다.
 - Canvas를 숨긴다.
-- 오류 stack 또는 문자열을 `#fatal`에 표시한다.
+- 내부 오류는 console에만 남기고 `#fatal`에는 새로고침을 안내하는 일반 텍스트만 표시한다.
 - 상태 텍스트를 `장면 로드 실패`로 바꾼다.
 
 PoC는 일부 에셋만 빠진 장면을 계속 그리는 부분 성공을 지원하지 않는다.
@@ -345,7 +383,7 @@ PoC는 일부 에셋만 빠진 장면을 계속 그리는 부분 성공을 지�
 
 - 이동 배경의 `속도값 × 5 × 경과시간(초)` 공식은 WzComparerR2 MapRender 공개 구현을 따른다. 원본 KMS 클라이언트 바이너리에서 직접 검증한 공식이 아니다.
 - PoC의 레이어 순서는 `front`, 오브젝트 map layer, placement `z`, 원본 order로 복원한 결과다.
-- 실제 로그인 폼, 버튼, 월드 선택과 인증 동작은 구현하지 않는다.
+- 모의 로그인 폼은 조회 중·인라인 검증·경고 다이얼로그 상태 전이만 검증한다. 실제 로그인 패널 외형, 월드 선택, 인증과 NEXON API 호출은 구현하지 않는다.
 - Spine, 파티클과 맵 오브젝트 이동 노드는 현재 MapLogin 데이터에 필요하지 않아 처리하지 않는다.
 - 정적 서버와 생성물 경로는 로컬 기술 확인용이다. 제품의 빌드·배포 계약으로 그대로 채택된 것이 아니다.
 - 브라우저는 모든 PNG를 선로드한다. 대규모 범용 맵 지원 시에는 로딩과 메모리 전략을 다시 설계해야 한다.

@@ -93,15 +93,17 @@ async function main () {
 
   try {
     const mapLogin = uiWz.wzDirectory.at('MapLogin.img')
+    const loginUi = uiWz.wzDirectory.at('Login.img')
     const backLogin = mapWz.wzDirectory.at('Back').at('login.img')
     const objLogin = mapWz.wzDirectory.at('Obj').at('login.img')
-    if (!mapLogin || !backLogin || !objLogin) {
-      throw new Error('MapLogin.img, Back/login.img, or Obj/login.img was not found.')
+    if (!mapLogin || !loginUi || !backLogin || !objLogin) {
+      throw new Error('MapLogin.img, Login.img, Back/login.img, or Obj/login.img was not found.')
     }
 
     // WzImage instances from the same WzFile share a position-based reader.
     // Parse sequentially so concurrent reads cannot overwrite reader.pos.
     await mapLogin.parseImage()
+    await loginUi.parseImage()
     await backLogin.parseImage()
     await objLogin.parseImage()
 
@@ -197,6 +199,18 @@ async function main () {
       return frames
     }
 
+    async function noticeAsset (resourcePath) {
+      const resource = loginUi.getFromPath(resourcePath)
+      if (!resource) throw new Error(`Login.img resource was not found: ${resourcePath}`)
+      const asset = await saveAsset(resource)
+      return {
+        asset: asset.src,
+        width: asset.width,
+        height: asset.height,
+        source: `UI.wz/Login.img/${resourcePath}`
+      }
+    }
+
     const backgrounds = []
     for (const placement of mapLogin.at('back').wzProperties) {
       const ani = valueOf(placement, 'ani', 0)
@@ -282,9 +296,38 @@ async function main () {
       }
     }
 
+    const notice = {
+      formatVersion: 1,
+      source: {
+        notice: 'UI.wz/Login.img/Notice',
+        patchVersion: PATCH_VERSION,
+        keySource: 'ZLZ.dll',
+        library: '@tybys/wz@1.7.1'
+      },
+      frame: {
+        width: 362,
+        height: 219,
+        background: await noticeAsset('Notice/backgrnd/1')
+      },
+      confirm: {
+        normal: await noticeAsset('Notice/BtYes/normal/0'),
+        mouseOver: await noticeAsset('Notice/BtYes/mouseOver/0'),
+        pressed: await noticeAsset('Notice/BtYes/pressed/0')
+      }
+    }
+
+    if (notice.frame.background.width !== notice.frame.width ||
+        notice.frame.background.height !== notice.frame.height) {
+      throw new Error('Login.img Notice background dimensions do not match 362x219.')
+    }
+
     await fs.writeFile(
       path.join(generatedDir, 'scene.json'),
       `${JSON.stringify(scene, null, 2)}\n`
+    )
+    await fs.writeFile(
+      path.join(generatedDir, 'notice.json'),
+      `${JSON.stringify(notice, null, 2)}\n`
     )
 
     console.log(`Map: ${map.width}x${map.height}, center=(${map.centerX}, ${map.centerY})`)
@@ -292,6 +335,7 @@ async function main () {
     console.log(`Objects: ${objects.length} (${animatedObjects.length} animated)`)
     console.log(`Assets: ${assetCache.size}, UOL frames: ${uolFrames.length}, linked frames: ${linkedFrames.length}`)
     console.log(`Wrote ${path.join(generatedDir, 'scene.json')}`)
+    console.log(`Wrote ${path.join(generatedDir, 'notice.json')}`)
   } finally {
     uiWz.dispose()
     mapWz.dispose()

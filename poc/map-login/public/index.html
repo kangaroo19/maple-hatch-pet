@@ -16,6 +16,22 @@
       box-sizing: border-box;
     }
 
+    [hidden] {
+      display: none !important;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     body {
       min-height: 100vh;
       margin: 0;
@@ -59,6 +75,7 @@
     }
 
     #viewport {
+      position: relative;
       width: 100%;
       height: min(78vh, 720px);
       min-height: 360px;
@@ -82,6 +99,88 @@
       width: 100%;
     }
 
+    #viewport-ui {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      height: 0;
+      pointer-events: none;
+    }
+
+    #login-demo {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      width: 230px;
+      padding: 12px;
+      border: 1px solid #94672f;
+      border-radius: 4px;
+      background: #251a10e8;
+      box-shadow: 0 8px 24px #0009;
+      color: #f5e7ca;
+      pointer-events: auto;
+    }
+
+    #login-demo label,
+    #login-demo input,
+    #login-demo button {
+      display: block;
+      width: 100%;
+    }
+
+    #login-demo label {
+      margin-bottom: 5px;
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    #login-demo input {
+      height: 30px;
+      padding: 4px 7px;
+      border: 1px solid #8a724f;
+      background: #fffdf5;
+      color: #24170c;
+      font: 0.78rem Dotum, '돋움', system-ui, sans-serif;
+    }
+
+    #login-demo button {
+      height: 30px;
+      margin-top: 8px;
+      border: 1px solid #b17b33;
+      background: #765020;
+      color: #fff5df;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    #login-demo button:disabled,
+    #login-demo input:disabled {
+      cursor: wait;
+      opacity: 0.65;
+    }
+
+    #lookup-state,
+    #nickname-error {
+      min-height: 1rem;
+      margin: 6px 0 0;
+      font-size: 0.7rem;
+    }
+
+    #lookup-state {
+      color: #cfdfed;
+    }
+
+    #nickname-error {
+      color: #ffb6b6;
+    }
+
+    #login-demo-note {
+      margin-top: 9px;
+      color: #c6b28d;
+      font-size: 0.64rem;
+      line-height: 1.35;
+    }
+
     #scene {
       position: sticky;
       top: 0;
@@ -95,6 +194,79 @@
       padding: 24px;
       color: #ffb6b6;
       white-space: pre-wrap;
+    }
+
+    #notice-dialog {
+      position: fixed;
+      top: var(--notice-top, 50%);
+      left: var(--notice-left, 50%);
+      width: 362px;
+      height: 219px;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+      border: 0;
+      background: transparent;
+      color: #493523;
+      transform: translate(-50%, -50%) scale(var(--notice-scale, 1));
+      transform-origin: center;
+    }
+
+    #notice-dialog::backdrop {
+      background: #0007;
+    }
+
+    #notice-frame {
+      position: relative;
+      width: 362px;
+      height: 219px;
+      background-position: 0 0;
+      background-repeat: no-repeat;
+      image-rendering: auto;
+    }
+
+    #notice-message {
+      position: absolute;
+      top: 58px;
+      left: 108px;
+      width: 230px;
+      max-height: 54px;
+      margin: 0;
+      overflow: hidden;
+      color: #493523;
+      font: 700 11px/18px Dotum, '돋움', system-ui, sans-serif;
+      letter-spacing: -0.2px;
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+    }
+
+    #notice-confirm {
+      position: absolute;
+      top: 153px;
+      left: 144px;
+      width: 75px;
+      height: 34px;
+      padding: 0;
+      border: 0;
+      outline: 0;
+      background-color: transparent;
+      background-image: var(--confirm-normal);
+      background-position: center;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    #notice-confirm:hover,
+    #notice-confirm:focus-visible {
+      background-image: var(--confirm-over);
+      filter: drop-shadow(0 0 2px #fff7bd);
+    }
+
+    #notice-confirm:active {
+      background-image: var(--confirm-pressed);
+      filter: none;
     }
 
     @media (max-width: 560px) {
@@ -123,12 +295,29 @@
       <div id="status" aria-live="polite">WZ 장면을 불러오는 중…</div>
     </header>
     <div id="viewport" tabindex="0" aria-label="스크롤 가능한 메이플스토리 로그인 맵">
+      <div id="viewport-ui">
+        <form id="login-demo" hidden novalidate aria-describedby="login-demo-note">
+          <label for="nickname">닉네임</label>
+          <input id="nickname" name="nickname" autocomplete="off">
+          <p id="nickname-error" aria-live="polite"></p>
+          <button id="lookup-submit" type="submit">로그인</button>
+          <p id="lookup-state" aria-live="polite"></p>
+          <p id="login-demo-note">PoC 상태 전이 검증용 폼이며 실제 제품 로그인 패널의 시각 기준이 아닙니다.</p>
+        </form>
+      </div>
       <div id="scroll-space">
         <canvas id="scene"></canvas>
-        <pre id="fatal"></pre>
+        <div id="fatal" role="alert"></div>
       </div>
     </div>
   </main>
+  <dialog id="notice-dialog" role="alertdialog" aria-labelledby="notice-title" aria-describedby="notice-message">
+    <div id="notice-frame">
+      <span id="notice-title" class="sr-only">알림</span>
+      <p id="notice-message"></p>
+      <button id="notice-confirm" type="button" aria-label="확인"></button>
+    </div>
+  </dialog>
   <script src="scene-utils.js"></script>
   <script src="app.js"></script>
 </body>

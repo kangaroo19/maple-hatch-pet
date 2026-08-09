@@ -1,5 +1,7 @@
 # MapLogin Frontend Documentation Implementation Plan
 
+> **보관 상태:** 완료된 역사적 실행 계획이다. 현재 프런트엔드 계약과 문서 읽기 순서는 [MapLogin 프런트엔드 구현 문서](../../frontend/index.md)를 따른다. 아래 체크박스는 당시 계획 형식을 보존한 것이며 현재 작업 상태를 나타내지 않는다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 후속 Codex가 `poc/map-login/`을 기준 구현으로 읽고 실제 제품 프런트엔드의 MapLogin 렌더러를 구현할 수 있도록 `docs/frontend/`에 세 문서로 된 기술 계약을 작성한다.
