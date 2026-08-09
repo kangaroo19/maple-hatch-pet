@@ -8,6 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+next-env.d.ts
+*.tsbuildinfo
+.next
+coverage
+playwright-report
+test-results
 dist
 dist-ssr
 *.local

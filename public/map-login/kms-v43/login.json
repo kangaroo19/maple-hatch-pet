@@ -1,0 +1,40 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "login": "UI.wz/Login.img/Title",
+    "patchVersion": 43,
+    "keySource": "ZLZ.dll"
+  },
+  "title": {
+    "asset": "/map-login/kms-v43/login/ms-title.png",
+    "width": 397,
+    "height": 219,
+    "source": "UI.wz/Login.img/Title/MSTitle"
+  },
+  "login": {
+    "normal": {
+      "asset": "/map-login/kms-v43/login/bt-login-normal.png",
+      "width": 95,
+      "height": 48,
+      "source": "UI.wz/Login.img/Title/BtLogin/normal"
+    },
+    "mouseOver": {
+      "asset": "/map-login/kms-v43/login/bt-login-mouse-over.png",
+      "width": 95,
+      "height": 48,
+      "source": "UI.wz/Login.img/Title/BtLogin/mouseOver"
+    },
+    "pressed": {
+      "asset": "/map-login/kms-v43/login/bt-login-pressed.png",
+      "width": 95,
+      "height": 48,
+      "source": "UI.wz/Login.img/Title/BtLogin/pressed"
+    },
+    "disabled": {
+      "asset": "/map-login/kms-v43/login/bt-login-disabled.png",
+      "width": 95,
+      "height": 48,
+      "source": "UI.wz/Login.img/Title/BtLogin/disabled"
+    }
+  }
+}

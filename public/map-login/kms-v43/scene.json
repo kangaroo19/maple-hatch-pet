@@ -1,0 +1,3733 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "map": "UI.wz/MapLogin.img",
+    "back": "Map.wz/Back/login.img",
+    "object": "Map.wz/Obj/login.img",
+    "patchVersion": 43,
+    "keySource": "ZLZ.dll",
+    "library": "@tybys/wz@1.7.1"
+  },
+  "map": {
+    "width": 849,
+    "height": 2349,
+    "centerX": 362,
+    "centerY": 2162
+  },
+  "backgrounds": [
+    {
+      "id": "0",
+      "source": "Map.wz/Back/login.img/back/0",
+      "order": 0,
+      "front": 0,
+      "ani": 0,
+      "no": "0",
+      "x": -400,
+      "y": -600,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 1,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0000.png",
+          "width": 20,
+          "height": 600,
+          "delay": 100,
+          "origin": {
+            "x": 10,
+            "y": 300
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "source": "Map.wz/Back/login.img/back/1",
+      "order": 1,
+      "front": 0,
+      "ani": 0,
+      "no": "1",
+      "x": -400,
+      "y": -1200,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 1,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0001.png",
+          "width": 20,
+          "height": 600,
+          "delay": 100,
+          "origin": {
+            "x": 10,
+            "y": 300
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "source": "Map.wz/Back/login.img/back/2",
+      "order": 2,
+      "front": 0,
+      "ani": 0,
+      "no": "2",
+      "x": -400,
+      "y": -1800,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 1,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0002.png",
+          "width": 20,
+          "height": 600,
+          "delay": 100,
+          "origin": {
+            "x": 10,
+            "y": 300
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "source": "Map.wz/Back/login.img/back/3",
+      "order": 3,
+      "front": 0,
+      "ani": 0,
+      "no": "3",
+      "x": -21,
+      "y": -1847,
+      "z": 0,
+      "rx": -5,
+      "ry": -100,
+      "cx": 1000,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0003.png",
+          "width": 224,
+          "height": 102,
+          "delay": 100,
+          "origin": {
+            "x": 112,
+            "y": 51
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "source": "Map.wz/Back/login.img/back/3",
+      "order": 4,
+      "front": 0,
+      "ani": 0,
+      "no": "3",
+      "x": -111,
+      "y": -1442,
+      "z": 0,
+      "rx": -4,
+      "ry": -100,
+      "cx": 800,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0003.png",
+          "width": 224,
+          "height": 102,
+          "delay": 100,
+          "origin": {
+            "x": 112,
+            "y": 51
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "source": "Map.wz/Back/login.img/back/9",
+      "order": 5,
+      "front": 0,
+      "ani": 0,
+      "no": "9",
+      "x": -239,
+      "y": -1825,
+      "z": 0,
+      "rx": -6,
+      "ry": -100,
+      "cx": 1000,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0004.png",
+          "width": 492,
+          "height": 235,
+          "delay": 100,
+          "origin": {
+            "x": 246,
+            "y": 117
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "8",
+      "source": "Map.wz/Back/login.img/back/5",
+      "order": 6,
+      "front": 0,
+      "ani": 0,
+      "no": "5",
+      "x": -48,
+      "y": -1106,
+      "z": 0,
+      "rx": -4,
+      "ry": -100,
+      "cx": 800,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0005.png",
+          "width": 473,
+          "height": 205,
+          "delay": 100,
+          "origin": {
+            "x": 241,
+            "y": 148
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "9",
+      "source": "Map.wz/Back/login.img/back/10",
+      "order": 7,
+      "front": 0,
+      "ani": 0,
+      "no": "10",
+      "x": -245,
+      "y": -1483,
+      "z": 0,
+      "rx": -7,
+      "ry": -100,
+      "cx": 850,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0006.png",
+          "width": 358,
+          "height": 275,
+          "delay": 100,
+          "origin": {
+            "x": 179,
+            "y": 137
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "14",
+      "source": "Map.wz/Back/login.img/ani/1",
+      "order": 8,
+      "front": 0,
+      "ani": 1,
+      "no": "1",
+      "x": -197,
+      "y": -1341,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0007.png",
+          "width": 10,
+          "height": 7,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0008.png",
+          "width": 9,
+          "height": 5,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0009.png",
+          "width": 8,
+          "height": 8,
+          "delay": 80,
+          "origin": {
+            "x": 2,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "15",
+      "source": "Map.wz/Back/login.img/ani/1",
+      "order": 9,
+      "front": 0,
+      "ani": 1,
+      "no": "1",
+      "x": -221,
+      "y": -1350,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0007.png",
+          "width": 10,
+          "height": 7,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0008.png",
+          "width": 9,
+          "height": 5,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0009.png",
+          "width": 8,
+          "height": 8,
+          "delay": 80,
+          "origin": {
+            "x": 2,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "source": "Map.wz/Back/login.img/ani/2",
+      "order": 10,
+      "front": 0,
+      "ani": 1,
+      "no": "2",
+      "x": -234,
+      "y": -1333,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0010.png",
+          "width": 12,
+          "height": 9,
+          "delay": 80,
+          "origin": {
+            "x": 5,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0011.png",
+          "width": 11,
+          "height": 6,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0012.png",
+          "width": 11,
+          "height": 10,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": 1
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "17",
+      "source": "Map.wz/Back/login.img/ani/1",
+      "order": 11,
+      "front": 0,
+      "ani": 1,
+      "no": "1",
+      "x": -252,
+      "y": -1346,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0007.png",
+          "width": 10,
+          "height": 7,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0008.png",
+          "width": 9,
+          "height": 5,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0009.png",
+          "width": 8,
+          "height": 8,
+          "delay": 80,
+          "origin": {
+            "x": 2,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "source": "Map.wz/Back/login.img/back/5",
+      "order": 12,
+      "front": 0,
+      "ani": 0,
+      "no": "5",
+      "x": 380,
+      "y": -1594,
+      "z": 0,
+      "rx": -5,
+      "ry": -100,
+      "cx": 750,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0005.png",
+          "width": 473,
+          "height": 205,
+          "delay": 100,
+          "origin": {
+            "x": 241,
+            "y": 148
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "source": "Map.wz/Back/login.img/back/6",
+      "order": 13,
+      "front": 0,
+      "ani": 0,
+      "no": "6",
+      "x": 390,
+      "y": -1642,
+      "z": 0,
+      "rx": -7,
+      "ry": -100,
+      "cx": 900,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0013.png",
+          "width": 301,
+          "height": 142,
+          "delay": 100,
+          "origin": {
+            "x": 116,
+            "y": 51
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "13",
+      "source": "Map.wz/Back/login.img/ani/2",
+      "order": 14,
+      "front": 0,
+      "ani": 1,
+      "no": "2",
+      "x": -212,
+      "y": -1366,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0010.png",
+          "width": 12,
+          "height": 9,
+          "delay": 80,
+          "origin": {
+            "x": 5,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0011.png",
+          "width": 11,
+          "height": 6,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0012.png",
+          "width": 11,
+          "height": 10,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": 1
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "12",
+      "source": "Map.wz/Back/login.img/ani/0",
+      "order": 15,
+      "front": 0,
+      "ani": 1,
+      "no": "0",
+      "x": -182,
+      "y": -1354,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0014.png",
+          "width": 10,
+          "height": 7,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0015.png",
+          "width": 9,
+          "height": 5,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0016.png",
+          "width": 8,
+          "height": 8,
+          "delay": 80,
+          "origin": {
+            "x": 2,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "11",
+      "source": "Map.wz/Back/login.img/back/4",
+      "order": 16,
+      "front": 0,
+      "ani": 0,
+      "no": "4",
+      "x": 324,
+      "y": -838,
+      "z": 0,
+      "rx": -4,
+      "ry": -100,
+      "cx": 700,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0017.png",
+          "width": 281,
+          "height": 102,
+          "delay": 100,
+          "origin": {
+            "x": 140,
+            "y": 51
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "10",
+      "source": "Map.wz/Back/login.img/back/8",
+      "order": 17,
+      "front": 0,
+      "ani": 0,
+      "no": "8",
+      "x": 243,
+      "y": -1638,
+      "z": 0,
+      "rx": -5,
+      "ry": -100,
+      "cx": 1200,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0018.png",
+          "width": 291,
+          "height": 165,
+          "delay": 100,
+          "origin": {
+            "x": 120,
+            "y": 81
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "18",
+      "source": "Map.wz/Back/login.img/ani/0",
+      "order": 18,
+      "front": 0,
+      "ani": 1,
+      "no": "0",
+      "x": -264,
+      "y": -1327,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0014.png",
+          "width": 10,
+          "height": 7,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0015.png",
+          "width": 9,
+          "height": 5,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0016.png",
+          "width": 8,
+          "height": 8,
+          "delay": 80,
+          "origin": {
+            "x": 2,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "19",
+      "source": "Map.wz/Back/login.img/ani/3",
+      "order": 19,
+      "front": 0,
+      "ani": 1,
+      "no": "3",
+      "x": -287,
+      "y": -1342,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0019.png",
+          "width": 12,
+          "height": 9,
+          "delay": 80,
+          "origin": {
+            "x": 5,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0020.png",
+          "width": 11,
+          "height": 6,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0021.png",
+          "width": 11,
+          "height": 10,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": 1
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "20",
+      "source": "Map.wz/Back/login.img/ani/0",
+      "order": 20,
+      "front": 0,
+      "ani": 1,
+      "no": "0",
+      "x": -307,
+      "y": -1336,
+      "z": 0,
+      "rx": 12,
+      "ry": -100,
+      "cx": 1100,
+      "cy": 0,
+      "type": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0014.png",
+          "width": 10,
+          "height": 7,
+          "delay": 80,
+          "origin": {
+            "x": 4,
+            "y": -3
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0015.png",
+          "width": 9,
+          "height": 5,
+          "delay": 80,
+          "origin": {
+            "x": 3,
+            "y": -2
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0016.png",
+          "width": 8,
+          "height": 8,
+          "delay": 80,
+          "origin": {
+            "x": 2,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "22",
+      "source": "Map.wz/Back/login.img/back/12",
+      "order": 21,
+      "front": 0,
+      "ani": 0,
+      "no": "12",
+      "x": 5,
+      "y": -447,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0022.png",
+          "width": 790,
+          "height": 294,
+          "delay": 100,
+          "origin": {
+            "x": 395,
+            "y": 147
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "23",
+      "source": "Map.wz/Back/login.img/back/13",
+      "order": 22,
+      "front": 0,
+      "ani": 0,
+      "no": "13",
+      "x": -181,
+      "y": -818,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0023.png",
+          "width": 438,
+          "height": 448,
+          "delay": 100,
+          "origin": {
+            "x": 219,
+            "y": 224
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "24",
+      "source": "Map.wz/Back/login.img/back/14",
+      "order": 23,
+      "front": 0,
+      "ani": 0,
+      "no": "14",
+      "x": -7,
+      "y": -1122,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0024.png",
+          "width": 751,
+          "height": 160,
+          "delay": 100,
+          "origin": {
+            "x": 375,
+            "y": 80
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "25",
+      "source": "Map.wz/Back/login.img/back/15",
+      "order": 24,
+      "front": 0,
+      "ani": 0,
+      "no": "15",
+      "x": -179,
+      "y": -1434,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0025.png",
+          "width": 408,
+          "height": 463,
+          "delay": 100,
+          "origin": {
+            "x": 204,
+            "y": 231
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "26",
+      "source": "Map.wz/Back/login.img/back/16",
+      "order": 25,
+      "front": 0,
+      "ani": 0,
+      "no": "16",
+      "x": -132,
+      "y": -1719,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0026.png",
+          "width": 500,
+          "height": 108,
+          "delay": 100,
+          "origin": {
+            "x": 250,
+            "y": 54
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "27",
+      "source": "Map.wz/Back/login.img/back/17",
+      "order": 26,
+      "front": 0,
+      "ani": 0,
+      "no": "17",
+      "x": -172,
+      "y": -1857,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0027.png",
+          "width": 432,
+          "height": 167,
+          "delay": 100,
+          "origin": {
+            "x": 216,
+            "y": 83
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "28",
+      "source": "Map.wz/Back/login.img/back/18",
+      "order": 27,
+      "front": 0,
+      "ani": 0,
+      "no": "18",
+      "x": 17,
+      "y": -900,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0028.png",
+          "width": 514,
+          "height": 160,
+          "delay": 100,
+          "origin": {
+            "x": 400,
+            "y": 1200
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "21",
+      "source": "Map.wz/Back/login.img/back/11",
+      "order": 28,
+      "front": 0,
+      "ani": 0,
+      "no": "11",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "rx": -100,
+      "ry": -100,
+      "cx": 0,
+      "cy": 0,
+      "type": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0029.png",
+          "width": 800,
+          "height": 600,
+          "delay": 100,
+          "origin": {
+            "x": 400,
+            "y": 300
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "id": "0-0",
+      "source": "Map.wz/Obj/login.img/Title/logo/0",
+      "layer": 0,
+      "order": 0,
+      "x": 19,
+      "y": -183,
+      "z": 3,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0030.png",
+          "width": 397,
+          "height": 219,
+          "delay": 8000,
+          "origin": {
+            "x": 198,
+            "y": 109
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0031.png",
+          "width": 397,
+          "height": 219,
+          "delay": 100,
+          "origin": {
+            "x": 198,
+            "y": 109
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-1",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/0",
+      "layer": 0,
+      "order": 1,
+      "x": 33,
+      "y": -639,
+      "z": 9,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0032.png",
+          "width": 656,
+          "height": 499,
+          "delay": 100,
+          "origin": {
+            "x": 328,
+            "y": 249
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-2",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/1",
+      "layer": 0,
+      "order": 2,
+      "x": 132,
+      "y": -559,
+      "z": 10,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0033.png",
+          "width": 109,
+          "height": 49,
+          "delay": 6000,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0034.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0035.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0036.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0037.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0038.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0039.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0040.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0041.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0042.png",
+          "width": 109,
+          "height": 49,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0043.png",
+          "width": 157,
+          "height": 58,
+          "delay": 120,
+          "origin": {
+            "x": 53,
+            "y": 53
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-4",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/3",
+      "layer": 0,
+      "order": 4,
+      "x": -4,
+      "y": -578,
+      "z": 10,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0054.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 15
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0055.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 14
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0056.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 13
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0057.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 12
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0058.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 11
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0059.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 10
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0060.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 11
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0061.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 12
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0062.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 13
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0063.png",
+          "width": 18,
+          "height": 7,
+          "delay": 180,
+          "origin": {
+            "x": 8,
+            "y": 14
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-5",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/4",
+      "layer": 0,
+      "order": 5,
+      "x": -96,
+      "y": -630,
+      "z": 10,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0064.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 20
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0065.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 19
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0066.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 18
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0067.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 17
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0068.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 16
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0069.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 15
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0070.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 16
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0071.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 17
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0072.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 18
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0073.png",
+          "width": 32,
+          "height": 10,
+          "delay": 120,
+          "origin": {
+            "x": 15,
+            "y": 19
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-7",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/6",
+      "layer": 0,
+      "order": 7,
+      "x": 39,
+      "y": -450,
+      "z": 10,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0075.png",
+          "width": 43,
+          "height": 70,
+          "delay": 5000,
+          "origin": {
+            "x": 23,
+            "y": 73
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0076.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 81
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0077.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 89
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0078.png",
+          "width": 43,
+          "height": 68,
+          "delay": 90,
+          "origin": {
+            "x": 23,
+            "y": 93
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0079.png",
+          "width": 43,
+          "height": 68,
+          "delay": 90,
+          "origin": {
+            "x": 23,
+            "y": 97
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0080.png",
+          "width": 43,
+          "height": 68,
+          "delay": 120,
+          "origin": {
+            "x": 23,
+            "y": 100
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0081.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 99
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0082.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 95
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0083.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 83
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0084.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 73
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0085.png",
+          "width": 43,
+          "height": 70,
+          "delay": 1000,
+          "origin": {
+            "x": 23,
+            "y": 73
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0076.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 81
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "1",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0077.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 89
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "2",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0078.png",
+          "width": 43,
+          "height": 68,
+          "delay": 90,
+          "origin": {
+            "x": 23,
+            "y": 93
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "3",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0079.png",
+          "width": 43,
+          "height": 68,
+          "delay": 90,
+          "origin": {
+            "x": 23,
+            "y": 97
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "4",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0080.png",
+          "width": 43,
+          "height": 68,
+          "delay": 120,
+          "origin": {
+            "x": 23,
+            "y": 100
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "5",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0081.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 99
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "6",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0082.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 95
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "7",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0083.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 83
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "8",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0084.png",
+          "width": 43,
+          "height": 68,
+          "delay": 60,
+          "origin": {
+            "x": 23,
+            "y": 73
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "9",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0085.png",
+          "width": 43,
+          "height": 70,
+          "delay": 1000,
+          "origin": {
+            "x": 23,
+            "y": 73
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "10",
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-8",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/7",
+      "layer": 0,
+      "order": 8,
+      "x": -17,
+      "y": -450,
+      "z": 10,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0086.png",
+          "width": 39,
+          "height": 72,
+          "delay": 3000,
+          "origin": {
+            "x": 18,
+            "y": 75
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0087.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 80
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0088.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 84
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0089.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 88
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0090.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 92
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0091.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 96
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0092.png",
+          "width": 39,
+          "height": 70,
+          "delay": 150,
+          "origin": {
+            "x": 18,
+            "y": 98
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0093.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 93
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0094.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 88
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0095.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 75
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0096.png",
+          "width": 39,
+          "height": 72,
+          "delay": 100,
+          "origin": {
+            "x": 18,
+            "y": 75
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0087.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 80
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "1",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0088.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 84
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "2",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0089.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 88
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "3",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0090.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 92
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "4",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0091.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 96
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "5",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0092.png",
+          "width": 39,
+          "height": 70,
+          "delay": 150,
+          "origin": {
+            "x": 18,
+            "y": 98
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "6",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0093.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 93
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "7",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0094.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 88
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "8",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0095.png",
+          "width": 39,
+          "height": 70,
+          "delay": 60,
+          "origin": {
+            "x": 18,
+            "y": 75
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "9",
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0096.png",
+          "width": 39,
+          "height": 72,
+          "delay": 100,
+          "origin": {
+            "x": 18,
+            "y": 75
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": "10",
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-3",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/2",
+      "layer": 0,
+      "order": 3,
+      "x": 119,
+      "y": -426,
+      "z": 11,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0044.png",
+          "width": 245,
+          "height": 236,
+          "delay": 180,
+          "origin": {
+            "x": 105,
+            "y": 275
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0045.png",
+          "width": 265,
+          "height": 239,
+          "delay": 180,
+          "origin": {
+            "x": 124,
+            "y": 274
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0046.png",
+          "width": 268,
+          "height": 242,
+          "delay": 180,
+          "origin": {
+            "x": 127,
+            "y": 274
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0047.png",
+          "width": 270,
+          "height": 243,
+          "delay": 180,
+          "origin": {
+            "x": 128,
+            "y": 274
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0048.png",
+          "width": 270,
+          "height": 245,
+          "delay": 180,
+          "origin": {
+            "x": 128,
+            "y": 275
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0049.png",
+          "width": 270,
+          "height": 244,
+          "delay": 180,
+          "origin": {
+            "x": 127,
+            "y": 274
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0050.png",
+          "width": 268,
+          "height": 244,
+          "delay": 180,
+          "origin": {
+            "x": 126,
+            "y": 274
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0051.png",
+          "width": 265,
+          "height": 244,
+          "delay": 180,
+          "origin": {
+            "x": 124,
+            "y": 274
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0052.png",
+          "width": 244,
+          "height": 242,
+          "delay": 180,
+          "origin": {
+            "x": 105,
+            "y": 275
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0053.png",
+          "width": 245,
+          "height": 240,
+          "delay": 180,
+          "origin": {
+            "x": 105,
+            "y": 275
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-6",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/5",
+      "layer": 0,
+      "order": 6,
+      "x": 24,
+      "y": -479,
+      "z": 12,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0074.png",
+          "width": 643,
+          "height": 126,
+          "delay": 100,
+          "origin": {
+            "x": 321,
+            "y": 63
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-9",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/9",
+      "layer": 0,
+      "order": 9,
+      "x": -90,
+      "y": -461,
+      "z": 12,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0097.png",
+          "width": 25,
+          "height": 9,
+          "delay": 360,
+          "origin": {
+            "x": 12,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0098.png",
+          "width": 4,
+          "height": 4,
+          "delay": 120,
+          "origin": {
+            "x": 0,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0099.png",
+          "width": 25,
+          "height": 9,
+          "delay": 120,
+          "origin": {
+            "x": 12,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0100.png",
+          "width": 4,
+          "height": 4,
+          "delay": 120,
+          "origin": {
+            "x": 0,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0101.png",
+          "width": 25,
+          "height": 9,
+          "delay": 120,
+          "origin": {
+            "x": 12,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0102.png",
+          "width": 4,
+          "height": 4,
+          "delay": 120,
+          "origin": {
+            "x": 0,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-10",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/8",
+      "layer": 0,
+      "order": 10,
+      "x": -151,
+      "y": -463,
+      "z": 12,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0103.png",
+          "width": 25,
+          "height": 9,
+          "delay": 90,
+          "origin": {
+            "x": 12,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0104.png",
+          "width": 4,
+          "height": 4,
+          "delay": 360,
+          "origin": {
+            "x": 0,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0105.png",
+          "width": 25,
+          "height": 9,
+          "delay": 90,
+          "origin": {
+            "x": 12,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0106.png",
+          "width": 4,
+          "height": 4,
+          "delay": 360,
+          "origin": {
+            "x": 0,
+            "y": 4
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-11",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/11",
+      "layer": 0,
+      "order": 11,
+      "x": -199,
+      "y": -570,
+      "z": 14,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0107.png",
+          "width": 96,
+          "height": 61,
+          "delay": 1000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0108.png",
+          "width": 96,
+          "height": 61,
+          "delay": 4000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0109.png",
+          "width": 96,
+          "height": 61,
+          "delay": 3000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-12",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/13",
+      "layer": 0,
+      "order": 12,
+      "x": 248,
+      "y": -559,
+      "z": 15,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0110.png",
+          "width": 96,
+          "height": 61,
+          "delay": 1500,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0111.png",
+          "width": 96,
+          "height": 61,
+          "delay": 4000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0112.png",
+          "width": 96,
+          "height": 61,
+          "delay": 3000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "0-13",
+      "source": "Map.wz/Obj/login.img/WorldSelect/summer/10",
+      "layer": 0,
+      "order": 13,
+      "x": -101,
+      "y": -584,
+      "z": 15,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0113.png",
+          "width": 96,
+          "height": 61,
+          "delay": 100,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0114.png",
+          "width": 96,
+          "height": 61,
+          "delay": 4000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0115.png",
+          "width": 96,
+          "height": 61,
+          "delay": 3000,
+          "origin": {
+            "x": 48,
+            "y": 30
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1-1",
+      "source": "Map.wz/Obj/login.img/WorldSelect/signboard/0",
+      "layer": 1,
+      "order": 14,
+      "x": 59,
+      "y": -888,
+      "z": 0,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0116.png",
+          "width": 741,
+          "height": 171,
+          "delay": 100,
+          "origin": {
+            "x": 373,
+            "y": 85
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1-2",
+      "source": "Map.wz/Obj/login.img/WorldSelect/signboard/2",
+      "layer": 1,
+      "order": 15,
+      "x": 42,
+      "y": -753,
+      "z": 2,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0117.png",
+          "width": 513,
+          "height": 152,
+          "delay": 100,
+          "origin": {
+            "x": 256,
+            "y": 76
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1-3",
+      "source": "Map.wz/Obj/login.img/WorldSelect/signboard/1",
+      "layer": 1,
+      "order": 16,
+      "x": 58,
+      "y": -1044,
+      "z": 3,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0118.png",
+          "width": 394,
+          "height": 146,
+          "delay": 100,
+          "origin": {
+            "x": 197,
+            "y": 73
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1-4",
+      "source": "Map.wz/Obj/login.img/CharSelect/signboard/0",
+      "layer": 1,
+      "order": 17,
+      "x": 253,
+      "y": -1258,
+      "z": 3,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0119.png",
+          "width": 133,
+          "height": 238,
+          "delay": 100,
+          "origin": {
+            "x": 66,
+            "y": 119
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1-0",
+      "source": "Map.wz/Obj/login.img/NewChar/signboard/0",
+      "layer": 1,
+      "order": 18,
+      "x": 214,
+      "y": -1846,
+      "z": 3,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0120.png",
+          "width": 201,
+          "height": 332,
+          "delay": 100,
+          "origin": {
+            "x": 100,
+            "y": 166
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "1-5",
+      "source": "Map.wz/Obj/login.img/Title/signboard/0",
+      "layer": 1,
+      "order": 19,
+      "x": 137,
+      "y": 21,
+      "z": 3,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0121.png",
+          "width": 368,
+          "height": 236,
+          "delay": 100,
+          "origin": {
+            "x": 184,
+            "y": 118
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4-4",
+      "source": "Map.wz/Obj/login.img/Title/effect/4",
+      "layer": 4,
+      "order": 24,
+      "x": 180,
+      "y": -304,
+      "z": 1,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0132.png",
+          "width": 366,
+          "height": 348,
+          "delay": 2800,
+          "origin": {
+            "x": 147,
+            "y": 26
+          },
+          "z": 0,
+          "a0": 10,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0133.png",
+          "width": 366,
+          "height": 348,
+          "delay": 2800,
+          "origin": {
+            "x": 147,
+            "y": 26
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 10,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4-1",
+      "source": "Map.wz/Obj/login.img/Title/effect/1",
+      "layer": 4,
+      "order": 21,
+      "x": 189,
+      "y": -304,
+      "z": 2,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0125.png",
+          "width": 355,
+          "height": 285,
+          "delay": 2500,
+          "origin": {
+            "x": 152,
+            "y": 37
+          },
+          "z": 0,
+          "a0": 10,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0126.png",
+          "width": 355,
+          "height": 285,
+          "delay": 2500,
+          "origin": {
+            "x": 152,
+            "y": 37
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 10,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4-3",
+      "source": "Map.wz/Obj/login.img/Title/effect/3",
+      "layer": 4,
+      "order": 23,
+      "x": 186,
+      "y": -304,
+      "z": 2,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0130.png",
+          "width": 262,
+          "height": 293,
+          "delay": 3000,
+          "origin": {
+            "x": 9,
+            "y": 14
+          },
+          "z": 0,
+          "a0": 10,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0131.png",
+          "width": 262,
+          "height": 293,
+          "delay": 3000,
+          "origin": {
+            "x": 9,
+            "y": 14
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 10,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4-0",
+      "source": "Map.wz/Obj/login.img/Title/effect/0",
+      "layer": 4,
+      "order": 20,
+      "x": 190,
+      "y": -306,
+      "z": 3,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0122.png",
+          "width": 238,
+          "height": 298,
+          "delay": 1500,
+          "origin": {
+            "x": 0,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0123.png",
+          "width": 238,
+          "height": 298,
+          "delay": 1500,
+          "origin": {
+            "x": 0,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0124.png",
+          "width": 238,
+          "height": 298,
+          "delay": 1000,
+          "origin": {
+            "x": 0,
+            "y": 0
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4-2",
+      "source": "Map.wz/Obj/login.img/Title/effect/2",
+      "layer": 4,
+      "order": 22,
+      "x": 194,
+      "y": -303,
+      "z": 4,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0127.png",
+          "width": 361,
+          "height": 290,
+          "delay": 1700,
+          "origin": {
+            "x": 187,
+            "y": 29
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0128.png",
+          "width": 361,
+          "height": 290,
+          "delay": 1700,
+          "origin": {
+            "x": 187,
+            "y": 29
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0129.png",
+          "width": 361,
+          "height": 290,
+          "delay": 1700,
+          "origin": {
+            "x": 187,
+            "y": 29
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    },
+    {
+      "id": "4-5",
+      "source": "Map.wz/Obj/login.img/Title/effect/5",
+      "layer": 4,
+      "order": 25,
+      "x": 183,
+      "y": -305,
+      "z": 5,
+      "f": 0,
+      "a": 255,
+      "frames": [
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0134.png",
+          "width": 362,
+          "height": 334,
+          "delay": 1000,
+          "origin": {
+            "x": 116,
+            "y": 35
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 255,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0135.png",
+          "width": 362,
+          "height": 334,
+          "delay": 1000,
+          "origin": {
+            "x": 116,
+            "y": 35
+          },
+          "z": 0,
+          "a0": 255,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        },
+        {
+          "asset": "/map-login/kms-v43/assets/asset-0136.png",
+          "width": 362,
+          "height": 334,
+          "delay": 2500,
+          "origin": {
+            "x": 116,
+            "y": 35
+          },
+          "z": 0,
+          "a0": 0,
+          "a1": 0,
+          "uol": null,
+          "inlink": null,
+          "outlink": null
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "backgrounds": 29,
+    "objects": 26,
+    "assets": 137,
+    "animatedBackgrounds": 9,
+    "animatedObjects": 18,
+    "movingBackgrounds": 18,
+    "uolFrames": 20,
+    "linkedFrames": 0
+  }
+}

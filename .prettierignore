@@ -1,0 +1,8 @@
+.next
+coverage
+docs
+node_modules
+playwright-report
+poc
+public/map-login/kms-v43
+test-results

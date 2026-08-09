@@ -1,0 +1,39 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "notice": "UI.wz/Login.img/Notice",
+    "patchVersion": 43,
+    "keySource": "ZLZ.dll",
+    "library": "@tybys/wz@1.7.1"
+  },
+  "frame": {
+    "width": 362,
+    "height": 219,
+    "background": {
+      "asset": "/map-login/kms-v43/assets/asset-0137.png",
+      "width": 362,
+      "height": 219,
+      "source": "UI.wz/Login.img/Notice/backgrnd/1"
+    }
+  },
+  "confirm": {
+    "normal": {
+      "asset": "/map-login/kms-v43/assets/asset-0138.png",
+      "width": 75,
+      "height": 32,
+      "source": "UI.wz/Login.img/Notice/BtYes/normal/0"
+    },
+    "mouseOver": {
+      "asset": "/map-login/kms-v43/assets/asset-0139.png",
+      "width": 75,
+      "height": 34,
+      "source": "UI.wz/Login.img/Notice/BtYes/mouseOver/0"
+    },
+    "pressed": {
+      "asset": "/map-login/kms-v43/assets/asset-0140.png",
+      "width": 75,
+      "height": 34,
+      "source": "UI.wz/Login.img/Notice/BtYes/pressed/0"
+    }
+  }
+}

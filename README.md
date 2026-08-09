@@ -2,7 +2,7 @@
 
 메이플스토리 캐릭터를 기반으로 Codex Pet 스프라이트를 생성하고 설치하는 서비스의 제품 명세 저장소입니다.
 
-현재 제품 구현 코드는 포함하지 않습니다. 제품·API·운영·프런트엔드 계약은 MVP 구현을 바로 시작할 수 있는 기준으로 확정했으며, [`poc/map-login/`](poc/map-login/)에는 MapLogin 장면 렌더링과 공통 경고 UI를 검증하는 실행 가능한 기술 PoC가 포함되어 있습니다.
+현재 저장소에는 확정된 제품·API·운영·프런트엔드 계약에 따른 MVP 구현과 [`poc/map-login/`](poc/map-login/)의 MapLogin 장면 렌더링·공통 경고 UI 기준 구현이 포함되어 있습니다.
 
 현재 구현 기준은 `docs/product-spec/`, `docs/development-environment.md`, `docs/frontend/` 순으로 확인합니다. `docs/superpowers/`의 명세와 계획은 결정 배경을 보존한 역사적 문서이며 현재 기준 문서와 충돌하면 현재 기준 문서를 우선합니다.
 

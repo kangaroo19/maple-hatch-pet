@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/internal/cron/pet-assets",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
