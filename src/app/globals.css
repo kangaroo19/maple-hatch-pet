@@ -82,6 +82,7 @@ a {
 }
 .map-viewport {
   position: relative;
+  container-type: inline-size;
   height: calc(100vh - 150px);
   min-height: 660px;
   overflow-y: auto;
@@ -120,46 +121,46 @@ a {
 }
 .login-panel {
   position: absolute;
-  top: clamp(210px, 42vh, 340px);
-  left: 50%;
-  width: 397px;
-  height: 285px;
-  transform: translate(-50%, -50%);
-  background: url("/map-login/kms-v43/login/ms-title.png") top center no-repeat;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: max(660px, calc(100vh - 150px));
+  pointer-events: none;
+}
+.login-controls {
+  position: absolute;
+  top: 28.7cqw;
+  left: 59.6cqw;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 95px;
+  width: 18cqw;
+  min-width: 202px;
+  max-width: 216px;
+  height: 48px;
+  background: none;
   pointer-events: auto;
-  filter: drop-shadow(0 12px 18px #0009);
 }
-.login-panel label {
-  position: absolute;
-  top: 217px;
-  left: 17px;
-  color: #f7ecd6;
-  text-shadow: 0 1px 2px #000;
-  font:
-    700 12px Dotum,
-    "돋움",
-    sans-serif;
-}
-.login-panel input {
-  position: absolute;
-  top: 235px;
-  left: 12px;
-  width: 272px;
-  height: 29px;
+.login-controls input {
+  min-width: 0;
+  height: 30px;
   padding: 4px 7px;
-  border: 1px solid #8b755a;
-  background: #fffef5;
-  color: #261a11;
+  border: 0;
+  background: #67280333;
+  color: #fff4d5;
+  text-shadow: 0 1px 1px #4a2105;
   font:
     12px Dotum,
     "돋움",
     sans-serif;
-  outline-color: #ca8f31;
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+}
+.login-controls input:focus-visible {
+  outline-color: #fff3a1;
 }
 .nickname-error {
   position: absolute;
-  top: 267px;
-  left: 12px;
+  top: 31px;
+  left: 4px;
   margin: 0;
   color: #ffd0c8;
   text-shadow: 0 1px 2px #000;
@@ -170,8 +171,8 @@ a {
 }
 .lookup-status {
   position: absolute;
-  top: 267px;
-  right: 12px;
+  top: 31px;
+  left: 4px;
   margin: 0;
   color: #e9dcc2;
   text-shadow: 0 1px 2px #000;
@@ -181,9 +182,6 @@ a {
     sans-serif;
 }
 .login-button {
-  position: absolute;
-  top: 225px;
-  left: 296px;
   width: 95px;
   height: 48px;
   padding: 0;

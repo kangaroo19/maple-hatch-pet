@@ -72,3 +72,25 @@ test("privacy and narrow viewport contracts", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "로그인" })).toHaveCount(0);
 });
+
+test("login uses the wooden sign already rendered in the map", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const panel = page.getByRole("form", { name: "캐릭터 로그인" });
+  const controls = panel.locator(".login-controls");
+
+  await expect(panel).toBeVisible();
+  await expect(page.getByRole("img", { name: "MapleStory" })).toHaveCount(0);
+  await expect(panel).toHaveClass(/scene-login-overlay/);
+  await expect(panel.locator(".login-board")).toHaveCount(0);
+  await expect(controls).toBeVisible();
+  await expect(panel.getByRole("textbox", { name: "닉네임" })).toHaveCount(1);
+  await expect(panel.locator('input[type="password"]')).toHaveCount(0);
+
+  const controlsBackground = await controls.evaluate(
+    (element) => getComputedStyle(element).backgroundImage,
+  );
+  expect(controlsBackground).toBe("none");
+});

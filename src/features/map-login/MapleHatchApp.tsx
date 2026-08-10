@@ -250,41 +250,46 @@ export function MapleHatchApp() {
       >
         <div className="login-sticky" hidden={!!character}>
           <form
-            className="login-panel"
+            className="login-panel scene-login-overlay"
             onSubmit={lookup}
             noValidate
             aria-busy={lookupPending}
+            aria-label="캐릭터 로그인"
           >
-            <label htmlFor="nickname">닉네임</label>
-            <input
-              ref={nicknameRef}
-              id="nickname"
-              value={nickname}
-              onChange={(event) => setNickname(event.target.value)}
-              disabled={lookupPending}
-              autoComplete="off"
-              aria-invalid={!!nicknameError}
-              aria-describedby="nickname-error"
-            />
-            <p
-              id="nickname-error"
-              className="nickname-error"
-              aria-live="polite"
-            >
-              {nicknameError}
-            </p>
-            <button
-              ref={lookupButtonRef}
-              className="login-button"
-              type="submit"
-              aria-label="로그인"
-              disabled={lookupPending}
-            >
-              <span className="sr-only">로그인</span>
-            </button>
-            <p className="lookup-status" aria-live="polite">
-              {lookupPending ? "캐릭터 조회 중…" : ""}
-            </p>
+            <div className="login-controls">
+              <label className="sr-only" htmlFor="nickname">
+                닉네임
+              </label>
+              <input
+                ref={nicknameRef}
+                id="nickname"
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
+                disabled={lookupPending}
+                autoComplete="off"
+                aria-invalid={!!nicknameError}
+                aria-describedby="nickname-error"
+              />
+              <p
+                id="nickname-error"
+                className="nickname-error"
+                aria-live="polite"
+              >
+                {nicknameError}
+              </p>
+              <button
+                ref={lookupButtonRef}
+                className="login-button"
+                type="submit"
+                aria-label="로그인"
+                disabled={lookupPending}
+              >
+                <span className="sr-only">로그인</span>
+              </button>
+              <p className="lookup-status" aria-live="polite">
+                {lookupPending ? "캐릭터 조회 중…" : ""}
+              </p>
+            </div>
           </form>
         </div>
         <div
