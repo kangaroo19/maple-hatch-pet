@@ -52,14 +52,14 @@ export function getLoginLayout(scene: MapLoginScene): LoginLayout {
   return {
     panel,
     input: {
-      x: panel.x + 74,
-      y: panel.y + 151,
-      width: 158,
-      height: 24,
+      x: panel.x + 113,
+      y: panel.y + 20,
+      width: 150,
+      height: 27,
     },
     button: {
-      x: panel.x + 244,
-      y: panel.y + 142,
+      x: panel.x + 264,
+      y: panel.y + 20,
       width: 95,
       height: 48,
     },

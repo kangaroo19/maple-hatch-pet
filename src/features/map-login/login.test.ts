@@ -41,6 +41,23 @@ describe("MapLogin first-screen login layout", () => {
     expect(rectsOverlap(layout.button, secondScreenBounds)).toBe(false);
   });
 
+  it("aligns the nickname with the email row and BtLogin with the right slot", () => {
+    const layout = getLoginLayout(scene);
+
+    expect(layout.input).toEqual({
+      x: layout.panel.x + 113,
+      y: layout.panel.y + 20,
+      width: 150,
+      height: 27,
+    });
+    expect(layout.button).toEqual({
+      x: layout.panel.x + 264,
+      y: layout.panel.y + 20,
+      width: 95,
+      height: 48,
+    });
+  });
+
   it("hit-tests the Canvas input and button without overlapping targets", () => {
     const layout = getLoginLayout(scene);
 

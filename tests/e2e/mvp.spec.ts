@@ -27,7 +27,9 @@ async function clickCanvasLoginTarget(
       top: mapViewport.scrollTop / scale - 2162,
     };
     const mapPoint =
-      selectedTarget === "input" ? { x: 106, y: 66 } : { x: 244.5, y: 69 };
+      selectedTarget === "input"
+        ? { x: 141, y: -63.5 }
+        : { x: 264.5, y: -53 };
     const bounds = canvasElement.getBoundingClientRect();
     return {
       x: bounds.left + (mapPoint.x - camera.left) * scale,
