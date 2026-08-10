@@ -27,6 +27,7 @@ export type SceneBackground = {
 
 export type SceneObject = {
   id: string;
+  source: string;
   layer: number;
   order: number;
   x: number;

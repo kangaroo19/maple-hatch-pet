@@ -47,7 +47,7 @@ export function NoticeDialog({
     dialogRef.current?.close();
     onClose();
     requestAnimationFrame(() => {
-      current?.returnFocus?.focus();
+      current?.returnFocus?.focus({ preventScroll: true });
       if (
         current?.selectOnClose &&
         current.returnFocus instanceof HTMLInputElement

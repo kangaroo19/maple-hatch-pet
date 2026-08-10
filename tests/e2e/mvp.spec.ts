@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const character = {
   name: "천짱",
@@ -7,6 +7,44 @@ const character = {
   level: 200,
   imageUrl: "https://open.api.nexon.com/static/maplestory/character/look/abc",
 };
+
+async function clickCanvasLoginTarget(
+  page: Page,
+  target: "input" | "button",
+) {
+  const viewport = page.locator(".map-viewport");
+  const canvas = page.locator("canvas.map-canvas");
+  await expect(viewport).toHaveAttribute("aria-busy", "false");
+  await expect
+    .poll(() => viewport.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(1000);
+  const point = await canvas.evaluate((element, selectedTarget) => {
+    const canvasElement = element as HTMLCanvasElement;
+    const mapViewport = canvasElement.closest(".map-viewport") as HTMLElement;
+    const scale = mapViewport.clientWidth / 849;
+    const camera = {
+      left: -362,
+      top: mapViewport.scrollTop / scale - 2162,
+    };
+    const mapPoint =
+      selectedTarget === "input" ? { x: 106, y: 66 } : { x: 244.5, y: 69 };
+    const bounds = canvasElement.getBoundingClientRect();
+    return {
+      x: bounds.left + (mapPoint.x - camera.left) * scale,
+      y: bounds.top + (mapPoint.y - camera.top) * scale,
+    };
+  }, target);
+  const targetClass = await page.evaluate(
+    ({ x, y }) => (document.elementFromPoint(x, y) as HTMLElement)?.className,
+    point,
+  );
+  if (!targetClass)
+    throw new Error(
+      `Canvas target is outside the viewport: ${JSON.stringify(point)}`,
+    );
+  expect(targetClass).toContain("map-canvas");
+  await page.mouse.click(point.x, point.y);
+}
 
 test("lookup, edit, create, install, invalidate and refresh flow", async ({
   page,
@@ -30,11 +68,16 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
 
   await page.goto("/");
   await expect(page.getByText("Data based on NEXON Open API")).toBeVisible();
-  await page.getByRole("button", { name: "로그인" }).click();
-  await expect(page.getByText("닉네임을 입력해 주세요.")).toBeVisible();
+  await clickCanvasLoginTarget(page, "button");
+  await expect(page.getByRole("alertdialog")).toContainText(
+    "닉네임을 입력해 주세요.",
+  );
+  await page.getByRole("button", { name: "확인" }).click();
+  await expect(page.getByRole("textbox", { name: "닉네임" })).toBeFocused();
 
-  await page.getByLabel("닉네임").fill("천짱");
-  await page.getByRole("button", { name: "로그인" }).click();
+  await clickCanvasLoginTarget(page, "input");
+  await page.keyboard.type("천짱");
+  await clickCanvasLoginTarget(page, "button");
   await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "기본", exact: true }),
@@ -73,24 +116,58 @@ test("privacy and narrow viewport contracts", async ({ page }) => {
   await expect(page.getByRole("button", { name: "로그인" })).toHaveCount(0);
 });
 
-test("login uses the wooden sign already rendered in the map", async ({
-  page,
-}) => {
+test("Canvas login uses the first-screen panel and keeps only a hidden native form", async ({ page }) => {
   await page.goto("/");
 
   const panel = page.getByRole("form", { name: "캐릭터 로그인" });
-  const controls = panel.locator(".login-controls");
 
-  await expect(panel).toBeVisible();
   await expect(page.getByRole("img", { name: "MapleStory" })).toHaveCount(0);
-  await expect(panel).toHaveClass(/scene-login-overlay/);
-  await expect(panel.locator(".login-board")).toHaveCount(0);
-  await expect(controls).toBeVisible();
+  await expect(panel).toHaveClass(/native-login-form/);
+  expect(await panel.boundingBox()).toMatchObject({ width: 1, height: 1 });
   await expect(panel.getByRole("textbox", { name: "닉네임" })).toHaveCount(1);
   await expect(panel.locator('input[type="password"]')).toHaveCount(0);
+  await clickCanvasLoginTarget(page, "input");
+  await expect(panel.getByRole("textbox", { name: "닉네임" })).toBeFocused();
+});
 
-  const controlsBackground = await controls.evaluate(
-    (element) => getComputedStyle(element).backgroundImage,
+test("Canvas input performs one successful lookup without reloading scene assets", async ({
+  page,
+}) => {
+  let sceneRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().endsWith("/map-login/kms-v43/scene.json"))
+      sceneRequests += 1;
+  });
+  await page.route("**/api/characters/lookup", (route) =>
+    route.fulfill({ json: { character, catalogVersion: 1 } }),
   );
-  expect(controlsBackground).toBe("none");
+
+  await page.goto("/");
+  await clickCanvasLoginTarget(page, "input");
+  const initialSceneRequests = sceneRequests;
+  await page.keyboard.insertText("천짱");
+  await clickCanvasLoginTarget(page, "button");
+
+  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
+  expect(sceneRequests).toBe(initialSceneRequests);
+});
+
+test("Canvas login blocks duplicate submissions while lookup is pending", async ({
+  page,
+}) => {
+  let lookupRequests = 0;
+  await page.route("**/api/characters/lookup", async (route) => {
+    lookupRequests += 1;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await route.fulfill({ json: { character, catalogVersion: 1 } });
+  });
+
+  await page.goto("/");
+  await clickCanvasLoginTarget(page, "input");
+  await page.keyboard.insertText("천짱");
+  await clickCanvasLoginTarget(page, "button");
+  await clickCanvasLoginTarget(page, "button");
+
+  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
+  expect(lookupRequests).toBe(1);
 });

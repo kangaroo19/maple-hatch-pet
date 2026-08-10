@@ -47,14 +47,20 @@ function userMessage(value: unknown): string {
 
 export function MapleHatchApp() {
   const viewportRef = useRef<HTMLDivElement>(null);
+  const loginFormRef = useRef<HTMLFormElement>(null);
   const nicknameRef = useRef<HTMLInputElement>(null);
   const lookupButtonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
+  const lookupPendingRef = useRef(false);
+  const initialCameraSetRef = useRef(false);
   const [desktop, setDesktop] = useState<boolean | null>(null);
   const [scene, setScene] = useState<MapLoginScene | null>(null);
   const [character, setCharacter] = useState<Character | null>(null);
   const [nickname, setNickname] = useState("");
-  const [nicknameError, setNicknameError] = useState("");
+  const [selection, setSelection] = useState({ start: 0, end: 0 });
+  const [inputFocused, setInputFocused] = useState(false);
+  const [loginButtonFocused, setLoginButtonFocused] = useState(false);
+  const [loginButtonPressed, setLoginButtonPressed] = useState(false);
   const [lookupPending, setLookupPending] = useState(false);
   const [createPending, setCreatePending] = useState(false);
   const [selectedState, setSelectedState] = useState<PetState>("idle");
@@ -103,11 +109,24 @@ export function MapleHatchApp() {
 
   const handleSceneReady = useCallback((loadedScene: MapLoginScene) => {
     setScene(loadedScene);
-    requestAnimationFrame(() => {
+  }, []);
+
+  useEffect(() => {
+    if (!scene || initialCameraSetRef.current) return;
+    initialCameraSetRef.current = true;
+    const frame = requestAnimationFrame(() => {
       const viewport = viewportRef.current;
       if (viewport)
         viewport.scrollTop = viewport.scrollHeight - viewport.clientHeight;
     });
+    return () => cancelAnimationFrame(frame);
+  }, [scene]);
+
+  const focusNativeControl = useCallback((element: HTMLElement | null) => {
+    const viewport = viewportRef.current;
+    const scrollTop = viewport?.scrollTop;
+    element?.focus({ preventScroll: true });
+    if (viewport && scrollTop !== undefined) viewport.scrollTop = scrollTop;
   }, []);
 
   const selected = states[selectedState];
@@ -139,13 +158,16 @@ export function MapleHatchApp() {
 
   async function lookup(event: React.FormEvent) {
     event.preventDefault();
+    if (lookupPendingRef.current) return;
     const trimmed = nickname.trim();
-    setNicknameError("");
     if (!trimmed) {
-      setNicknameError("닉네임을 입력해 주세요.");
-      nicknameRef.current?.focus();
+      setNotice({
+        message: "닉네임을 입력해 주세요.",
+        returnFocus: nicknameRef.current,
+      });
       return;
     }
+    lookupPendingRef.current = true;
     setLookupPending(true);
     try {
       const response = await fetch("/api/characters/lookup", {
@@ -175,6 +197,7 @@ export function MapleHatchApp() {
         selectOnClose: true,
       });
     } finally {
+      lookupPendingRef.current = false;
       setLookupPending(false);
     }
   }
@@ -216,7 +239,7 @@ export function MapleHatchApp() {
   function reset() {
     setCharacter(null);
     setNickname("");
-    setNicknameError("");
+    setSelection({ start: 0, end: 0 });
     setStates(initialStates());
     setSelectedState("idle");
     setResult(null);
@@ -248,50 +271,59 @@ export function MapleHatchApp() {
         className={`map-viewport ${character ? "is-unlocked" : "is-locked"}`}
         aria-busy={!scene}
       >
-        <div className="login-sticky" hidden={!!character}>
-          <form
-            className="login-panel scene-login-overlay"
-            onSubmit={lookup}
-            noValidate
-            aria-busy={lookupPending}
-            aria-label="캐릭터 로그인"
+        <form
+          ref={loginFormRef}
+          className="native-login-form"
+          onSubmit={lookup}
+          noValidate
+          aria-busy={lookupPending}
+          aria-label="캐릭터 로그인"
+        >
+          <label htmlFor="nickname">닉네임</label>
+          <input
+            ref={nicknameRef}
+            id="nickname"
+            value={nickname}
+            onChange={(event) => {
+              setNickname(event.target.value);
+              setSelection({
+                start: event.target.selectionStart ?? event.target.value.length,
+                end: event.target.selectionEnd ?? event.target.value.length,
+              });
+            }}
+            onSelect={(event) =>
+              setSelection({
+                start: event.currentTarget.selectionStart ?? 0,
+                end: event.currentTarget.selectionEnd ?? 0,
+              })
+            }
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => setInputFocused(false)}
+            disabled={lookupPending}
+            autoComplete="off"
+          />
+          <button
+            ref={lookupButtonRef}
+            type="submit"
+            aria-label="로그인"
+            disabled={lookupPending}
+            onFocus={() => setLoginButtonFocused(true)}
+            onBlur={() => {
+              setLoginButtonFocused(false);
+              setLoginButtonPressed(false);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ")
+                setLoginButtonPressed(true);
+            }}
+            onKeyUp={(event) => {
+              if (event.key === "Enter" || event.key === " ")
+                setLoginButtonPressed(false);
+            }}
           >
-            <div className="login-controls">
-              <label className="sr-only" htmlFor="nickname">
-                닉네임
-              </label>
-              <input
-                ref={nicknameRef}
-                id="nickname"
-                value={nickname}
-                onChange={(event) => setNickname(event.target.value)}
-                disabled={lookupPending}
-                autoComplete="off"
-                aria-invalid={!!nicknameError}
-                aria-describedby="nickname-error"
-              />
-              <p
-                id="nickname-error"
-                className="nickname-error"
-                aria-live="polite"
-              >
-                {nicknameError}
-              </p>
-              <button
-                ref={lookupButtonRef}
-                className="login-button"
-                type="submit"
-                aria-label="로그인"
-                disabled={lookupPending}
-              >
-                <span className="sr-only">로그인</span>
-              </button>
-              <p className="lookup-status" aria-live="polite">
-                {lookupPending ? "캐릭터 조회 중…" : ""}
-              </p>
-            </div>
-          </form>
-        </div>
+            로그인
+          </button>
+        </form>
         <div
           className="map-scroll-space"
           style={{
@@ -303,6 +335,19 @@ export function MapleHatchApp() {
           <MapSceneCanvas
             viewportRef={viewportRef}
             onReady={handleSceneReady}
+            loginState={{
+              visible: !character,
+              nickname,
+              selectionStart: selection.start,
+              selectionEnd: selection.end,
+              inputFocused,
+              buttonFocused: loginButtonFocused,
+              buttonPressed: loginButtonPressed,
+              disabled: lookupPending,
+            }}
+            onInputFocus={() => focusNativeControl(nicknameRef.current)}
+            onButtonFocus={() => focusNativeControl(lookupButtonRef.current)}
+            onButtonActivate={() => loginFormRef.current?.requestSubmit()}
           />
           {character && (
             <section className="creator-area" aria-label="Pet 편집">

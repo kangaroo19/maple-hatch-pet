@@ -82,7 +82,6 @@ a {
 }
 .map-viewport {
   position: relative;
-  container-type: inline-size;
   height: calc(100vh - 150px);
   min-height: 660px;
   overflow-y: auto;
@@ -112,96 +111,16 @@ a {
   padding: 30px;
   color: #ffd1d1;
 }
-.login-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  height: 0;
-  pointer-events: none;
-}
-.login-panel {
-  position: absolute;
-  inset: 0 auto auto 0;
-  width: 100%;
-  height: max(660px, calc(100vh - 150px));
-  pointer-events: none;
-}
-.login-controls {
-  position: absolute;
-  top: 28.7cqw;
-  left: 59.6cqw;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 95px;
-  width: 18cqw;
-  min-width: 202px;
-  max-width: 216px;
-  height: 48px;
-  background: none;
-  pointer-events: auto;
-}
-.login-controls input {
-  min-width: 0;
-  height: 30px;
-  padding: 4px 7px;
-  border: 0;
-  background: #67280333;
-  color: #fff4d5;
-  text-shadow: 0 1px 1px #4a2105;
-  font:
-    12px Dotum,
-    "돋움",
-    sans-serif;
-  outline: 2px solid transparent;
-  outline-offset: -2px;
-}
-.login-controls input:focus-visible {
-  outline-color: #fff3a1;
-}
-.nickname-error {
-  position: absolute;
-  top: 31px;
-  left: 4px;
-  margin: 0;
-  color: #ffd0c8;
-  text-shadow: 0 1px 2px #000;
-  font:
-    700 11px Dotum,
-    "돋움",
-    sans-serif;
-}
-.lookup-status {
-  position: absolute;
-  top: 31px;
-  left: 4px;
-  margin: 0;
-  color: #e9dcc2;
-  text-shadow: 0 1px 2px #000;
-  font:
-    11px Dotum,
-    "돋움",
-    sans-serif;
-}
-.login-button {
-  width: 95px;
-  height: 48px;
+.native-login-form {
+  position: fixed;
+  width: 1px;
+  height: 1px;
   padding: 0;
+  overflow: hidden;
   border: 0;
-  background: transparent url("/map-login/kms-v43/login/bt-login-normal.png")
-    no-repeat;
-  cursor: pointer;
-}
-.login-button:hover,
-.login-button:focus-visible {
-  background-image: url("/map-login/kms-v43/login/bt-login-mouse-over.png");
-  outline: 2px solid #fff3a1;
-  outline-offset: 2px;
-}
-.login-button:active {
-  background-image: url("/map-login/kms-v43/login/bt-login-pressed.png");
-}
-.login-button:disabled {
-  background-image: url("/map-login/kms-v43/login/bt-login-disabled.png");
-  cursor: wait;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 .creator-area {
   position: absolute;
