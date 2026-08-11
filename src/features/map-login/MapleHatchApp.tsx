@@ -88,23 +88,14 @@ export function MapleHatchApp() {
     }
     const start = viewport.scrollTop;
     const startedAt = performance.now();
-    let frame = 0;
-    const finish = () => {
-      cancelAnimationFrame(frame);
-      viewport.scrollTop = destination;
-      for (const event of ["wheel", "pointerdown", "touchstart"])
-        viewport.removeEventListener(event, finish);
-    };
-    for (const event of ["wheel", "pointerdown", "touchstart"])
-      viewport.addEventListener(event, finish, { once: true });
     const tick = (now: number) => {
       const progress = Math.min(1, (now - startedAt) / 1000);
       const eased = 1 - (1 - progress) ** 3;
       viewport.scrollTop = start + (destination - start) * eased;
-      if (progress < 1) frame = requestAnimationFrame(tick);
-      else finish();
+      if (progress < 1) requestAnimationFrame(tick);
+      else viewport.scrollTop = destination;
     };
-    frame = requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   }, []);
 
   const handleSceneReady = useCallback((loadedScene: MapLoginScene) => {
@@ -268,7 +259,7 @@ export function MapleHatchApp() {
       </header>
       <div
         ref={viewportRef}
-        className={`map-viewport ${character ? "is-unlocked" : "is-locked"}`}
+        className="map-viewport"
         aria-busy={!scene}
       >
         <form

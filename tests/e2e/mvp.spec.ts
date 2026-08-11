@@ -173,3 +173,51 @@ test("Canvas login blocks duplicate submissions while lookup is pending", async 
   await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
   expect(lookupRequests).toBe(1);
 });
+
+test("camera transitions only through login and find-another-character actions", async ({
+  page,
+}) => {
+  await page.route("**/api/characters/lookup", (route) =>
+    route.fulfill({ json: { character, catalogVersion: 1 } }),
+  );
+
+  await page.goto("/");
+  const viewport = page.locator(".map-viewport");
+  await clickCanvasLoginTarget(page, "input");
+  const loginScreenTop = await viewport.evaluate((element) => element.scrollTop);
+  await page.mouse.wheel(0, -800);
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBe(
+    loginScreenTop,
+  );
+
+  await page.keyboard.insertText("천짱");
+  await clickCanvasLoginTarget(page, "button");
+  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
+  await expect
+    .poll(() => viewport.evaluate((element) => element.scrollTop))
+    .toBe(0);
+
+  await viewport.hover();
+  await page.mouse.wheel(0, 800);
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBe(0);
+
+  await page.getByRole("button", { name: "다른 캐릭터 찾기" }).click();
+  await expect
+    .poll(() =>
+      viewport.evaluate(
+        (element) =>
+          Math.abs(
+            element.scrollTop -
+              (element.scrollHeight - element.clientHeight),
+          ) < 1,
+      ),
+    )
+    .toBe(true);
+  const returnedLoginTop = await viewport.evaluate(
+    (element) => element.scrollTop,
+  );
+  await page.mouse.wheel(0, -800);
+  expect(await viewport.evaluate((element) => element.scrollTop)).toBe(
+    returnedLoginTop,
+  );
+});

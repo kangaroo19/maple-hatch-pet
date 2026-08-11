@@ -84,16 +84,13 @@ a {
   position: relative;
   height: calc(100vh - 150px);
   min-height: 660px;
-  overflow-y: auto;
+  overflow: hidden;
   overscroll-behavior: contain;
   border: 1px solid #45637c;
   border-radius: 8px;
   background: #050a11;
   box-shadow: 0 24px 72px #000c;
   scrollbar-color: #7198b5 #101923;
-}
-.map-viewport.is-locked {
-  overflow: hidden;
 }
 .map-scroll-space {
   position: relative;

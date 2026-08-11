@@ -402,7 +402,7 @@ export function MapSceneCanvas({
     <canvas
       ref={canvasRef}
       className="map-canvas"
-      aria-label="스크롤 가능한 메이플스토리 로그인 맵"
+      aria-label="메이플스토리 로그인 맵"
       onPointerMove={updatePointer}
       onPointerLeave={(event) => {
         pointerRef.current.hovered = false;
