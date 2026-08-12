@@ -197,6 +197,23 @@ test("Canvas login uses the first-screen panel and keeps only a hidden native fo
   await expect(panel.getByRole("textbox", { name: "닉네임" })).toBeFocused();
 });
 
+test("does not load the original NewChar stat panel asset", async ({
+  page,
+}) => {
+  let statPanelRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().endsWith("/map-login/kms-v43/assets/asset-0120.png"))
+      statPanelRequests += 1;
+  });
+
+  await page.goto("/");
+  await expect(page.locator(".map-viewport")).toHaveAttribute(
+    "aria-busy",
+    "false",
+  );
+  expect(statPanelRequests).toBe(0);
+});
+
 test("Canvas input performs one successful lookup without reloading scene assets", async ({
   page,
 }) => {

@@ -53,6 +53,14 @@ export type FrameSelection = {
   progress: number;
 };
 
+const HIDDEN_PRODUCT_SCENE_OBJECTS = new Set([
+  "Map.wz/Obj/login.img/NewChar/signboard/0",
+]);
+
+export function shouldRenderSceneObject(source: string): boolean {
+  return !HIDDEN_PRODUCT_SCENE_OBJECTS.has(source);
+}
+
 export function frameAtTime(
   frames: SceneFrame[],
   elapsedMs: number,

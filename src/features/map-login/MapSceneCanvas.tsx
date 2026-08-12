@@ -41,6 +41,7 @@ import {
   frameAtTime,
   getBackgroundPosition,
   getTileMode,
+  shouldRenderSceneObject,
   validateScene,
   type MapLoginScene,
   type SceneFrame,
@@ -299,9 +300,13 @@ export function MapSceneCanvas({
       if (!sceneResponse.ok || !loginResponse.ok) throw new Error("manifest");
       const scene = validateScene(await sceneResponse.json());
       const login = validateLogin(await loginResponse.json());
-      const sceneSources = [...scene.backgrounds, ...scene.objects].flatMap(
-        (item) => item.frames.map((frame) => frame.asset),
+      const visibleSceneObjects = scene.objects.filter((item) =>
+        shouldRenderSceneObject(item.source),
       );
+      const sceneSources = [
+        ...scene.backgrounds,
+        ...visibleSceneObjects,
+      ].flatMap((item) => item.frames.map((frame) => frame.asset));
       const loginSources = Object.values(login.login).map(
         (asset) => asset.asset,
       );
@@ -584,7 +589,7 @@ export function MapSceneCanvas({
         };
 
         scene.backgrounds.filter((item) => !item.front).forEach(drawBackground);
-        scene.objects.forEach((object) => {
+        visibleSceneObjects.forEach((object) => {
           const selection = frameAtTime(object.frames, elapsed);
           drawFrame(
             images.get(selection.frame.asset)!,

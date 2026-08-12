@@ -5,6 +5,7 @@ import {
   frameAtTime,
   getBackgroundPosition,
   getTileMode,
+  shouldRenderSceneObject,
   validateScene,
 } from "@/features/map-login/scene";
 
@@ -78,6 +79,15 @@ describe("MapLogin scene math", () => {
     expect(
       alphaForFrame({ frame: frames[0]!, index: 0, progress: 0.5 }, 128),
     ).toBeCloseTo(0.25098, 4);
+  });
+
+  it("hides the original NewChar stat panel without hiding other scene objects", () => {
+    expect(
+      shouldRenderSceneObject("Map.wz/Obj/login.img/NewChar/signboard/0"),
+    ).toBe(false);
+    expect(
+      shouldRenderSceneObject("Map.wz/Obj/login.img/Title/signboard/0"),
+    ).toBe(true);
   });
 });
 
