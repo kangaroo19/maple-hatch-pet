@@ -11,6 +11,7 @@ export type SceneFrame = {
 
 export type SceneBackground = {
   id: string;
+  source: string;
   order: number;
   front: number;
   x: number;

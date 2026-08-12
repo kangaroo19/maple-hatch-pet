@@ -8,10 +8,18 @@ const character = {
   imageUrl: "https://open.api.nexon.com/static/maplestory/character/look/abc",
 };
 
-async function clickCanvasLoginTarget(
-  page: Page,
-  target: "input" | "button",
-) {
+const previewPng = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+zv9pAAAAAElFTkSuQmCC",
+  "base64",
+);
+
+test.beforeEach(async ({ page }) => {
+  await page.route("https://open.api.nexon.com/**", (route) =>
+    route.fulfill({ body: previewPng, contentType: "image/png" }),
+  );
+});
+
+async function clickCanvasLoginTarget(page: Page, target: "input" | "button") {
   const viewport = page.locator(".map-viewport");
   const canvas = page.locator("canvas.map-canvas");
   await expect(viewport).toHaveAttribute("aria-busy", "false");
@@ -27,9 +35,7 @@ async function clickCanvasLoginTarget(
       top: mapViewport.scrollTop / scale - 2162,
     };
     const mapPoint =
-      selectedTarget === "input"
-        ? { x: 141, y: -63.5 }
-        : { x: 264.5, y: -53 };
+      selectedTarget === "input" ? { x: 141, y: -63.5 } : { x: 264.5, y: -53 };
     const bounds = canvasElement.getBoundingClientRect();
     return {
       x: bounds.left + (mapPoint.x - camera.left) * scale,
@@ -45,6 +51,46 @@ async function clickCanvasLoginTarget(
       `Canvas target is outside the viewport: ${JSON.stringify(point)}`,
     );
   expect(targetClass).toContain("map-canvas");
+  await page.mouse.click(point.x, point.y);
+}
+
+async function clickCanvasCreatorTarget(
+  page: Page,
+  target: "next" | "primary" | "secondary" | "close",
+) {
+  const viewport = page.locator(".map-viewport");
+  const canvas = page.locator("canvas.map-canvas");
+  await expect(viewport).toHaveAttribute("aria-busy", "false");
+  await expect
+    .poll(() => viewport.evaluate((element) => element.scrollTop))
+    .toBe(0);
+  const point = await canvas.evaluate((element, selectedTarget) => {
+    const canvasElement = element as HTMLCanvasElement;
+    const mapViewport = canvasElement.closest(".map-viewport") as HTMLElement;
+    const scale = mapViewport.clientWidth / 849;
+    const camera = {
+      left: -362,
+      top: mapViewport.scrollTop / scale - 2162,
+    };
+    const mapPoints = {
+      next: { x: 316.5, y: -1940 },
+      primary: { x: 162, y: -1826 },
+      secondary: { x: 268, y: -1826 },
+      close: { x: 117.5, y: -1802 },
+    };
+    const mapPoint = mapPoints[selectedTarget];
+    const bounds = canvasElement.getBoundingClientRect();
+    return {
+      x: bounds.left + (mapPoint.x - camera.left) * scale,
+      y: bounds.top + (mapPoint.y - camera.top) * scale,
+    };
+  }, target);
+  expect(
+    await page.evaluate(
+      ({ x, y }) => (document.elementFromPoint(x, y) as HTMLElement)?.className,
+      point,
+    ),
+  ).toContain("map-canvas");
   await page.mouse.click(point.x, point.y);
 }
 
@@ -80,21 +126,32 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   await clickCanvasLoginTarget(page, "input");
   await page.keyboard.type("천짱");
   await clickCanvasLoginTarget(page, "button");
-  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "기본", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  const editor = page.getByRole("region", { name: "Pet 편집" });
+  await expect(editor).toContainText("기본 (IDLE) · 1/9");
+  await expect(page.getByRole("button", { name: "이전 상태" })).toBeDisabled();
+  const emotion = page.getByLabel("표정");
+  await emotion.focus();
+  await page.keyboard.press("Enter");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(emotion).toHaveValue("E01");
 
-  await page.getByRole("button", { name: "Pet 만들기" }).click();
-  await expect(page.getByRole("link", { name: "Codex에 설치" })).toBeVisible();
+  await clickCanvasCreatorTarget(page, "primary");
+  await expect(
+    page.getByRole("dialog", { name: "Pet 설치 정보" }),
+  ).toHaveAttribute("open", "");
+  await expect(page.getByRole("link", { name: "Codex에 설치" })).toBeFocused();
   await expect(
     page.getByText("생성된 이미지는 28일 동안 설치에 사용할 수 있어요."),
-  ).toBeVisible();
+  ).toHaveCount(1);
   const deletionLink = page.getByRole("link", { name: "이미지 삭제 요청" });
   await expect(deletionLink).toHaveAttribute("href", /test\.png/);
 
-  await page.getByRole("button", { name: "검토", exact: true }).click();
-  await expect(page.getByRole("link", { name: "Codex에 설치" })).toBeVisible();
+  await clickCanvasCreatorTarget(page, "close");
+  for (let index = 0; index < 8; index += 1)
+    await clickCanvasCreatorTarget(page, "next");
+  await expect(editor).toContainText("검토 (REVIEW) · 9/9");
+  await expect(page.getByRole("button", { name: "설치 정보" })).toHaveCount(1);
   await page.getByLabel("표정").selectOption("E00");
   await expect(page.getByRole("link", { name: "Codex에 설치" })).toHaveCount(0);
 
@@ -116,9 +173,17 @@ test("privacy and narrow viewport contracts", async ({ page }) => {
     page.getByText("너비 1024px 이상의 데스크톱 브라우저에서 이용해 주세요."),
   ).toBeVisible();
   await expect(page.getByRole("button", { name: "로그인" })).toHaveCount(0);
+
+  await page.setViewportSize({ width: 1024, height: 800 });
+  await page.goto("/");
+  await expect(page.getByRole("form", { name: "캐릭터 로그인" })).toHaveCount(
+    1,
+  );
 });
 
-test("Canvas login uses the first-screen panel and keeps only a hidden native form", async ({ page }) => {
+test("Canvas login uses the first-screen panel and keeps only a hidden native form", async ({
+  page,
+}) => {
   await page.goto("/");
 
   const panel = page.getByRole("form", { name: "캐릭터 로그인" });
@@ -150,7 +215,9 @@ test("Canvas input performs one successful lookup without reloading scene assets
   await page.keyboard.insertText("천짱");
   await clickCanvasLoginTarget(page, "button");
 
-  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Pet 편집" })).toContainText(
+    "기본 (IDLE) · 1/9",
+  );
   expect(sceneRequests).toBe(initialSceneRequests);
 });
 
@@ -170,7 +237,9 @@ test("Canvas login blocks duplicate submissions while lookup is pending", async 
   await clickCanvasLoginTarget(page, "button");
   await clickCanvasLoginTarget(page, "button");
 
-  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Pet 편집" })).toContainText(
+    "기본 (IDLE) · 1/9",
+  );
   expect(lookupRequests).toBe(1);
 });
 
@@ -184,7 +253,9 @@ test("camera transitions only through login and find-another-character actions",
   await page.goto("/");
   const viewport = page.locator(".map-viewport");
   await clickCanvasLoginTarget(page, "input");
-  const loginScreenTop = await viewport.evaluate((element) => element.scrollTop);
+  const loginScreenTop = await viewport.evaluate(
+    (element) => element.scrollTop,
+  );
   await page.mouse.wheel(0, -800);
   expect(await viewport.evaluate((element) => element.scrollTop)).toBe(
     loginScreenTop,
@@ -192,7 +263,9 @@ test("camera transitions only through login and find-another-character actions",
 
   await page.keyboard.insertText("천짱");
   await clickCanvasLoginTarget(page, "button");
-  await expect(page.getByRole("heading", { name: "천짱" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Pet 편집" })).toContainText(
+    "기본 (IDLE) · 1/9",
+  );
   await expect
     .poll(() => viewport.evaluate((element) => element.scrollTop))
     .toBe(0);
@@ -201,14 +274,13 @@ test("camera transitions only through login and find-another-character actions",
   await page.mouse.wheel(0, 800);
   expect(await viewport.evaluate((element) => element.scrollTop)).toBe(0);
 
-  await page.getByRole("button", { name: "다른 캐릭터 찾기" }).click();
+  await clickCanvasCreatorTarget(page, "secondary");
   await expect
     .poll(() =>
       viewport.evaluate(
         (element) =>
           Math.abs(
-            element.scrollTop -
-              (element.scrollHeight - element.clientHeight),
+            element.scrollTop - (element.scrollHeight - element.clientHeight),
           ) < 1,
       ),
     )

@@ -1,0 +1,345 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "newChar": "UI.wz/Login.img/NewChar",
+    "basic": "UI.wz/Basic.img",
+    "patchVersion": 43,
+    "keySource": "ZLZ.dll"
+  },
+  "scroll": {
+    "open": [
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-open-0.png",
+        "width": 242,
+        "height": 30,
+        "source": "UI.wz/Login.img/NewChar/scroll/0/0",
+        "delay": 250,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-open-1.png",
+        "width": 242,
+        "height": 169,
+        "source": "UI.wz/Login.img/NewChar/scroll/0/1",
+        "delay": 50,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-open-2.png",
+        "width": 242,
+        "height": 167,
+        "source": "UI.wz/Login.img/NewChar/scroll/0/2",
+        "delay": 50,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-open-3.png",
+        "width": 242,
+        "height": 165,
+        "source": "UI.wz/Login.img/NewChar/scroll/0/3",
+        "delay": 100,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    ],
+    "close": [
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-close-0.png",
+        "width": 242,
+        "height": 165,
+        "source": "UI.wz/Login.img/NewChar/scroll/1/0",
+        "delay": 100,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-close-1.png",
+        "width": 242,
+        "height": 167,
+        "source": "UI.wz/Login.img/NewChar/scroll/1/1",
+        "delay": 30,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-close-2.png",
+        "width": 242,
+        "height": 169,
+        "source": "UI.wz/Login.img/NewChar/scroll/1/2",
+        "delay": 30,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/scroll-close-3.png",
+        "width": 242,
+        "height": 30,
+        "source": "UI.wz/Login.img/NewChar/scroll/1/3",
+        "delay": 1000,
+        "origin": {
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  "arrows": {
+    "left": {
+      "normal": {
+        "asset": "/map-login/kms-v43/new-char/bt-left-normal.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtLeft/normal"
+      },
+      "mouseOver": {
+        "asset": "/map-login/kms-v43/new-char/bt-left-mouse-over.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtLeft/mouseOver"
+      },
+      "pressed": {
+        "asset": "/map-login/kms-v43/new-char/bt-left-pressed.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtLeft/pressed"
+      },
+      "disabled": {
+        "asset": "/map-login/kms-v43/new-char/bt-left-disabled.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtLeft/disabled"
+      }
+    },
+    "right": {
+      "normal": {
+        "asset": "/map-login/kms-v43/new-char/bt-right-normal.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtRight/normal"
+      },
+      "mouseOver": {
+        "asset": "/map-login/kms-v43/new-char/bt-right-mouse-over.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtRight/mouseOver"
+      },
+      "pressed": {
+        "asset": "/map-login/kms-v43/new-char/bt-right-pressed.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtRight/pressed"
+      },
+      "disabled": {
+        "asset": "/map-login/kms-v43/new-char/bt-right-disabled.png",
+        "width": 15,
+        "height": 16,
+        "source": "UI.wz/Login.img/NewChar/BtRight/disabled"
+      }
+    }
+  },
+  "combo": {
+    "normal": [
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-normal-0.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/normal/0"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-normal-1.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/normal/1"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-normal-2.png",
+        "width": 18,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/normal/2"
+      }
+    ],
+    "mouseOver": [
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-mouse-over-0.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/mouseOver/0"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-mouse-over-1.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/mouseOver/1"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-mouse-over-2.png",
+        "width": 18,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/mouseOver/2"
+      }
+    ],
+    "pressed": [
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-pressed-0.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/pressed/0"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-pressed-1.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/pressed/1"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-pressed-2.png",
+        "width": 18,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/pressed/2"
+      }
+    ],
+    "disabled": [
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-disabled-0.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/disabled/0"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-disabled-1.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/disabled/1"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-disabled-2.png",
+        "width": 18,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/disabled/2"
+      }
+    ],
+    "selected": [
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-selected-0.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/selected/0"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-selected-1.png",
+        "width": 5,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/selected/1"
+      },
+      {
+        "asset": "/map-login/kms-v43/new-char/combo-selected-2.png",
+        "width": 18,
+        "height": 17,
+        "source": "UI.wz/Basic.img/ComboBox/selected/2"
+      }
+    ]
+  },
+  "comboButton": {
+    "normal": {
+      "asset": "/map-login/kms-v43/new-char/bt-combo-normal.png",
+      "width": 17,
+      "height": 16,
+      "source": "UI.wz/Basic.img/BtComboBox/normal"
+    },
+    "mouseOver": {
+      "asset": "/map-login/kms-v43/new-char/bt-combo-mouse-over.png",
+      "width": 17,
+      "height": 16,
+      "source": "UI.wz/Basic.img/BtComboBox/mouseOver"
+    },
+    "pressed": {
+      "asset": "/map-login/kms-v43/new-char/bt-combo-pressed.png",
+      "width": 17,
+      "height": 16,
+      "source": "UI.wz/Basic.img/BtComboBox/pressed"
+    },
+    "disabled": {
+      "asset": "/map-login/kms-v43/new-char/bt-combo-disabled.png",
+      "width": 17,
+      "height": 16,
+      "source": "UI.wz/Basic.img/BtComboBox/disabled"
+    }
+  },
+  "tab": {
+    "normal": {
+      "left": {
+        "asset": "/map-login/kms-v43/new-char/tab-normal-left.png",
+        "width": 6,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/left0"
+      },
+      "middle": {
+        "asset": "/map-login/kms-v43/new-char/tab-normal-middle.png",
+        "width": 13,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/middle0"
+      },
+      "right": {
+        "asset": "/map-login/kms-v43/new-char/tab-normal-right.png",
+        "width": 12,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/right0"
+      },
+      "fill": {
+        "asset": "/map-login/kms-v43/new-char/tab-normal-fill.png",
+        "width": 1,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/fill0"
+      }
+    },
+    "selected": {
+      "left": {
+        "asset": "/map-login/kms-v43/new-char/tab-selected-left.png",
+        "width": 6,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/left1"
+      },
+      "middle": {
+        "asset": "/map-login/kms-v43/new-char/tab-selected-middle.png",
+        "width": 13,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/middle1"
+      },
+      "right": {
+        "asset": "/map-login/kms-v43/new-char/tab-selected-right.png",
+        "width": 12,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/right1"
+      },
+      "fill": {
+        "asset": "/map-login/kms-v43/new-char/tab-selected-fill.png",
+        "width": 1,
+        "height": 24,
+        "source": "UI.wz/Basic.img/Tab/fill1"
+      }
+    }
+  },
+  "alert": {
+    "asset": "/map-login/kms-v43/new-char/char-alert.png",
+    "width": 187,
+    "height": 120,
+    "source": "UI.wz/Login.img/NewChar/charAlert"
+  }
+}

@@ -108,175 +108,22 @@ a {
   padding: 30px;
   color: #ffd1d1;
 }
-.native-login-form {
+.native-login-form,
+.native-creator-form,
+.native-install-dialog {
   position: fixed;
   width: 1px;
   height: 1px;
   padding: 0;
+  margin: -1px;
   overflow: hidden;
   border: 0;
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
 }
-.creator-area {
-  position: absolute;
-  z-index: 5;
-  top: 28px;
-  left: 50%;
-  display: grid;
-  grid-template-columns: minmax(390px, 0.9fr) minmax(470px, 1.1fr);
-  gap: 22px;
-  width: min(1040px, calc(100% - 40px));
-  transform: translateX(-50%);
-}
-.character-side,
-.editor-panel {
-  border: 1px solid #dfc178;
-  border-radius: 10px;
-  background: linear-gradient(#fff9e9f2, #ead8b8f2);
-  color: #33261b;
-  box-shadow: 0 18px 45px #000a;
-}
-.character-side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 18px 24px 22px;
-  text-align: center;
-}
-.character-stage {
-  width: 100%;
-  height: 390px;
-  overflow: hidden;
-  border-radius: 8px;
-  background: radial-gradient(circle, #91ddf088, transparent 60%);
-}
-.character-stage img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  image-rendering: auto;
-}
-.character-stage .flip-character {
-  transform: scaleX(-1);
-}
-.character-side h2 {
-  margin: 4px 0;
-  font-size: 25px;
-}
-.character-side p {
-  margin: 0 0 8px;
-  color: #69533d;
-}
-.character-side small {
-  color: #806b55;
-}
-.editor-panel {
-  padding: 24px;
-}
-.eyebrow {
-  margin: 0 0 5px;
-  color: #815d29;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-}
-.editor-panel h2 {
-  margin: 0 0 18px;
-  font-size: 22px;
-}
-.state-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-}
-.state-grid button {
-  min-height: 38px;
-  border: 1px solid #ab8a52;
-  border-radius: 5px;
-  background: #f6e8c9;
-  color: #4b3826;
-  cursor: pointer;
-}
-.state-grid button[aria-pressed="true"] {
-  border-color: #6c461b;
-  background: #8d5c25;
-  color: #fff9e9;
-  box-shadow: inset 0 0 0 1px #eacb8b;
-}
-.select-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 18px;
-}
-.select-grid label {
-  display: grid;
-  gap: 6px;
-  color: #685039;
-  font-size: 12px;
-  font-weight: 700;
-}
-.select-grid select {
-  width: 100%;
-  height: 40px;
-  padding: 0 10px;
-  border: 1px solid #9f7b49;
-  border-radius: 5px;
-  background: #fffaf0;
-  color: #33261b;
-}
-.select-grid select:disabled {
-  opacity: 0.65;
-}
-.editor-actions {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 9px;
-  margin-top: 20px;
-}
-.editor-actions button,
-.install-button {
-  display: grid;
-  place-items: center;
-  min-height: 44px;
-  border: 1px solid #6f4519;
-  border-radius: 6px;
-  background: linear-gradient(#bc7b32, #724314);
-  color: #fff8df;
-  font-weight: 800;
-  text-decoration: none;
-  cursor: pointer;
-}
-.editor-actions .secondary {
-  background: #e8d7b8;
-  color: #4d3926;
-}
-.editor-actions button:disabled {
-  cursor: wait;
-  opacity: 0.65;
-}
-.install-area {
-  display: grid;
-  gap: 8px;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #bda27a;
-  text-align: center;
-}
-.install-area p {
-  margin: 0;
-  color: #654c34;
-  font-size: 13px;
-}
-.install-area > a:not(.install-button) {
-  color: #68420d;
-  font-size: 13px;
-  font-weight: 700;
-}
-.install-area small {
-  color: #806b55;
+.native-install-dialog::backdrop {
+  background: transparent;
 }
 .notice-dialog {
   width: 362px;

@@ -6,6 +6,7 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
   type RefObject,
+  type WheelEvent as ReactWheelEvent,
 } from "react";
 
 import {
@@ -17,6 +18,25 @@ import {
   type LoginManifest,
 } from "@/features/map-login/login";
 import {
+  getDropdownWindow,
+  getNewCharLayout,
+  hitTestNewChar,
+  moveDropdownOption,
+  validateNewChar,
+  type NewCharLayout,
+  type NewCharManifest,
+  type NewCharTarget,
+} from "@/features/map-login/new-char";
+import {
+  drawNewCharEditor,
+  getDropdownItems,
+  getDropdownRowRect,
+  getNewCharAssetSources,
+  type CanvasCreatorState,
+  type CreatorDropdownState,
+  type CreatorPointerState,
+} from "@/features/map-login/new-char-renderer";
+import {
   alphaForFrame,
   frameAtTime,
   getBackgroundPosition,
@@ -25,6 +45,11 @@ import {
   type MapLoginScene,
   type SceneFrame,
 } from "@/features/map-login/scene";
+import {
+  PET_STATES,
+  type ActionCode,
+  type EmotionCode,
+} from "@/lib/pet-contract";
 
 export type CanvasLoginState = {
   visible: boolean;
@@ -37,13 +62,30 @@ export type CanvasLoginState = {
   disabled: boolean;
 };
 
+export type CanvasCreatorKeyboardCommand = {
+  id: number;
+  target: "action" | "emotion";
+  key: "ArrowUp" | "ArrowDown" | "Enter" | "Escape";
+} | null;
+
 type Props = {
   viewportRef: RefObject<HTMLDivElement | null>;
   onReady: (scene: MapLoginScene) => void;
   loginState: CanvasLoginState;
+  creatorState: CanvasCreatorState;
+  creatorKeyboardCommand: CanvasCreatorKeyboardCommand;
   onInputFocus: () => void;
   onButtonFocus: () => void;
   onButtonActivate: () => void;
+  onCreatorFocus: (target: NewCharTarget) => void;
+  onStateMove: (direction: -1 | 1) => void;
+  onActionChange: (value: ActionCode) => void;
+  onEmotionChange: (value: EmotionCode) => void;
+  onPrimaryActivate: () => void;
+  onSecondaryActivate: () => void;
+  onInstallActivate: () => void;
+  onDeleteActivate: () => void;
+  onModalClose: () => void;
 };
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -55,26 +97,87 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+function pointInRect(
+  rect: { x: number; y: number; width: number; height: number },
+  point: { x: number; y: number },
+) {
+  return (
+    point.x >= rect.x &&
+    point.y >= rect.y &&
+    point.x <= rect.x + rect.width &&
+    point.y <= rect.y + rect.height
+  );
+}
+
 export function MapSceneCanvas({
   viewportRef,
   onReady,
   loginState,
+  creatorState,
+  creatorKeyboardCommand,
   onInputFocus,
   onButtonFocus,
   onButtonActivate,
+  onCreatorFocus,
+  onStateMove,
+  onActionChange,
+  onEmotionChange,
+  onPrimaryActivate,
+  onSecondaryActivate,
+  onInstallActivate,
+  onDeleteActivate,
+  onModalClose,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<MapLoginScene | null>(null);
-  const layoutRef = useRef<LoginLayout | null>(null);
+  const loginLayoutRef = useRef<LoginLayout | null>(null);
+  const newCharLayoutRef = useRef<NewCharLayout | null>(null);
+  const newCharManifestRef = useRef<NewCharManifest | null>(null);
   const scaleRef = useRef(1);
-  const pointerRef = useRef({ hovered: false, pressed: false });
+  const loginPointerRef = useRef({ hovered: false, pressed: false });
+  const creatorPointerRef = useRef<
+    CreatorPointerState & { optionPressed: number | null }
+  >({
+    hovered: null,
+    pressed: null,
+    optionHovered: null,
+    optionPressed: null,
+  });
+  const dropdownRef = useRef<CreatorDropdownState>(null);
+  const previewRef = useRef<{
+    url: string | null;
+    image: HTMLImageElement | null;
+  }>({ url: null, image: null });
+  const previewCacheRef = useRef(new Map<string, HTMLImageElement>());
+  const reducedMotionRef = useRef(false);
+  const lastKeyboardCommandRef = useRef(0);
+  const transitionRef = useRef({
+    visible: creatorState.visible,
+    closing: creatorState.closing,
+    startedAt: 0,
+  });
   const loginRef = useRef({
     state: loginState,
     onInputFocus,
     onButtonFocus,
     onButtonActivate,
   });
+  const creatorRef = useRef({
+    state: creatorState,
+    keyboardCommand: creatorKeyboardCommand,
+    onCreatorFocus,
+    onStateMove,
+    onActionChange,
+    onEmotionChange,
+    onPrimaryActivate,
+    onSecondaryActivate,
+    onInstallActivate,
+    onDeleteActivate,
+    onModalClose,
+  });
   const [failed, setFailed] = useState(false);
+  const [creatorAssetsFailed, setCreatorAssetsFailed] = useState(false);
+  const [previewFailedUrl, setPreviewFailedUrl] = useState<string | null>(null);
 
   useEffect(() => {
     loginRef.current = {
@@ -84,6 +187,98 @@ export function MapSceneCanvas({
       onButtonActivate,
     };
   }, [loginState, onButtonActivate, onButtonFocus, onInputFocus]);
+
+  useEffect(() => {
+    creatorRef.current = {
+      state: creatorState,
+      keyboardCommand: creatorKeyboardCommand,
+      onCreatorFocus,
+      onStateMove,
+      onActionChange,
+      onEmotionChange,
+      onPrimaryActivate,
+      onSecondaryActivate,
+      onInstallActivate,
+      onDeleteActivate,
+      onModalClose,
+    };
+    if (
+      !creatorState.visible ||
+      creatorState.closing ||
+      creatorState.modalOpen
+    ) {
+      dropdownRef.current = null;
+    }
+  }, [
+    creatorState,
+    creatorKeyboardCommand,
+    onActionChange,
+    onCreatorFocus,
+    onDeleteActivate,
+    onEmotionChange,
+    onInstallActivate,
+    onModalClose,
+    onPrimaryActivate,
+    onSecondaryActivate,
+    onStateMove,
+  ]);
+
+  useEffect(() => {
+    const url = creatorState.previewUrl;
+    if (!url) {
+      previewRef.current = { url: null, image: null };
+      return;
+    }
+    const cached = previewCacheRef.current.get(url);
+    if (cached) {
+      previewRef.current = { url, image: cached };
+      return;
+    }
+    let cancelled = false;
+    let attempt = 0;
+    const loadPreview = () => {
+      const image = new Image();
+      image.onload = () => {
+        previewCacheRef.current.set(url, image);
+        if (!cancelled) {
+          previewRef.current = { url, image };
+          setPreviewFailedUrl((current) => (current === url ? null : current));
+        }
+      };
+      image.onerror = () => {
+        if (cancelled) return;
+        if (attempt < 1) {
+          attempt += 1;
+          loadPreview();
+          return;
+        }
+        setPreviewFailedUrl(url);
+      };
+      image.src = url;
+    };
+    loadPreview();
+    return () => {
+      cancelled = true;
+    };
+  }, [creatorState.previewUrl]);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => {
+      reducedMotionRef.current = query.matches;
+    };
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const closeDropdown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") dropdownRef.current = null;
+    };
+    window.addEventListener("keydown", closeDropdown);
+    return () => window.removeEventListener("keydown", closeDropdown);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,7 +323,35 @@ export function MapSceneCanvas({
       let deviceScale = 1;
 
       sceneRef.current = scene;
-      layoutRef.current = getLoginLayout(scene);
+      loginLayoutRef.current = getLoginLayout(scene);
+      newCharLayoutRef.current = getNewCharLayout(scene);
+
+      async function loadCreatorAssets() {
+        try {
+          const response = await fetch("/map-login/kms-v43/new-char.json", {
+            cache: "no-store",
+            signal: controller.signal,
+          });
+          if (!response.ok) throw new Error("manifest");
+          const manifest = validateNewChar(await response.json());
+          const creatorImages = await Promise.all(
+            getNewCharAssetSources(manifest).map(
+              async (src) => [src, await loadImage(src)] as const,
+            ),
+          );
+          if (cancelled) return;
+          creatorImages.forEach(([src, image]) => images.set(src, image));
+          newCharManifestRef.current = manifest;
+        } catch (error) {
+          if (
+            cancelled ||
+            (error instanceof DOMException && error.name === "AbortError")
+          )
+            return;
+          setCreatorAssetsFailed(true);
+        }
+      }
+      void loadCreatorAssets();
 
       function resize() {
         scale = activeViewport.clientWidth / scene.map.width;
@@ -167,13 +390,12 @@ export function MapSceneCanvas({
         manifest: LoginManifest,
       ) {
         const state = loginRef.current.state;
-        const layout = layoutRef.current;
+        const layout = loginLayoutRef.current;
         if (!state.visible || !layout) return;
-
         const buttonState = resolveLoginButtonState({
           disabled: state.disabled,
-          pressed: pointerRef.current.pressed || state.buttonPressed,
-          hovered: pointerRef.current.hovered,
+          pressed: loginPointerRef.current.pressed || state.buttonPressed,
+          hovered: loginPointerRef.current.hovered,
           focused: state.buttonFocused,
         });
         const button = layout.button;
@@ -204,11 +426,7 @@ export function MapSceneCanvas({
         const availableWidth = input.width - padding * 2;
         const textOffset = Math.min(0, availableWidth - caretWidth);
         const textX = x + padding + textOffset;
-
-        if (
-          state.inputFocused &&
-          state.selectionStart !== state.selectionEnd
-        ) {
+        if (state.inputFocused && state.selectionStart !== state.selectionEnd) {
           const selectionStart = Math.min(
             state.selectionStart,
             state.selectionEnd,
@@ -219,22 +437,19 @@ export function MapSceneCanvas({
           );
           const selectionX =
             textX +
-            activeContext.measureText(
-              state.nickname.slice(0, selectionStart),
-            ).width;
+            activeContext.measureText(state.nickname.slice(0, selectionStart))
+              .width;
           const selectionWidth = activeContext.measureText(
             state.nickname.slice(selectionStart, selectionEnd),
           ).width;
           activeContext.fillStyle = "#477eae";
           activeContext.fillRect(selectionX, y + 3, selectionWidth, 18);
         }
-
         activeContext.fillStyle = "#fff4d5";
         activeContext.shadowColor = "#3b1a08";
         activeContext.shadowBlur = 1;
         activeContext.shadowOffsetY = 1;
         activeContext.fillText(state.nickname, textX, textY);
-
         if (
           state.inputFocused &&
           !state.disabled &&
@@ -251,6 +466,64 @@ export function MapSceneCanvas({
           );
         }
         activeContext.restore();
+      }
+
+      function handleCreatorKeyboardCommand(
+        command: NonNullable<CanvasCreatorKeyboardCommand>,
+      ) {
+        if (command.key === "Escape") {
+          dropdownRef.current = null;
+          creatorPointerRef.current.optionHovered = null;
+          return;
+        }
+        const items = getDropdownItems(command.target);
+        const state = creatorRef.current.state;
+        const selected =
+          command.target === "action"
+            ? state.selectedAction
+            : state.selectedEmotion;
+        const selectedIndex = Math.max(
+          0,
+          items.findIndex((item) => item.code === selected),
+        );
+        let dropdown = dropdownRef.current;
+        const wasOpen = dropdown?.kind === command.target;
+        if (!wasOpen) {
+          const start = getDropdownWindow(
+            items.length,
+            selectedIndex,
+            selectedIndex - 3,
+          ).start;
+          dropdown = { kind: command.target, start };
+          dropdownRef.current = dropdown;
+          creatorPointerRef.current.optionHovered = selectedIndex - start;
+        }
+        if (!dropdown) return;
+        const active =
+          creatorPointerRef.current.optionHovered === null
+            ? selectedIndex
+            : dropdown.start + creatorPointerRef.current.optionHovered;
+
+        if (command.key === "Enter") {
+          if (!wasOpen) return;
+          const item = items[active];
+          if (item) {
+            if (command.target === "action")
+              creatorRef.current.onActionChange(item.code as ActionCode);
+            else creatorRef.current.onEmotionChange(item.code as EmotionCode);
+          }
+          dropdownRef.current = null;
+          creatorPointerRef.current.optionHovered = null;
+          return;
+        }
+
+        const moved = moveDropdownOption(
+          items.length,
+          { start: dropdown.start, active },
+          command.key === "ArrowDown" ? 1 : -1,
+        );
+        dropdownRef.current = { kind: command.target, start: moved.start };
+        creatorPointerRef.current.optionHovered = moved.active - moved.start;
       }
 
       const startedAt = performance.now();
@@ -324,6 +597,56 @@ export function MapSceneCanvas({
         });
         scene.backgrounds.filter((item) => item.front).forEach(drawBackground);
         drawLogin(elapsed, camera, login);
+
+        const current = creatorRef.current.state;
+        const keyboardCommand = creatorRef.current.keyboardCommand;
+        if (
+          keyboardCommand &&
+          keyboardCommand.id !== lastKeyboardCommandRef.current
+        ) {
+          lastKeyboardCommandRef.current = keyboardCommand.id;
+          handleCreatorKeyboardCommand(keyboardCommand);
+        }
+        if (
+          transitionRef.current.visible !== current.visible ||
+          transitionRef.current.closing !== current.closing
+        ) {
+          transitionRef.current = {
+            visible: current.visible,
+            closing: current.closing,
+            startedAt: elapsed,
+          };
+        }
+        if (
+          current.visible &&
+          !current.closing &&
+          activeViewport.scrollTop > Math.max(2, scale * 2)
+        ) {
+          transitionRef.current.startedAt = elapsed;
+        }
+        const newCharLayout = newCharLayoutRef.current;
+        const newChar = newCharManifestRef.current;
+        if (newCharLayout && newChar) {
+          drawNewCharEditor({
+            context: activeContext,
+            images,
+            preview:
+              previewRef.current.url === current.previewUrl
+                ? previewRef.current.image
+                : null,
+            manifest: newChar,
+            layout: newCharLayout,
+            state: current,
+            pointer: creatorPointerRef.current,
+            dropdown: dropdownRef.current,
+            camera,
+            logicalWidth: scene.map.width,
+            logicalHeight,
+            elapsed,
+            transitionStartedAt: transitionRef.current.startedAt,
+            reducedMotion: reducedMotionRef.current,
+          });
+        }
         animationFrame = requestAnimationFrame(render);
       }
 
@@ -354,7 +677,9 @@ export function MapSceneCanvas({
       cancelAnimationFrame(animationFrame);
       removeResize?.();
       sceneRef.current = null;
-      layoutRef.current = null;
+      loginLayoutRef.current = null;
+      newCharLayoutRef.current = null;
+      newCharManifestRef.current = null;
     };
   }, [onReady, viewportRef]);
 
@@ -365,8 +690,7 @@ export function MapSceneCanvas({
     const bounds = event.currentTarget.getBoundingClientRect();
     const scale = scaleRef.current;
     return {
-      x:
-        (event.clientX - bounds.left) / scale - scene.map.centerX,
+      x: (event.clientX - bounds.left) / scale - scene.map.centerX,
       y:
         (event.clientY - bounds.top) / scale +
         viewport.scrollTop / scale -
@@ -374,22 +698,105 @@ export function MapSceneCanvas({
     };
   }
 
-  function targetAt(event: ReactPointerEvent<HTMLCanvasElement>) {
-    const layout = layoutRef.current;
+  function loginTargetAt(event: ReactPointerEvent<HTMLCanvasElement>) {
+    const layout = loginLayoutRef.current;
     const point = mapPoint(event);
     if (!loginRef.current.state.visible || !layout || !point) return null;
     return hitTestLogin(layout, point);
   }
 
+  function optionAt(point: { x: number; y: number }) {
+    const dropdown = dropdownRef.current;
+    const layout = newCharLayoutRef.current;
+    if (!dropdown || !layout) return null;
+    const items = getDropdownItems(dropdown.kind);
+    const count = Math.min(8, items.length - dropdown.start);
+    for (let row = 0; row < count; row += 1) {
+      if (pointInRect(getDropdownRowRect(layout[dropdown.kind], row), point)) {
+        return { row, index: dropdown.start + row };
+      }
+    }
+    return null;
+  }
+
+  function creatorTargetAt(event: ReactPointerEvent<HTMLCanvasElement>) {
+    const layout = newCharLayoutRef.current;
+    const point = mapPoint(event);
+    const state = creatorRef.current.state;
+    if (!state.visible || state.closing || !layout || !point) return null;
+    return hitTestNewChar(layout, point, state.modalOpen);
+  }
+
+  function creatorTargetDisabled(target: NewCharTarget) {
+    const state = creatorRef.current.state;
+    const index = PET_STATES.indexOf(state.selectedState);
+    if (state.createPending)
+      return !["install", "delete", "close"].includes(target);
+    if (target === "previous") return index === 0;
+    if (target === "next") return index === PET_STATES.length - 1;
+    if (target === "action")
+      return (
+        state.selectedState === "running-left" ||
+        state.selectedState === "running-right"
+      );
+    return false;
+  }
+
   function updatePointer(event: ReactPointerEvent<HTMLCanvasElement>) {
-    const target = targetAt(event);
-    pointerRef.current.hovered = target === "button";
+    const loginTarget = loginTargetAt(event);
+    loginPointerRef.current.hovered = loginTarget === "button";
+    const point = mapPoint(event);
+    const option = point ? optionAt(point) : null;
+    const creatorTarget = creatorTargetAt(event);
+    creatorPointerRef.current.optionHovered = option?.row ?? null;
+    creatorPointerRef.current.hovered = creatorTarget;
     event.currentTarget.style.cursor =
-      target === "input"
+      loginTarget === "input"
         ? "text"
-        : target === "button" && !loginRef.current.state.disabled
+        : loginTarget === "button" && !loginRef.current.state.disabled
           ? "pointer"
-          : "default";
+          : option || (creatorTarget && !creatorTargetDisabled(creatorTarget))
+            ? "pointer"
+            : "default";
+  }
+
+  function showDropdown(kind: "action" | "emotion") {
+    const state = creatorRef.current.state;
+    const items = getDropdownItems(kind);
+    const selected =
+      kind === "action" ? state.selectedAction : state.selectedEmotion;
+    const selectedIndex = items.findIndex((item) => item.code === selected);
+    const start = getDropdownWindow(
+      items.length,
+      selectedIndex,
+      selectedIndex - 3,
+    ).start;
+    dropdownRef.current = {
+      kind,
+      start,
+    };
+    creatorPointerRef.current.optionHovered = selectedIndex - start;
+  }
+
+  function openDropdown(kind: "action" | "emotion") {
+    if (dropdownRef.current?.kind === kind) {
+      dropdownRef.current = null;
+      creatorPointerRef.current.optionHovered = null;
+      return;
+    }
+    showDropdown(kind);
+  }
+
+  function activateCreatorTarget(target: NewCharTarget) {
+    const callbacks = creatorRef.current;
+    if (target === "previous") callbacks.onStateMove(-1);
+    else if (target === "next") callbacks.onStateMove(1);
+    else if (target === "action" || target === "emotion") openDropdown(target);
+    else if (target === "primary") callbacks.onPrimaryActivate();
+    else if (target === "secondary") callbacks.onSecondaryActivate();
+    else if (target === "install") callbacks.onInstallActivate();
+    else if (target === "delete") callbacks.onDeleteActivate();
+    else callbacks.onModalClose();
   }
 
   if (failed)
@@ -398,43 +805,116 @@ export function MapSceneCanvas({
         화면을 불러오지 못했습니다. 페이지를 새로고침해 주세요.
       </div>
     );
+  const creatorFailure =
+    creatorState.visible &&
+    (creatorAssetsFailed || previewFailedUrl === creatorState.previewUrl);
   return (
-    <canvas
-      ref={canvasRef}
-      className="map-canvas"
-      aria-label="메이플스토리 로그인 맵"
-      onPointerMove={updatePointer}
-      onPointerLeave={(event) => {
-        pointerRef.current.hovered = false;
-        event.currentTarget.style.cursor = "default";
-      }}
-      onPointerDown={(event) => {
-        const target = targetAt(event);
-        if (target === "input") {
+    <>
+      <canvas
+        ref={canvasRef}
+        className="map-canvas"
+        aria-label="메이플스토리 로그인 및 Pet 편집 맵"
+        hidden={creatorFailure}
+        onWheel={(event: ReactWheelEvent<HTMLCanvasElement>) => {
+          const dropdown = dropdownRef.current;
+          if (!dropdown) return;
           event.preventDefault();
-          loginRef.current.onInputFocus();
-          return;
-        }
-        if (target === "button" && !loginRef.current.state.disabled) {
+          const total = getDropdownItems(dropdown.kind).length;
+          dropdownRef.current = {
+            ...dropdown,
+            start: Math.min(
+              Math.max(0, total - 8),
+              Math.max(0, dropdown.start + (event.deltaY > 0 ? 1 : -1)),
+            ),
+          };
+          creatorPointerRef.current.optionHovered = null;
+        }}
+        onPointerMove={updatePointer}
+        onPointerLeave={(event) => {
+          loginPointerRef.current.hovered = false;
+          creatorPointerRef.current.hovered = null;
+          creatorPointerRef.current.optionHovered = null;
+          event.currentTarget.style.cursor = "default";
+        }}
+        onPointerDown={(event) => {
+          const loginTarget = loginTargetAt(event);
+          if (loginTarget === "input") {
+            event.preventDefault();
+            loginRef.current.onInputFocus();
+            return;
+          }
+          if (loginTarget === "button" && !loginRef.current.state.disabled) {
+            event.preventDefault();
+            loginPointerRef.current.pressed = true;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            loginRef.current.onButtonFocus();
+            return;
+          }
+          const point = mapPoint(event);
+          const option = point ? optionAt(point) : null;
+          if (option) {
+            event.preventDefault();
+            creatorPointerRef.current.optionPressed = option.index;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            return;
+          }
+          const target = creatorTargetAt(event);
+          if (!target || creatorTargetDisabled(target)) {
+            if (dropdownRef.current) dropdownRef.current = null;
+            return;
+          }
           event.preventDefault();
-          pointerRef.current.pressed = true;
+          creatorPointerRef.current.pressed = target;
           event.currentTarget.setPointerCapture(event.pointerId);
-          loginRef.current.onButtonFocus();
-        }
-      }}
-      onPointerUp={(event) => {
-        const activate =
-          pointerRef.current.pressed &&
-          targetAt(event) === "button" &&
-          !loginRef.current.state.disabled;
-        pointerRef.current.pressed = false;
-        if (event.currentTarget.hasPointerCapture(event.pointerId))
-          event.currentTarget.releasePointerCapture(event.pointerId);
-        if (activate) loginRef.current.onButtonActivate();
-      }}
-      onPointerCancel={() => {
-        pointerRef.current.pressed = false;
-      }}
-    />
+          creatorRef.current.onCreatorFocus(target);
+        }}
+        onPointerUp={(event) => {
+          const loginActivate =
+            loginPointerRef.current.pressed &&
+            loginTargetAt(event) === "button" &&
+            !loginRef.current.state.disabled;
+          loginPointerRef.current.pressed = false;
+          if (loginActivate) loginRef.current.onButtonActivate();
+
+          const point = mapPoint(event);
+          const option = point ? optionAt(point) : null;
+          const pressedOption = creatorPointerRef.current.optionPressed;
+          creatorPointerRef.current.optionPressed = null;
+          if (option && option.index === pressedOption && dropdownRef.current) {
+            const dropdown = dropdownRef.current;
+            const item = getDropdownItems(dropdown.kind)[option.index];
+            if (item) {
+              if (dropdown.kind === "action")
+                creatorRef.current.onActionChange(item.code as ActionCode);
+              else creatorRef.current.onEmotionChange(item.code as EmotionCode);
+            }
+            dropdownRef.current = null;
+          } else {
+            const target = creatorTargetAt(event);
+            const pressed = creatorPointerRef.current.pressed;
+            creatorPointerRef.current.pressed = null;
+            if (
+              target &&
+              target === pressed &&
+              !creatorTargetDisabled(target)
+            ) {
+              activateCreatorTarget(target);
+            }
+          }
+          if (event.currentTarget.hasPointerCapture(event.pointerId))
+            event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+        onPointerCancel={() => {
+          loginPointerRef.current.pressed = false;
+          creatorPointerRef.current.pressed = null;
+          creatorPointerRef.current.optionPressed = null;
+        }}
+      />
+      {creatorFailure ? (
+        <div className="scene-fatal" role="alert">
+          캐릭터 편집 화면을 불러오지 못했습니다. 페이지를 새로고침해 주세요.
+        </div>
+      ) : null}
+    </>
   );
 }
