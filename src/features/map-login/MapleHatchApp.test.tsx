@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/features/map-login/MapSceneCanvas", () => ({
   MapSceneCanvas: ({
@@ -81,7 +81,26 @@ beforeEach(() => {
   };
 });
 
+afterEach(cleanup);
+
 describe("MapleHatchApp NewChar editor", () => {
+  it("uses the framed stage without a separate product header", () => {
+    const { container } = render(<MapleHatchApp />);
+
+    expect(
+      screen.queryByRole("heading", { name: "Maple Hatch Pet" }),
+    ).not.toBeInTheDocument();
+    const stage = container.querySelector(".map-stage");
+    expect(
+      stage?.querySelector(":scope > .frame-attribution"),
+    ).toContainElement(
+      screen.getByRole("link", { name: "개인정보 처리 안내" }),
+    );
+    expect(
+      container.querySelector(".map-viewport .frame-attribution"),
+    ).toBeNull();
+  });
+
   it("keeps per-state values, preserves results across states, and invalidates changed selections", async () => {
     const user = userEvent.setup();
     render(<MapleHatchApp />);

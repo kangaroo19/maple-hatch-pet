@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { buildCharacterFrameUrl } from "@/lib/nexon-url";
+import { Attribution } from "@/components/Attribution";
 import {
   ACTIONS,
   DEFAULT_STATES,
@@ -338,12 +339,18 @@ export function MapleHatchApp() {
   if (desktop === false) {
     return (
       <main className="desktop-required">
-        너비 1024px 이상의 데스크톱 브라우저에서 이용해 주세요.
+        <p>너비 1024px 이상의 데스크톱 브라우저에서 이용해 주세요.</p>
+        <Attribution className="standalone-attribution" />
       </main>
     );
   }
   if (desktop === null)
-    return <main className="app-loading">화면을 준비하는 중…</main>;
+    return (
+      <main className="app-loading">
+        <p>화면을 준비하는 중…</p>
+        <Attribution className="standalone-attribution" />
+      </main>
+    );
 
   const deleteHref = result
     ? `mailto:1000jjj@naver.com?subject=${encodeURIComponent("Maple Hatch Pet 이미지 삭제 요청")}&body=${encodeURIComponent(`삭제할 생성 이미지 URL: ${result.spritesheetUrl}`)}`
@@ -351,261 +358,262 @@ export function MapleHatchApp() {
 
   return (
     <main className="map-shell">
-      <header className="app-header">
-        <h1>Maple Hatch Pet</h1>
-        <p>메이플스토리 캐릭터를 Codex Pet으로 부화시켜 보세요.</p>
-      </header>
-      <div ref={viewportRef} className="map-viewport" aria-busy={!scene}>
-        <form
-          ref={loginFormRef}
-          className="native-login-form"
-          onSubmit={lookup}
-          noValidate
-          aria-busy={lookupPending}
-          aria-label="캐릭터 로그인"
-          aria-hidden={Boolean(character)}
-          inert={Boolean(character)}
-        >
-          <label htmlFor="nickname">닉네임</label>
-          <input
-            ref={nicknameRef}
-            id="nickname"
-            value={nickname}
-            onChange={(event) => {
-              setNickname(event.target.value);
-              setSelection({
-                start: event.target.selectionStart ?? event.target.value.length,
-                end: event.target.selectionEnd ?? event.target.value.length,
-              });
-            }}
-            onSelect={(event) =>
-              setSelection({
-                start: event.currentTarget.selectionStart ?? 0,
-                end: event.currentTarget.selectionEnd ?? 0,
-              })
-            }
-            onFocus={() => setInputFocused(true)}
-            onBlur={() => setInputFocused(false)}
-            disabled={lookupPending}
-            autoComplete="off"
-          />
-          <button
-            ref={lookupButtonRef}
-            type="submit"
-            aria-label="로그인"
-            disabled={lookupPending}
-            onFocus={() => setLoginButtonFocused(true)}
-            onBlur={() => {
-              setLoginButtonFocused(false);
-              setLoginButtonPressed(false);
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ")
-                setLoginButtonPressed(true);
-            }}
-            onKeyUp={(event) => {
-              if (event.key === "Enter" || event.key === " ")
+      <div className="map-stage">
+        <div ref={viewportRef} className="map-viewport" aria-busy={!scene}>
+          <form
+            ref={loginFormRef}
+            className="native-login-form"
+            onSubmit={lookup}
+            noValidate
+            aria-busy={lookupPending}
+            aria-label="캐릭터 로그인"
+            aria-hidden={Boolean(character)}
+            inert={Boolean(character)}
+          >
+            <label htmlFor="nickname">닉네임</label>
+            <input
+              ref={nicknameRef}
+              id="nickname"
+              value={nickname}
+              onChange={(event) => {
+                setNickname(event.target.value);
+                setSelection({
+                  start:
+                    event.target.selectionStart ?? event.target.value.length,
+                  end: event.target.selectionEnd ?? event.target.value.length,
+                });
+              }}
+              onSelect={(event) =>
+                setSelection({
+                  start: event.currentTarget.selectionStart ?? 0,
+                  end: event.currentTarget.selectionEnd ?? 0,
+                })
+              }
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
+              disabled={lookupPending}
+              autoComplete="off"
+            />
+            <button
+              ref={lookupButtonRef}
+              type="submit"
+              aria-label="로그인"
+              disabled={lookupPending}
+              onFocus={() => setLoginButtonFocused(true)}
+              onBlur={() => {
+                setLoginButtonFocused(false);
                 setLoginButtonPressed(false);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ")
+                  setLoginButtonPressed(true);
+              }}
+              onKeyUp={(event) => {
+                if (event.key === "Enter" || event.key === " ")
+                  setLoginButtonPressed(false);
+              }}
+            >
+              로그인
+            </button>
+          </form>
+          <div
+            className="map-scroll-space"
+            style={{
+              aspectRatio: scene ? `800 / ${scene.map.height}` : undefined,
             }}
           >
-            로그인
-          </button>
-        </form>
-        <div
-          className="map-scroll-space"
-          style={{
-            aspectRatio: scene
-              ? `${scene.map.width} / ${scene.map.height}`
-              : undefined,
-          }}
-        >
-          <MapSceneCanvas
-            viewportRef={viewportRef}
-            onReady={handleSceneReady}
-            loginState={{
-              visible: !character,
-              nickname,
-              selectionStart: selection.start,
-              selectionEnd: selection.end,
-              inputFocused,
-              buttonFocused: loginButtonFocused,
-              buttonPressed: loginButtonPressed,
-              disabled: lookupPending,
-            }}
-            creatorState={{
-              visible: Boolean(character),
-              closing: creatorClosing,
-              character,
-              previewUrl: previewUrl?.toString() ?? null,
-              selectedState,
-              selectedAction,
-              selectedEmotion: selected.emotion as EmotionCode,
-              createPending,
-              hasResult: Boolean(result),
-              modalOpen: resultOpen,
-              focused: creatorFocused,
-            }}
-            creatorKeyboardCommand={creatorKeyboardCommand}
-            onInputFocus={() => focusNativeControl(nicknameRef.current)}
-            onButtonFocus={() => focusNativeControl(lookupButtonRef.current)}
-            onButtonActivate={() => loginFormRef.current?.requestSubmit()}
-            onCreatorFocus={focusCreatorTarget}
-            onStateMove={(direction) =>
-              setSelectedState((current) => movePetState(current, direction))
-            }
-            onActionChange={(value) => updateSelection("action", value)}
-            onEmotionChange={(value) => updateSelection("emotion", value)}
-            onPrimaryActivate={() => {
-              if (result) setResultOpen(true);
-              else void createPet();
-            }}
-            onSecondaryActivate={reset}
-            onInstallActivate={() => installLinkRef.current?.click()}
-            onDeleteActivate={() => deleteLinkRef.current?.click()}
-            onModalClose={closeInstallModal}
-          />
-          {character && (
-            <section
-              className="native-creator-form"
-              aria-label="Pet 편집"
-              aria-hidden={resultOpen}
-              inert={resultOpen}
-            >
-              <p aria-live="polite">
-                {STATE_LABELS[selectedState]} ({selectedState.toUpperCase()}) ·{" "}
-                {PET_STATES.indexOf(selectedState) + 1}/{PET_STATES.length}
-              </p>
-              <button
-                ref={previousButtonRef}
-                type="button"
-                disabled={
-                  selectedState === PET_STATES[0] ||
-                  createPending ||
-                  creatorClosing
-                }
-                onFocus={() => setCreatorFocused("previous")}
-                onBlur={() => setCreatorFocused(null)}
-                onClick={() =>
-                  setSelectedState((current) => movePetState(current, -1))
-                }
+            <MapSceneCanvas
+              viewportRef={viewportRef}
+              onReady={handleSceneReady}
+              loginState={{
+                visible: !character,
+                nickname,
+                selectionStart: selection.start,
+                selectionEnd: selection.end,
+                inputFocused,
+                buttonFocused: loginButtonFocused,
+                buttonPressed: loginButtonPressed,
+                disabled: lookupPending,
+              }}
+              creatorState={{
+                visible: Boolean(character),
+                closing: creatorClosing,
+                character,
+                previewUrl: previewUrl?.toString() ?? null,
+                selectedState,
+                selectedAction,
+                selectedEmotion: selected.emotion as EmotionCode,
+                createPending,
+                hasResult: Boolean(result),
+                modalOpen: resultOpen,
+                focused: creatorFocused,
+              }}
+              creatorKeyboardCommand={creatorKeyboardCommand}
+              onInputFocus={() => focusNativeControl(nicknameRef.current)}
+              onButtonFocus={() => focusNativeControl(lookupButtonRef.current)}
+              onButtonActivate={() => loginFormRef.current?.requestSubmit()}
+              onCreatorFocus={focusCreatorTarget}
+              onStateMove={(direction) =>
+                setSelectedState((current) => movePetState(current, direction))
+              }
+              onActionChange={(value) => updateSelection("action", value)}
+              onEmotionChange={(value) => updateSelection("emotion", value)}
+              onPrimaryActivate={() => {
+                if (result) setResultOpen(true);
+                else void createPet();
+              }}
+              onSecondaryActivate={reset}
+              onInstallActivate={() => installLinkRef.current?.click()}
+              onDeleteActivate={() => deleteLinkRef.current?.click()}
+              onModalClose={closeInstallModal}
+            />
+            {character && (
+              <section
+                className="native-creator-form"
+                aria-label="Pet 편집"
+                aria-hidden={resultOpen}
+                inert={resultOpen}
               >
-                이전 상태
-              </button>
-              <button
-                ref={nextButtonRef}
-                type="button"
-                disabled={
-                  selectedState === PET_STATES.at(-1) ||
-                  createPending ||
-                  creatorClosing
-                }
-                onFocus={() => setCreatorFocused("next")}
-                onBlur={() => setCreatorFocused(null)}
-                onClick={() =>
-                  setSelectedState((current) => movePetState(current, 1))
-                }
-              >
-                다음 상태
-              </button>
-              <label htmlFor="creator-action">액션</label>
-              <select
-                ref={actionSelectRef}
-                id="creator-action"
-                value={selectedAction}
-                disabled={
-                  selectedState === "running-left" ||
-                  selectedState === "running-right" ||
-                  createPending ||
-                  creatorClosing
-                }
-                onFocus={() => setCreatorFocused("action")}
-                onBlur={() => {
-                  setCreatorFocused(null);
-                  sendCreatorKeyboardCommand("action", "Escape");
-                }}
-                onKeyDown={(event) => {
-                  if (
-                    event.key !== "ArrowUp" &&
-                    event.key !== "ArrowDown" &&
-                    event.key !== "Enter" &&
-                    event.key !== "Escape"
-                  )
-                    return;
-                  event.preventDefault();
-                  sendCreatorKeyboardCommand("action", event.key);
-                }}
-                onChange={(event) =>
-                  updateSelection("action", event.target.value)
-                }
-              >
-                {ACTIONS.map((entry) => (
-                  <option key={entry.code} value={entry.code}>
-                    {entry.label}
-                  </option>
-                ))}
-              </select>
-              <label htmlFor="creator-emotion">표정</label>
-              <select
-                ref={emotionSelectRef}
-                id="creator-emotion"
-                value={selected.emotion}
-                disabled={createPending || creatorClosing}
-                onFocus={() => setCreatorFocused("emotion")}
-                onBlur={() => {
-                  setCreatorFocused(null);
-                  sendCreatorKeyboardCommand("emotion", "Escape");
-                }}
-                onKeyDown={(event) => {
-                  if (
-                    event.key !== "ArrowUp" &&
-                    event.key !== "ArrowDown" &&
-                    event.key !== "Enter" &&
-                    event.key !== "Escape"
-                  )
-                    return;
-                  event.preventDefault();
-                  sendCreatorKeyboardCommand("emotion", event.key);
-                }}
-                onChange={(event) =>
-                  updateSelection("emotion", event.target.value as EmotionCode)
-                }
-              >
-                {EMOTIONS.map((entry) => (
-                  <option key={entry.code} value={entry.code}>
-                    {entry.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                ref={createButtonRef}
-                type="button"
-                disabled={createPending || creatorClosing}
-                onFocus={() => setCreatorFocused("primary")}
-                onBlur={() => setCreatorFocused(null)}
-                onClick={() => {
-                  if (result) setResultOpen(true);
-                  else void createPet();
-                }}
-              >
-                {result
-                  ? "설치 정보"
-                  : createPending
-                    ? "Pet 만드는 중…"
-                    : "Pet 만들기"}
-              </button>
-              <button
-                ref={resetButtonRef}
-                type="button"
-                disabled={createPending || creatorClosing}
-                onFocus={() => setCreatorFocused("secondary")}
-                onBlur={() => setCreatorFocused(null)}
-                onClick={reset}
-              >
-                다른 캐릭터 찾기
-              </button>
-            </section>
-          )}
+                <p aria-live="polite">
+                  {STATE_LABELS[selectedState]} ({selectedState.toUpperCase()})
+                  · {PET_STATES.indexOf(selectedState) + 1}/{PET_STATES.length}
+                </p>
+                <button
+                  ref={previousButtonRef}
+                  type="button"
+                  disabled={
+                    selectedState === PET_STATES[0] ||
+                    createPending ||
+                    creatorClosing
+                  }
+                  onFocus={() => setCreatorFocused("previous")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onClick={() =>
+                    setSelectedState((current) => movePetState(current, -1))
+                  }
+                >
+                  이전 상태
+                </button>
+                <button
+                  ref={nextButtonRef}
+                  type="button"
+                  disabled={
+                    selectedState === PET_STATES.at(-1) ||
+                    createPending ||
+                    creatorClosing
+                  }
+                  onFocus={() => setCreatorFocused("next")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onClick={() =>
+                    setSelectedState((current) => movePetState(current, 1))
+                  }
+                >
+                  다음 상태
+                </button>
+                <label htmlFor="creator-action">액션</label>
+                <select
+                  ref={actionSelectRef}
+                  id="creator-action"
+                  value={selectedAction}
+                  disabled={
+                    selectedState === "running-left" ||
+                    selectedState === "running-right" ||
+                    createPending ||
+                    creatorClosing
+                  }
+                  onFocus={() => setCreatorFocused("action")}
+                  onBlur={() => {
+                    setCreatorFocused(null);
+                    sendCreatorKeyboardCommand("action", "Escape");
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key !== "ArrowUp" &&
+                      event.key !== "ArrowDown" &&
+                      event.key !== "Enter" &&
+                      event.key !== "Escape"
+                    )
+                      return;
+                    event.preventDefault();
+                    sendCreatorKeyboardCommand("action", event.key);
+                  }}
+                  onChange={(event) =>
+                    updateSelection("action", event.target.value)
+                  }
+                >
+                  {ACTIONS.map((entry) => (
+                    <option key={entry.code} value={entry.code}>
+                      {entry.label}
+                    </option>
+                  ))}
+                </select>
+                <label htmlFor="creator-emotion">표정</label>
+                <select
+                  ref={emotionSelectRef}
+                  id="creator-emotion"
+                  value={selected.emotion}
+                  disabled={createPending || creatorClosing}
+                  onFocus={() => setCreatorFocused("emotion")}
+                  onBlur={() => {
+                    setCreatorFocused(null);
+                    sendCreatorKeyboardCommand("emotion", "Escape");
+                  }}
+                  onKeyDown={(event) => {
+                    if (
+                      event.key !== "ArrowUp" &&
+                      event.key !== "ArrowDown" &&
+                      event.key !== "Enter" &&
+                      event.key !== "Escape"
+                    )
+                      return;
+                    event.preventDefault();
+                    sendCreatorKeyboardCommand("emotion", event.key);
+                  }}
+                  onChange={(event) =>
+                    updateSelection(
+                      "emotion",
+                      event.target.value as EmotionCode,
+                    )
+                  }
+                >
+                  {EMOTIONS.map((entry) => (
+                    <option key={entry.code} value={entry.code}>
+                      {entry.label}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  ref={createButtonRef}
+                  type="button"
+                  disabled={createPending || creatorClosing}
+                  onFocus={() => setCreatorFocused("primary")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onClick={() => {
+                    if (result) setResultOpen(true);
+                    else void createPet();
+                  }}
+                >
+                  {result
+                    ? "설치 정보"
+                    : createPending
+                      ? "Pet 만드는 중…"
+                      : "Pet 만들기"}
+                </button>
+                <button
+                  ref={resetButtonRef}
+                  type="button"
+                  disabled={createPending || creatorClosing}
+                  onFocus={() => setCreatorFocused("secondary")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onClick={reset}
+                >
+                  다른 캐릭터 찾기
+                </button>
+              </section>
+            )}
+          </div>
         </div>
+        <Attribution className="frame-attribution" />
       </div>
       <dialog
         ref={installDialogRef}

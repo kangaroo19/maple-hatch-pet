@@ -20,7 +20,7 @@ PoC를 그대로 복사하는 것이 목표가 아니다. PoC에서 검증한 WZ
 3. 현재 제품 코드 구조와 `docs/development-environment.md`의 기술 계약을 확인한다.
 4. [프런트엔드 문서 인덱스의 제품 UI 의도](./index.md#제품-ui-의도)와 현재 제품 명세를 확인한다.
 5. v43 추출 결과를 `public/map-login/kms-v43/`에서 제공하는 고정 자산 계약을 확인한다.
-6. `MSTitle`, `BtLogin` 4상태와 Notice의 v43 manifest 크기 및 첫 화면 `Title/signboard/0` 장면 좌표를 확인한다.
+6. `Common/frame`, `MSTitle`, `BtLogin` 4상태와 Notice의 v43 manifest 크기 및 첫 화면 `Title/signboard/0` 장면 좌표를 확인한다.
 
 현재 PoC의 CSS 로그인 폼을 제품 시각 기준으로 복사하지 않는다. 조회 상태와 접근성 흐름만 참고하고, 계정 저장·회원가입·비밀번호 찾기처럼 기능으로 연결되지 않는 컨트롤은 표시하지 않는다.
 
@@ -55,7 +55,9 @@ PoC를 그대로 복사하는 것이 목표가 아니다. PoC에서 검증한 WZ
 
 - 너비 `1024px` 이상에서만 MapLogin 장면과 생성 UI를 초기화한다. 더 좁은 화면에는 데스크톱 접속 안내를 표시한다.
 - 조회 전에는 첫 로그인 화면의 카메라 위치를 고정하고 생성 영역으로의 직접 스크롤을 막는다.
+- 제품 화면은 최대 원본 크기 `800 × 600`의 4:3 뷰포트로 중앙 배치하고, 가용 폭이나 높이가 부족할 때만 비례 축소한다. 맵은 프레임 뒤의 전체 논리 화면을 채우며 원본 크기보다 확대하지 않는다.
 - 로그인 UI는 앱 진입 시 보이는 첫 화면의 `Title/signboard/0` bounds와 현재 카메라 변환에 결합한다. 하단 STR/DEX/INT/LUK 현판과 두 번째 화면에는 배치하지 않는다. `MSTitle`은 버전 자산으로만 유지하고 화면에는 표시하지 않으며, `BtLogin` 4상태와 닉네임 텍스트·선택 영역·커서는 Canvas가 렌더링한다. 화면 밖 native form만 IME·붙여넣기·선택·키보드 제출과 접근성을 담당한다.
+- 장면, 로그인과 편집 UI를 그린 뒤 `Login.img/Common/frame`을 카메라와 무관한 Canvas 마지막 레이어로 합성한다. 별도 제품 헤더나 현대식 카드 테두리는 표시하지 않고, NEXON 출처와 개인정보 링크는 프레임 하단 중앙의 HTML 오버레이로 유지한다.
 - 조회 중에는 진행 문구 없이 `BtLogin/disabled`만 표시해 중복 제출을 막는다. 빈 닉네임과 조회·생성·저장 등 웹 흐름을 막는 오류는 `Login.img/Notice` 기반 공통 경고 다이얼로그로 표시하고, 닫은 뒤 지정된 native 입력 또는 버튼에 스크롤 없이 포커스를 복원한다.
 - 공통 경고는 확인 버튼 하나만 제공한다. 확인 또는 `Esc`로 닫고 배경 클릭은 무시하며, 닫은 뒤 호출자가 지정한 입력 또는 실행 버튼으로 포커스를 복원한다.
 - 로그인 제출 성공과 `다른 캐릭터 찾기`는 각각 약 1초의 일회성 자동 스크롤을 사용한다. 모션 감소 설정에서는 즉시 이동하며 다른 입력은 카메라 위치에 영향을 주지 않는다.
@@ -186,7 +188,7 @@ Canvas에는 MapLogin 장면임을 설명하는 접근 가능한 이름을 제�
 
 WZ 파일은 브라우저 번들에 포함하지 않는다. `extract.cjs`와 동일한 역할의 도구를 구현 작업 전에 명시적으로 실행해 scene, Notice manifest와 PNG를 만들고 승인된 결과만 `public/map-login/kms-v43/`에 커밋한다. Vercel 빌드 중에는 원본 WZ를 읽거나 자산을 다시 추출하지 않는다. Notice는 `backgrnd/1`과 `BtYes`의 `normal`, `mouseOver`, `pressed`만 추출하고 사용자 메시지는 PNG로 만들지 않는다.
 
-현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. 화면 배치는 `MSTitle` 크기가 아니라 현재 scene의 첫 화면 `Title/signboard/0` bounds와 카메라 변환을 기준으로 계산한다.
+현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
 
 scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신하고 `formatVersion` 호환성을 확인한다. 이 정적 WZ 자산은 Pet 생성 PNG용 Vercel Blob에 올리지 않는다.
 
@@ -209,7 +211,7 @@ WZ 추출 자산을 비상업 Production에서 공개 제공하는 권리는 별
 - manifest와 모든 PNG가 정상 로드됨
 - `public/map-login/kms-v43/`의 scene, manifest와 필수 PNG가 같은 버전으로 로드됨
 - `new-char.json`의 출처·크기·origin·delay가 KMS v1.2.43 계약과 일치하고 필수 NewChar·Basic PNG가 모두 로드됨
-- `MSTitle`은 자산으로 유지되지만 화면에는 표시되지 않고, `BtLogin` 4상태와 Canvas 입력이 첫 로그인 화면의 `Title/signboard/0` 패널에 장면·카메라 좌표로 결합됨
+- `Common/frame`은 `800 × 600` 마지막 Canvas 레이어로 고정되고, `MSTitle`은 자산으로 유지되지만 화면에는 표시되지 않으며, `BtLogin` 4상태와 Canvas 입력이 첫 로그인 화면의 `Title/signboard/0` 패널에 장면·카메라 좌표로 결합됨
 - Notice 배경·버튼이 원본 크기로 로드되고 hover, focus와 active 상태가 각각 맞는 버튼 에셋을 사용함
 - 빈 입력과 차단 오류는 Notice로 표시되고, 조회 중은 진행 문구 없이 disabled 버튼으로 중복 제출이 차단됨
 - 경고가 확인과 `Esc`로 닫히고 배경 클릭으로 닫히지 않으며 호출자 포커스가 복원됨
@@ -276,7 +278,7 @@ placement 좌표는 anchor이고 실제 이미지 왼쪽 위는 `anchor - origin
 - [ ] 제품 전환 외의 자동 상하 카메라 왕복이 없다.
 - [ ] 너비 `1024px` 미만에서는 MapLogin UI 대신 데스크톱 접속 안내를 표시한다.
 - [ ] 생성 영역이 `NewChar/signboard/0` 기준의 캐릭터와 WZ 양피지 Canvas UI로 구성되고 비순환 좌우 화살표로 한 상태씩 편집된다.
-- [ ] v43 scene, manifest, `MSTitle`, `BtLogin` 4상태, Notice, NewChar·Basic 자산과 필수 PNG가 `public/map-login/kms-v43/`에서 함께 제공된다.
+- [ ] v43 scene, manifest, `Common/frame`, `MSTitle`, `BtLogin` 4상태, Notice, NewChar·Basic 자산과 필수 PNG가 `public/map-login/kms-v43/`에서 함께 제공된다.
 - [ ] Canvas 로그인 입력과 `BtLogin`이 첫 화면 `Title/signboard/0` 패널의 장면·카메라 좌표를 사용하고, `MSTitle` 또는 화면에 보이는 HTML overlay를 표시하지 않는다.
 - [ ] 계정 저장, 회원가입, 비밀번호 찾기 등 비기능 컨트롤을 표시하지 않는다.
 - [ ] 생성 성공 후 같은 Canvas 장면의 설치 모달에 `Codex에 설치` 버튼, 28일 안내와 이메일 삭제 요청 링크가 표시되고 `설치 정보`로 다시 열 수 있다.

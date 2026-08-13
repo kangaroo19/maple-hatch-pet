@@ -4,9 +4,12 @@ import {
   alphaForFrame,
   frameAtTime,
   getBackgroundPosition,
+  getMapCamera,
   getTileMode,
+  getViewportScale,
   shouldRenderSceneObject,
   validateScene,
+  viewportPointToMap,
 } from "@/features/map-login/scene";
 
 const frames = [
@@ -88,6 +91,24 @@ describe("MapLogin scene math", () => {
     expect(
       shouldRenderSceneObject("Map.wz/Obj/login.img/Title/signboard/0"),
     ).toBe(true);
+  });
+
+  it("uses a capped 800x600 viewport without changing WZ map coordinates", () => {
+    expect(getViewportScale(400)).toBe(0.5);
+    expect(getViewportScale(800)).toBe(1);
+    expect(getViewportScale(1000)).toBe(1);
+
+    const camera = getMapCamera({ centerX: 362, centerY: 2162 }, 874.5, 0.5);
+    expect(camera).toEqual({
+      left: -362,
+      top: -413,
+      centerX: 38,
+      centerY: -113,
+    });
+    expect(viewportPointToMap({ x: 200, y: 150 }, camera, 0.5)).toEqual({
+      x: 38,
+      y: -113,
+    });
   });
 });
 

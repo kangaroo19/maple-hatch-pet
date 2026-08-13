@@ -53,12 +53,51 @@ export type FrameSelection = {
   progress: number;
 };
 
+export const MAP_LOGIN_VIEWPORT = { width: 800, height: 600 } as const;
+
+export type MapCamera = {
+  left: number;
+  top: number;
+  centerX: number;
+  centerY: number;
+};
+
 const HIDDEN_PRODUCT_SCENE_OBJECTS = new Set([
   "Map.wz/Obj/login.img/NewChar/signboard/0",
 ]);
 
 export function shouldRenderSceneObject(source: string): boolean {
   return !HIDDEN_PRODUCT_SCENE_OBJECTS.has(source);
+}
+
+export function getViewportScale(clientWidth: number): number {
+  return Math.min(1, clientWidth / MAP_LOGIN_VIEWPORT.width);
+}
+
+export function getMapCamera(
+  map: Pick<MapLoginScene["map"], "centerX" | "centerY">,
+  scrollTop: number,
+  scale: number,
+): MapCamera {
+  const left = -map.centerX;
+  const top = scrollTop / scale - map.centerY;
+  return {
+    left,
+    top,
+    centerX: left + MAP_LOGIN_VIEWPORT.width / 2,
+    centerY: top + MAP_LOGIN_VIEWPORT.height / 2,
+  };
+}
+
+export function viewportPointToMap(
+  point: { x: number; y: number },
+  camera: Pick<MapCamera, "left" | "top">,
+  scale: number,
+): { x: number; y: number } {
+  return {
+    x: point.x / scale + camera.left,
+    y: point.y / scale + camera.top,
+  };
 }
 
 export function frameAtTime(

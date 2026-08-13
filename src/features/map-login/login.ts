@@ -14,11 +14,7 @@ export type LoginLayout = {
 };
 
 export type LoginTarget = "input" | "button";
-export type LoginButtonState =
-  | "normal"
-  | "mouseOver"
-  | "pressed"
-  | "disabled";
+export type LoginButtonState = "normal" | "mouseOver" | "pressed" | "disabled";
 
 type LoginAsset = {
   asset: string;
@@ -28,6 +24,7 @@ type LoginAsset = {
 
 export type LoginManifest = {
   formatVersion: 1;
+  frame: LoginAsset;
   title: LoginAsset;
   login: Record<LoginButtonState, LoginAsset>;
 };
@@ -132,6 +129,7 @@ export function validateLogin(candidate: unknown): LoginManifest {
   const login = manifest.login;
   if (
     manifest.formatVersion !== 1 ||
+    !validAsset(manifest.frame, 800, 600) ||
     !validAsset(manifest.title, 397, 219) ||
     !login ||
     !validAsset(login.normal, 95, 48) ||
@@ -141,4 +139,16 @@ export function validateLogin(candidate: unknown): LoginManifest {
   )
     throw new Error("로그인 자산 데이터가 올바르지 않습니다.");
   return manifest as LoginManifest;
+}
+
+export function validateLoginFrameImage(
+  manifest: LoginManifest,
+  image: Pick<HTMLImageElement, "naturalWidth" | "naturalHeight">,
+): void {
+  if (
+    image.naturalWidth !== manifest.frame.width ||
+    image.naturalHeight !== manifest.frame.height
+  ) {
+    throw new Error("로그인 프레임 이미지 크기가 올바르지 않습니다.");
+  }
 }

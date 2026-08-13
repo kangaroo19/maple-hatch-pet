@@ -211,10 +211,11 @@ async function main() {
     const manifest = {
       formatVersion: 1,
       source: {
-        login: "UI.wz/Login.img/Title",
+        login: "UI.wz/Login.img",
         patchVersion: 43,
         keySource: "ZLZ.dll",
       },
+      frame: await saveLoginCanvas(loginImage, "Common/frame", "frame.png"),
       title: await saveLoginCanvas(loginImage, "Title/MSTitle", "ms-title.png"),
       login: {
         normal: await saveLoginCanvas(
@@ -241,6 +242,9 @@ async function main() {
     };
     if (manifest.title.width !== 397 || manifest.title.height !== 219) {
       throw new Error("MSTitle dimensions do not match 397x219.");
+    }
+    if (manifest.frame.width !== 800 || manifest.frame.height !== 600) {
+      throw new Error("Login frame dimensions do not match 800x600.");
     }
     for (const asset of Object.values(manifest.login)) {
       if (asset.width !== 95 || asset.height !== 48) {

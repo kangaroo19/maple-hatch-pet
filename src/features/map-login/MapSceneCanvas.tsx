@@ -14,6 +14,7 @@ import {
   hitTestLogin,
   resolveLoginButtonState,
   validateLogin,
+  validateLoginFrameImage,
   type LoginLayout,
   type LoginManifest,
 } from "@/features/map-login/login";
@@ -40,9 +41,13 @@ import {
   alphaForFrame,
   frameAtTime,
   getBackgroundPosition,
+  getMapCamera,
   getTileMode,
+  getViewportScale,
+  MAP_LOGIN_VIEWPORT,
   shouldRenderSceneObject,
   validateScene,
+  viewportPointToMap,
   type MapLoginScene,
   type SceneFrame,
 } from "@/features/map-login/scene";
@@ -310,12 +315,17 @@ export function MapSceneCanvas({
       const loginSources = Object.values(login.login).map(
         (asset) => asset.asset,
       );
-      const sources = new Set([...sceneSources, ...loginSources]);
+      const sources = new Set([
+        ...sceneSources,
+        login.frame.asset,
+        ...loginSources,
+      ]);
       const loaded = await Promise.all(
         [...sources].map(async (src) => [src, await loadImage(src)] as const),
       );
       if (cancelled) return;
       const images = new Map(loaded);
+      validateLoginFrameImage(login, images.get(login.frame.asset)!);
       const viewport = viewportRef.current;
       const canvas = canvasRef.current;
       const context = canvas?.getContext("2d", { alpha: false });
@@ -324,7 +334,6 @@ export function MapSceneCanvas({
       const activeCanvas = canvas;
       const activeContext = context;
       let scale = 1;
-      let logicalHeight = 600;
       let deviceScale = 1;
 
       sceneRef.current = scene;
@@ -359,16 +368,14 @@ export function MapSceneCanvas({
       void loadCreatorAssets();
 
       function resize() {
-        scale = activeViewport.clientWidth / scene.map.width;
+        scale = getViewportScale(activeViewport.clientWidth);
         scaleRef.current = scale;
-        logicalHeight = Math.min(
-          scene.map.height,
-          Math.ceil(activeViewport.clientHeight / scale),
-        );
         deviceScale = Math.min(window.devicePixelRatio || 1, 2);
-        activeCanvas.width = Math.ceil(scene.map.width * deviceScale);
-        activeCanvas.height = Math.ceil(logicalHeight * deviceScale);
-        activeCanvas.style.height = `${logicalHeight * scale}px`;
+        activeCanvas.width = Math.ceil(MAP_LOGIN_VIEWPORT.width * deviceScale);
+        activeCanvas.height = Math.ceil(
+          MAP_LOGIN_VIEWPORT.height * deviceScale,
+        );
+        activeCanvas.style.height = `${MAP_LOGIN_VIEWPORT.height * scale}px`;
         activeContext.imageSmoothingEnabled = false;
       }
 
@@ -534,17 +541,16 @@ export function MapSceneCanvas({
       const startedAt = performance.now();
       function render(now: number) {
         const elapsed = now - startedAt;
-        const sceneTop = activeViewport.scrollTop / scale;
-        const camera = {
-          left: -scene.map.centerX,
-          top: sceneTop - scene.map.centerY,
-          centerX: -scene.map.centerX + scene.map.width / 2,
-          centerY: sceneTop - scene.map.centerY + logicalHeight / 2,
-        };
+        const camera = getMapCamera(scene.map, activeViewport.scrollTop, scale);
         activeContext.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
         activeContext.globalAlpha = 1;
         activeContext.fillStyle = "#050a11";
-        activeContext.fillRect(0, 0, scene.map.width, logicalHeight);
+        activeContext.fillRect(
+          0,
+          0,
+          MAP_LOGIN_VIEWPORT.width,
+          MAP_LOGIN_VIEWPORT.height,
+        );
 
         const drawBackground = (
           background: MapLoginScene["backgrounds"][number],
@@ -566,13 +572,13 @@ export function MapSceneCanvas({
             ? Math.floor(-left / cellWidth) - 1
             : 0;
           const lastColumn = mode.horizontal
-            ? Math.ceil((scene.map.width - left) / cellWidth) + 1
+            ? Math.ceil((MAP_LOGIN_VIEWPORT.width - left) / cellWidth) + 1
             : 1;
           const firstRow = mode.vertical
             ? Math.floor(-top / cellHeight) - 1
             : 0;
           const lastRow = mode.vertical
-            ? Math.ceil((logicalHeight - top) / cellHeight) + 1
+            ? Math.ceil((MAP_LOGIN_VIEWPORT.height - top) / cellHeight) + 1
             : 1;
           for (let row = firstRow; row < lastRow; row += 1) {
             for (let column = firstColumn; column < lastColumn; column += 1) {
@@ -645,13 +651,15 @@ export function MapSceneCanvas({
             pointer: creatorPointerRef.current,
             dropdown: dropdownRef.current,
             camera,
-            logicalWidth: scene.map.width,
-            logicalHeight,
+            logicalWidth: MAP_LOGIN_VIEWPORT.width,
+            logicalHeight: MAP_LOGIN_VIEWPORT.height,
             elapsed,
             transitionStartedAt: transitionRef.current.startedAt,
             reducedMotion: reducedMotionRef.current,
           });
         }
+        activeContext.globalAlpha = 1;
+        activeContext.drawImage(images.get(login.frame.asset)!, 0, 0);
         animationFrame = requestAnimationFrame(render);
       }
 
@@ -694,13 +702,12 @@ export function MapSceneCanvas({
     if (!scene || !viewport) return null;
     const bounds = event.currentTarget.getBoundingClientRect();
     const scale = scaleRef.current;
-    return {
-      x: (event.clientX - bounds.left) / scale - scene.map.centerX,
-      y:
-        (event.clientY - bounds.top) / scale +
-        viewport.scrollTop / scale -
-        scene.map.centerY,
-    };
+    const camera = getMapCamera(scene.map, viewport.scrollTop, scale);
+    return viewportPointToMap(
+      { x: event.clientX - bounds.left, y: event.clientY - bounds.top },
+      camera,
+      scale,
+    );
   }
 
   function loginTargetAt(event: ReactPointerEvent<HTMLCanvasElement>) {

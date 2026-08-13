@@ -45,11 +45,11 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 
 여기서 조회 성공은 새 닉네임의 중복 여부를 확인한다는 뜻이 아니라, 입력한 닉네임으로 실제 메이플스토리 캐릭터를 찾았다는 뜻이다. 사용자가 상태별 설정을 마치면 제품 명세의 Pet 생성 단계로 이어진다. 상태와 선택 범위의 상세 계약은 [MVP PRD](../product-spec/mvp.md)를 따른다.
 
-현재 PoC의 CSS 기반 로그인 폼은 접근성 흐름을 확인하기 위한 모의 UI이며 원본 로그인 패널의 시각 기준이 아니다. 제품은 KMS v1.2.43 `UI.wz/Login.img`에서 `Title/MSTitle`(`397 × 219`), `Title/BtLogin`의 `normal`·`mouseOver`·`pressed`·`disabled`(각 `95 × 48`), `Notice`, `NewChar`의 양피지·화살표·`charAlert` 자산을 추출하고 `UI.wz/Basic.img`에서 콤보박스와 탭 조각을 추출한다. `MSTitle`은 버전 자산으로 유지하되 화면에는 표시하지 않고, 로그인과 NewChar 편집 UI는 MapLogin Canvas가 직접 렌더링한다. 추출 결과는 최종 앱의 `public/map-login/kms-v43/`에 버전된 정적 자산으로 포함한다.
+현재 PoC의 CSS 기반 로그인 폼은 접근성 흐름을 확인하기 위한 모의 UI이며 원본 로그인 패널의 시각 기준이 아니다. 제품은 KMS v1.2.43 `UI.wz/Login.img`에서 `Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`), `Title/BtLogin`의 `normal`·`mouseOver`·`pressed`·`disabled`(각 `95 × 48`), `Notice`, `NewChar`의 양피지·화살표·`charAlert` 자산을 추출하고 `UI.wz/Basic.img`에서 콤보박스와 탭 조각을 추출한다. `MSTitle`은 버전 자산으로 유지하되 화면에는 표시하지 않는다. 제품 Canvas는 고정 `800 × 600` 논리 뷰포트로 로그인과 NewChar 편집 UI를 렌더링한 뒤 `Common/frame`을 카메라와 무관한 마지막 레이어로 합성한다. 추출 결과는 최종 앱의 `public/map-login/kms-v43/`에 버전된 정적 자산으로 포함한다.
 
 로그인 입력과 버튼은 현재 장면의 `Title/signboard/0` bounds와 카메라 변환을 기준으로 배치한다. 빈 입력에는 배경·테두리·placeholder를 추가하지 않으며 긴 닉네임은 입력 영역에 clip한다. 화면에 보이는 HTML input/button overlay는 만들지 않고, 화면 밖 native form은 한글 IME, 붙여넣기, 선택, Tab, Enter/Space와 접근성만 담당한다. 계정 저장, 회원가입, 비밀번호 찾기와 월드 선택처럼 제품 기능으로 연결되지 않는 버튼이나 컨트롤은 표시하지 않는다.
 
-모든 제품 화면에는 `Data based on NEXON Open API`를 상시 표시하고 `/privacy` 링크를 제공한다.
+모든 제품 화면에는 `Data based on NEXON Open API`를 상시 표시하고 `/privacy` 링크를 제공한다. MapLogin 화면에서는 프레임 하단 중앙의 접근 가능한 HTML 오버레이로 표시한다.
 
 ### 캐릭터 생성 영역
 
@@ -116,7 +116,7 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 - v43 WZ 추출 결과인 scene, Notice·NewChar manifest와 PNG를 최종 앱의 `public/map-login/kms-v43/`에 커밋하고 Next.js 정적 자산으로 제공한다.
 - 제품 빌드나 Vercel 배포 중에 원본 WZ를 다시 읽지 않는다. 원본 WZ와 DLL은 저장소 밖 읽기 전용 입력이다.
 - scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신한다.
-- `MSTitle` 자산은 유지하되 표시하지 않고, 첫 로그인 화면의 `Title/signboard/0` 패널에 `BtLogin` 4상태와 Canvas 입력을 장면·카메라 좌표로 배치한다.
+- `Common/frame`은 `800 × 600` 고정 화면의 마지막 Canvas 레이어로 표시하고, `MSTitle`은 자산으로 유지하되 표시하지 않는다. 첫 로그인 화면의 `Title/signboard/0` 패널에는 `BtLogin` 4상태와 Canvas 입력을 장면·카메라 좌표로 배치한다.
 - `new-char.json`은 `formatVersion: 1`이며 `NewChar` 양피지·화살표·`charAlert`와 `Basic.img` 콤보박스·탭 조각의 출처, 크기, origin과 delay를 고정한다.
 - 비기능 계정 컨트롤은 만들지 않는다.
 - WZ 추출 자산을 비상업 Production에서 공개 제공하는 권리는 별도로 확인되지 않았다. 사용자는 이 위험을 인지하고 MVP 전제로 수용했으며, 이는 법적 허가나 권리 확인을 뜻하지 않는다.

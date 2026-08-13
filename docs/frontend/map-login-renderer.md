@@ -12,7 +12,7 @@ PoC는 완성된 맵 이미지를 추출하지 않는다. Node.js 추출기가 W
 
 ```text
 UI.wz/MapLogin.img        맵 크기, 배경과 오브젝트 배치
-UI.wz/Login.img           Notice 배경과 확인 버튼
+UI.wz/Login.img           제품 고정 프레임, Notice 배경과 확인 버튼
 Map.wz/Back/login.img     배경 Canvas와 애니메이션
 Map.wz/Obj/login.img      오브젝트 Canvas와 애니메이션
           │
@@ -258,6 +258,8 @@ scroll-space height  = map.height × scale
 
 `scale`은 CSS 픽셀과 맵 논리 좌표의 비율이고 `deviceScale`은 Canvas bitmap 선명도를 위한 DPR이다. 두 값을 섞지 않는다.
 
+제품 통합은 PoC의 가변 논리 높이 대신 `800 × 600` 고정 논리 뷰포트를 사용한다. CSS 화면은 원본 크기보다 확대하지 않고 가용 폭이나 높이가 부족할 때만 4:3으로 축소하며, 스크롤 공간 높이는 `map.height × (viewport.clientWidth / 800)`으로 계산한다.
+
 ## 6. 카메라 좌표
 
 매 렌더 프레임에 `viewport.scrollTop`을 맵 논리 좌표로 바꾼다.
@@ -267,9 +269,11 @@ sceneTop = viewport.scrollTop / scale
 
 camera.left    = -map.centerX
 camera.top     = sceneTop - map.centerY
-camera.centerX = -map.centerX + map.width / 2
-camera.centerY = sceneTop - map.centerY + logicalViewHeight / 2
+camera.centerX = -map.centerX + 400
+camera.centerY = sceneTop - map.centerY + 300
 ```
+
+위 중심 공식의 `400`, `300`은 제품 통합의 고정 `800 × 600` 논리 뷰포트 절반이다. PoC의 가변 뷰포트에서는 각각 `map.width / 2`, `logicalViewHeight / 2`를 사용한다.
 
 오브젝트의 화면 anchor는 다음과 같다.
 
@@ -362,7 +366,9 @@ y += camera.centerY × (100 + ry) / 100
 5. `front`가 거짓인 배경을 원본 순서대로 그린다.
 6. `layer`, `z`, `order`로 정렬된 오브젝트를 그린다.
 7. `front`가 참인 배경을 원본 순서대로 그린다.
-8. 다음 animation frame을 요청한다.
+8. 제품 로그인 또는 NewChar Canvas UI를 그린다.
+9. 제품 통합에서는 `UI.wz/Login.img/Common/frame`을 화면 좌표 `(0, 0)`에 마지막으로 그린다.
+10. 다음 animation frame을 요청한다.
 
 `setTransform()`을 매 프레임 사용하므로 이전 프레임의 scale이 누적되지 않는다. 애니메이션은 스크롤 이벤트에 묶이지 않아 사용자가 멈춘 위치에서도 계속 진행된다.
 

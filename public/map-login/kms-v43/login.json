@@ -1,9 +1,15 @@
 {
   "formatVersion": 1,
   "source": {
-    "login": "UI.wz/Login.img/Title",
+    "login": "UI.wz/Login.img",
     "patchVersion": 43,
     "keySource": "ZLZ.dll"
+  },
+  "frame": {
+    "asset": "/map-login/kms-v43/login/frame.png",
+    "width": 800,
+    "height": 600,
+    "source": "UI.wz/Login.img/Common/frame"
   },
   "title": {
     "asset": "/map-login/kms-v43/login/ms-title.png",

@@ -29,7 +29,7 @@ async function clickCanvasLoginTarget(page: Page, target: "input" | "button") {
   const point = await canvas.evaluate((element, selectedTarget) => {
     const canvasElement = element as HTMLCanvasElement;
     const mapViewport = canvasElement.closest(".map-viewport") as HTMLElement;
-    const scale = mapViewport.clientWidth / 849;
+    const scale = mapViewport.clientWidth / 800;
     const camera = {
       left: -362,
       top: mapViewport.scrollTop / scale - 2162,
@@ -67,7 +67,7 @@ async function clickCanvasCreatorTarget(
   const point = await canvas.evaluate((element, selectedTarget) => {
     const canvasElement = element as HTMLCanvasElement;
     const mapViewport = canvasElement.closest(".map-viewport") as HTMLElement;
-    const scale = mapViewport.clientWidth / 849;
+    const scale = mapViewport.clientWidth / 800;
     const camera = {
       left: -362,
       top: mapViewport.scrollTop / scale - 2162,

@@ -9,6 +9,7 @@ import {
   rectsOverlap,
   resolveLoginButtonState,
   validateLogin,
+  validateLoginFrameImage,
 } from "@/features/map-login/login";
 import { validateScene } from "@/features/map-login/scene";
 
@@ -125,7 +126,7 @@ describe("MapLogin login button state", () => {
 });
 
 describe("MapLogin login manifest", () => {
-  it("provides all four 95x48 BtLogin states while retaining MSTitle", () => {
+  it("provides the fixed 800x600 frame with all login assets", () => {
     const manifest = validateLogin(
       JSON.parse(
         readFileSync("public/map-login/kms-v43/login.json", "utf8"),
@@ -141,5 +142,46 @@ describe("MapLogin login manifest", () => {
     for (const asset of Object.values(manifest.login))
       expect(asset).toMatchObject({ width: 95, height: 48 });
     expect(manifest.title).toMatchObject({ width: 397, height: 219 });
+    expect(manifest.frame).toMatchObject({ width: 800, height: 600 });
+  });
+
+  it("rejects a missing or incorrectly sized fixed frame", () => {
+    const manifest = JSON.parse(
+      readFileSync("public/map-login/kms-v43/login.json", "utf8"),
+    ) as Record<string, unknown>;
+    const withoutFrame = { ...manifest, frame: undefined };
+
+    expect(() => validateLogin(withoutFrame)).toThrow("로그인 자산");
+    expect(() =>
+      validateLogin({
+        ...manifest,
+        frame: {
+          asset: "/map-login/kms-v43/login/frame.png",
+          width: 849,
+          height: 600,
+        },
+      }),
+    ).toThrow("로그인 자산");
+  });
+
+  it("rejects a loaded frame whose intrinsic size disagrees with the manifest", () => {
+    const manifest = validateLogin(
+      JSON.parse(
+        readFileSync("public/map-login/kms-v43/login.json", "utf8"),
+      ) as unknown,
+    );
+
+    expect(() =>
+      validateLoginFrameImage(manifest, {
+        naturalWidth: 849,
+        naturalHeight: 600,
+      }),
+    ).toThrow("로그인 프레임");
+    expect(() =>
+      validateLoginFrameImage(manifest, {
+        naturalWidth: 800,
+        naturalHeight: 600,
+      }),
+    ).not.toThrow();
   });
 });
