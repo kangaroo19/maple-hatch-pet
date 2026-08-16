@@ -1,7 +1,8 @@
-import { publishSpritesheet } from "@/server/blob-store";
+import { publishPetPackage } from "@/server/blob-store";
 import { createPetHandler, writeRequestLog } from "@/server/handlers";
 import { fetchCharacter } from "@/server/nexon-client";
 import { generateSpritesheet } from "@/server/pet-generator";
+import { createPetPackage } from "@/server/pet-package";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -13,7 +14,9 @@ const handler = createPetHandler({
       signal,
     }),
   generateSpritesheet,
-  publishSpritesheet: (png, signal) => publishSpritesheet(png, { signal }),
+  createPackage: createPetPackage,
+  publishPackage: (packageBytes, petId, signal) =>
+    publishPetPackage(packageBytes, petId, { signal }),
   log: writeRequestLog,
 });
 

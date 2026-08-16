@@ -1,7 +1,11 @@
 import { randomUUID } from "node:crypto";
 
-import { AppError, invalidRequest, internalError } from "@/lib/errors";
-import { buildPetDeepLink } from "@/lib/pet-link";
+import {
+  AppError,
+  invalidRequest,
+  internalError,
+  petPackageNotFound,
+} from "@/lib/errors";
 import {
   normalizePetRequest,
   planFrames,
@@ -24,6 +28,7 @@ export type RequestLog = {
   deletedCount?: number;
 };
 type Logger = (entry: RequestLog) => void;
+const PRODUCTION_SERVICE_ORIGIN = "https://maple-hatch-pet.vercel.app";
 
 export const writeRequestLog: Logger = (entry) =>
   console.info(JSON.stringify(entry));
@@ -114,7 +119,18 @@ export function createPetHandler(dependencies: {
     rows: PlannedRow[],
     signal: AbortSignal,
   ) => Promise<Buffer>;
-  publishSpritesheet: (png: Buffer, signal: AbortSignal) => Promise<string>;
+  createPackage: (input: {
+    petId: string;
+    displayName: string;
+    description: string;
+    spritesheet: Buffer;
+  }) => Buffer;
+  publishPackage: (
+    packageBytes: Buffer,
+    petId: string,
+    signal: AbortSignal,
+  ) => Promise<void>;
+  randomUUID?: () => string;
   now?: () => Date;
   timeoutMs?: number;
   log?: Logger;
@@ -152,23 +168,29 @@ export function createPetHandler(dependencies: {
           controller.signal,
         );
         if (controller.signal.aborted) throw timeoutError;
+        const description = `${currentCharacter.world} ${currentCharacter.class} 캐릭터`;
+        const petId = (dependencies.randomUUID ?? randomUUID)();
+        state = "packaging";
+        const packageBytes = dependencies.createPackage({
+          petId,
+          displayName: currentCharacter.name,
+          description,
+          spritesheet: png,
+        });
         state = "publishing";
-        const spritesheetUrl = await dependencies.publishSpritesheet(
-          png,
+        await dependencies.publishPackage(
+          packageBytes,
+          petId,
           controller.signal,
         );
         if (controller.signal.aborted) throw timeoutError;
-        const description = `${currentCharacter.world} ${currentCharacter.class} 캐릭터`;
         const createdAt = (dependencies.now ?? (() => new Date()))();
         return {
           displayName: currentCharacter.name,
           description,
-          spritesheetUrl,
-          deepLink: buildPetDeepLink({
-            name: currentCharacter.name,
-            imageUrl: spritesheetUrl,
-            description,
-          }),
+          petId,
+          packageUrl: `${PRODUCTION_SERVICE_ORIGIN}/api/pets/${petId}/package`,
+          installCommand: `npx maple-hatch-pet add ${petId}`,
           expiresAt: new Date(
             createdAt.getTime() + 28 * 24 * 60 * 60 * 1000,
           ).toISOString(),
@@ -193,6 +215,49 @@ export function createPetHandler(dependencies: {
       return response;
     } finally {
       if (timeout) clearTimeout(timeout);
+    }
+  };
+}
+
+export function createPackageDownloadHandler(dependencies: {
+  getPackage: (petId: string) => Promise<{
+    stream: ReadableStream<Uint8Array>;
+    size: number;
+  } | null>;
+  isPetId: (petId: string) => boolean;
+  log?: Logger;
+}) {
+  return async (request: Request, petId: string): Promise<Response> => {
+    const startedAt = Date.now();
+    const requestId = randomUUID();
+    try {
+      if (!dependencies.isPetId(petId)) throw petPackageNotFound();
+      const petPackage = await dependencies.getPackage(petId);
+      if (!petPackage) throw petPackageNotFound();
+      const response = new Response(petPackage.stream, {
+        headers: {
+          "cache-control": "public, max-age=3600",
+          "content-disposition": `attachment; filename="${petId}.codex-pet.zip"`,
+          "content-length": String(petPackage.size),
+          "content-type": "application/zip",
+          "x-content-type-options": "nosniff",
+        },
+      });
+      logResult(dependencies.log, startedAt, requestId, {
+        path: "/api/pets/:petId/package",
+        state: "ready",
+        status: 200,
+      });
+      return response;
+    } catch (error) {
+      const response = errorResponse(error);
+      logResult(dependencies.log, startedAt, requestId, {
+        path: "/api/pets/:petId/package",
+        state: "failed",
+        status: response.status,
+        code: codeFor(error),
+      });
+      return response;
     }
   };
 }

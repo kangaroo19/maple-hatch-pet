@@ -31,5 +31,5 @@
     "playwright.config.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "poc"]
+  "exclude": ["node_modules", "poc", "cli"]
 }

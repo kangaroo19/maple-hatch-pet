@@ -105,10 +105,11 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
       json: {
         displayName: "천짱",
         description: "스카니아 마법사 캐릭터",
-        spritesheetUrl:
-          "https://store.public.blob.vercel-storage.com/pets/test.png",
-        deepLink:
-          "codex://pets/install?name=%EC%B2%9C%EC%A7%B1&imageUrl=https%3A%2F%2Fstore.public.blob.vercel-storage.com%2Fpets%2Ftest.png&description=test&spriteVersionNumber=1",
+        petId: "12345678-1234-4234-9234-123456789abc",
+        packageUrl:
+          "http://localhost/api/pets/12345678-1234-4234-9234-123456789abc/package",
+        installCommand:
+          "npx maple-hatch-pet add 12345678-1234-4234-9234-123456789abc",
         expiresAt: "2026-09-06T00:00:00.000Z",
       },
     }),
@@ -140,12 +141,16 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   await expect(
     page.getByRole("dialog", { name: "Pet 설치 정보" }),
   ).toHaveAttribute("open", "");
-  await expect(page.getByRole("link", { name: "Codex에 설치" })).toBeFocused();
   await expect(
-    page.getByText("생성된 이미지는 28일 동안 설치에 사용할 수 있어요."),
+    page.getByRole("button", { name: "설치 명령 복사" }),
+  ).toBeFocused();
+  await expect(
+    page.getByText("이 설치 명령은 생성 후 28일 동안 사용할 수 있습니다."),
   ).toHaveCount(1);
-  const deletionLink = page.getByRole("link", { name: "이미지 삭제 요청" });
-  await expect(deletionLink).toHaveAttribute("href", /test\.png/);
+  const deletionLink = page.getByRole("link", {
+    name: "이미지 삭제 요청",
+  });
+  await expect(deletionLink).toHaveAttribute("href", /12345678-1234/);
 
   await clickCanvasCreatorTarget(page, "close");
   for (let index = 0; index < 8; index += 1)
@@ -153,10 +158,14 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   await expect(editor).toContainText("검토 (REVIEW) · 9/9");
   await expect(page.getByRole("button", { name: "설치 정보" })).toHaveCount(1);
   await page.getByLabel("표정").selectOption("E00");
-  await expect(page.getByRole("link", { name: "Codex에 설치" })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "설치 명령 복사" }),
+  ).toHaveCount(0);
 
   await page.reload();
-  await expect(page.getByRole("link", { name: "Codex에 설치" })).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "설치 명령 복사" }),
+  ).toHaveCount(0);
 });
 
 test("privacy and narrow viewport contracts", async ({ page }) => {

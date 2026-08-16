@@ -33,8 +33,9 @@ import type { Character } from "@/server/nexon-client";
 type Result = {
   displayName: string;
   description: string;
-  spritesheetUrl: string;
-  deepLink: string;
+  petId: string;
+  packageUrl: string;
+  installCommand: string;
   expiresAt: string;
 };
 
@@ -64,7 +65,7 @@ export function MapleHatchApp() {
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const resetButtonRef = useRef<HTMLButtonElement>(null);
   const installDialogRef = useRef<HTMLDialogElement>(null);
-  const installLinkRef = useRef<HTMLAnchorElement>(null);
+  const installButtonRef = useRef<HTMLButtonElement>(null);
   const deleteLinkRef = useRef<HTMLAnchorElement>(null);
   const closeInstallRef = useRef<HTMLButtonElement>(null);
   const resetTimerRef = useRef<number | null>(null);
@@ -85,6 +86,7 @@ export function MapleHatchApp() {
   const [states, setStates] = useState<StateInputs>(initialStates);
   const [result, setResult] = useState<Result | null>(null);
   const [resultOpen, setResultOpen] = useState(false);
+  const [copyStatus, setCopyStatus] = useState("");
   const [creatorClosing, setCreatorClosing] = useState(false);
   const [creatorFocused, setCreatorFocused] = useState<NewCharTarget | null>(
     null,
@@ -155,6 +157,7 @@ export function MapleHatchApp() {
 
   const closeInstallModal = useCallback(() => {
     setResultOpen(false);
+    setCopyStatus("");
     requestAnimationFrame(() => focusNativeControl(createButtonRef.current));
   }, [focusNativeControl]);
 
@@ -163,11 +166,21 @@ export function MapleHatchApp() {
     if (!dialog) return;
     if (resultOpen && result) {
       if (!dialog.open) dialog.show();
-      requestAnimationFrame(() => focusNativeControl(installLinkRef.current));
+      requestAnimationFrame(() => focusNativeControl(installButtonRef.current));
     } else if (dialog.open) {
       dialog.close();
     }
   }, [focusNativeControl, result, resultOpen]);
+
+  async function copyInstallCommand() {
+    if (!result) return;
+    try {
+      await navigator.clipboard.writeText(result.installCommand);
+      setCopyStatus("설치 명령을 복사했습니다.");
+    } catch {
+      setCopyStatus("복사하지 못했습니다. 화면의 명령을 직접 복사해 주세요.");
+    }
+  }
 
   const selected = states[selectedState];
   const selectedAction = (selected.action ?? "A03") as ActionCode;
@@ -318,7 +331,7 @@ export function MapleHatchApp() {
       emotion: emotionSelectRef.current,
       primary: createButtonRef.current,
       secondary: resetButtonRef.current,
-      install: installLinkRef.current,
+      install: installButtonRef.current,
       delete: deleteLinkRef.current,
       close: closeInstallRef.current,
     };
@@ -353,7 +366,7 @@ export function MapleHatchApp() {
     );
 
   const deleteHref = result
-    ? `mailto:1000jjj@naver.com?subject=${encodeURIComponent("Maple Hatch Pet 이미지 삭제 요청")}&body=${encodeURIComponent(`삭제할 생성 이미지 URL: ${result.spritesheetUrl}`)}`
+    ? `mailto:1000jjj@naver.com?subject=${encodeURIComponent("Maple Hatch Pet 이미지 삭제 요청")}&body=${encodeURIComponent(`삭제할 Pet ID: ${result.petId}`)}`
     : "";
 
   return (
@@ -446,6 +459,7 @@ export function MapleHatchApp() {
                 createPending,
                 hasResult: Boolean(result),
                 modalOpen: resultOpen,
+                installCommand: result?.installCommand ?? null,
                 focused: creatorFocused,
               }}
               creatorKeyboardCommand={creatorKeyboardCommand}
@@ -463,7 +477,7 @@ export function MapleHatchApp() {
                 else void createPet();
               }}
               onSecondaryActivate={reset}
-              onInstallActivate={() => installLinkRef.current?.click()}
+              onInstallActivate={() => installButtonRef.current?.click()}
               onDeleteActivate={() => deleteLinkRef.current?.click()}
               onModalClose={closeInstallModal}
             />
@@ -624,7 +638,10 @@ export function MapleHatchApp() {
           event.preventDefault();
           closeInstallModal();
         }}
-        onClose={() => setResultOpen(false)}
+        onClose={() => {
+          setResultOpen(false);
+          setCopyStatus("");
+        }}
         onKeyDown={(event) => {
           if (event.key === "Escape") {
             event.preventDefault();
@@ -633,7 +650,7 @@ export function MapleHatchApp() {
           }
           if (event.key !== "Tab") return;
           const controls = [
-            installLinkRef.current,
+            installButtonRef.current,
             deleteLinkRef.current,
             closeInstallRef.current,
           ].filter(
@@ -652,17 +669,25 @@ export function MapleHatchApp() {
         }}
       >
         <p>Pet 생성이 완료되었습니다.</p>
-        <p>생성된 이미지는 28일 동안 설치에 사용할 수 있어요.</p>
+        <p>아래 명령을 터미널에서 실행해 주세요.</p>
         {result && (
           <>
-            <a
-              ref={installLinkRef}
-              href={result.deepLink}
+            <code>{result.installCommand}</code>
+            <button
+              ref={installButtonRef}
+              type="button"
               onFocus={() => setCreatorFocused("install")}
               onBlur={() => setCreatorFocused(null)}
+              onClick={() => void copyInstallCommand()}
             >
-              Codex에 설치
-            </a>
+              설치 명령 복사
+            </button>
+            <p>이 설치 명령은 생성 후 28일 동안 사용할 수 있습니다.</p>
+            <p>
+              설치가 끝나면 Codex 데스크톱의 Settings &gt; Pets에서 Refresh를
+              눌러 주세요.
+            </p>
+            <p aria-live="polite">{copyStatus}</p>
             <a
               ref={deleteLinkRef}
               href={deleteHref}

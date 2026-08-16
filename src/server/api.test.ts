@@ -6,6 +6,7 @@ import { DEFAULT_STATES } from "@/lib/pet-contract";
 import {
   createCronHandler,
   createLookupHandler,
+  createPackageDownloadHandler,
   createPetHandler,
 } from "@/server/handlers";
 import { fetchCharacter } from "@/server/nexon-client";
@@ -145,8 +146,9 @@ describe("route handlers", () => {
         return character;
       },
       generateSpritesheet: async () => Buffer.from("png"),
-      publishSpritesheet: async () =>
-        "https://store.public.blob.vercel-storage.com/pets/unique.png",
+      createPackage: () => Buffer.from("zip"),
+      publishPackage: async () => undefined,
+      randomUUID: () => "12345678-1234-4234-9234-123456789abc",
       now: () => new Date("2026-08-09T12:34:56.000Z"),
     });
     const response = await handler(
@@ -165,10 +167,11 @@ describe("route handlers", () => {
     expect(await response.json()).toEqual({
       displayName: "천짱",
       description: "스카니아 마법사 캐릭터",
-      spritesheetUrl:
-        "https://store.public.blob.vercel-storage.com/pets/unique.png",
-      deepLink:
-        "codex://pets/install?name=%EC%B2%9C%EC%A7%B1&imageUrl=https%3A%2F%2Fstore.public.blob.vercel-storage.com%2Fpets%2Funique.png&description=%EC%8A%A4%EC%B9%B4%EB%8B%88%EC%95%84+%EB%A7%88%EB%B2%95%EC%82%AC+%EC%BA%90%EB%A6%AD%ED%84%B0&spriteVersionNumber=1",
+      petId: "12345678-1234-4234-9234-123456789abc",
+      packageUrl:
+        "https://maple-hatch-pet.vercel.app/api/pets/12345678-1234-4234-9234-123456789abc/package",
+      installCommand:
+        "npx maple-hatch-pet add 12345678-1234-4234-9234-123456789abc",
       expiresAt: "2026-09-06T12:34:56.000Z",
     });
   });
@@ -177,8 +180,8 @@ describe("route handlers", () => {
     const handler = createPetHandler({
       fetchCharacter: async () => character,
       generateSpritesheet: async () => new Promise<Buffer>(() => undefined),
-      publishSpritesheet: async () =>
-        "https://store.public.blob.vercel-storage.com/pets/never.png",
+      createPackage: () => Buffer.from("zip"),
+      publishPackage: async () => undefined,
       timeoutMs: 5,
     });
     const response = await Promise.race([
@@ -227,6 +230,77 @@ describe("route handlers", () => {
         code: "INVALID_REQUEST",
         message: "요청을 확인해 주세요.",
         retryable: false,
+      },
+    });
+  });
+
+  it("streams a package without exposing its Blob URL", async () => {
+    const handler = createPackageDownloadHandler({
+      isPetId: () => true,
+      getPackage: async () => ({
+        stream: new Blob(["zip"]).stream(),
+        size: 3,
+      }),
+    });
+    const response = await handler(
+      new Request(`http://localhost/api/pets/id/package`),
+      "12345678-1234-4234-9234-123456789abc",
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("application/zip");
+    expect(response.headers.get("content-length")).toBe("3");
+    expect(await response.text()).toBe("zip");
+  });
+
+  it("returns a stable 404 for an invalid or expired package id", async () => {
+    const handler = createPackageDownloadHandler({
+      isPetId: () => false,
+      getPackage: async () => {
+        throw new Error("must not fetch");
+      },
+    });
+    const response = await handler(
+      new Request("http://localhost/api/pets/bad/package"),
+      "bad",
+    );
+
+    expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({
+      error: {
+        code: "PET_PACKAGE_NOT_FOUND",
+        message: "Pet 패키지를 찾을 수 없거나 만료되었습니다.",
+        retryable: false,
+      },
+    });
+  });
+
+  it("returns the common error envelope when package publishing fails", async () => {
+    const handler = createPetHandler({
+      fetchCharacter: async () => character,
+      generateSpritesheet: async () => Buffer.from("png"),
+      createPackage: () => Buffer.from("zip"),
+      publishPackage: async () => {
+        throw new Error("storage detail");
+      },
+    });
+    const response = await handler(
+      new Request("http://localhost/api/pets", {
+        method: "POST",
+        body: JSON.stringify({
+          characterName: "천짱",
+          catalogVersion: 1,
+          states: DEFAULT_STATES,
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({
+      error: {
+        code: "INTERNAL_ERROR",
+        message: "Pet을 만들지 못했습니다.",
+        retryable: true,
       },
     });
   });

@@ -17,19 +17,20 @@ export default function PrivacyPage() {
         <p>
           조회 데이터는 요청 사이에 캐시하지 않습니다. Pet 만들기 요청에서는
           Vercel Function이 NEXON에서 현재 정보를 다시 조회하고 공식 캐릭터
-          이미지만으로 PNG를 생성합니다.
+          이미지만으로 Pet 설치 패키지를 생성합니다.
         </p>
         <p>
-          생성 PNG는 Vercel Blob 공개 저장소에 저장되며 URL을 아는 누구나 접근할
-          수 있습니다. 생성 시각부터 <strong>28일간 유효</strong>하고, 매일
-          실행되는 정리 작업으로
+          생성 패키지에는 Pet 정보와 PNG 스프라이트시트가 포함되며 Vercel Blob
+          공개 저장소에 저장됩니다. Pet ID를 아는 누구나 서비스의 다운로드
+          경로로 접근할 수 있습니다. 생성 시각부터 <strong>28일간 유효</strong>
+          하고, 매일 실행되는 정리 작업으로
           <strong> 최대 30일 이내</strong> 삭제됩니다.
         </p>
         <h2>요청과 문의</h2>
         <p>
           접근·정정·삭제 요청은{" "}
           <a href="mailto:1000jjj@naver.com">1000jjj@naver.com</a>으로 보내
-          주세요. 생성 이미지의 조기 삭제를 요청할 때는 생성 URL을 이메일 본문에
+          주세요. 생성 패키지의 조기 삭제를 요청할 때는 Pet ID를 이메일 본문에
           포함해야 합니다.
         </p>
         <h2>NEXON 데이터 안내</h2>

@@ -1,0 +1,32 @@
+{
+  "name": "maple-hatch-pet",
+  "version": "1.0.0",
+  "description": "Install Maple Hatch Pet packages into Codex",
+  "type": "module",
+  "bin": {
+    "maple-hatch-pet": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "^24.0.0",
+    "@types/pngjs": "^6.0.5",
+    "typescript": "^5.9.0",
+    "vitest": "^4.0.0"
+  }
+}

@@ -2,42 +2,47 @@
 
 import { describe, expect, it } from "vitest";
 
-import { cleanupExpiredPets, publishSpritesheet } from "@/server/blob-store";
+import { cleanupExpiredPets, publishPetPackage } from "@/server/blob-store";
+
+const petId = "12345678-1234-4234-9234-123456789abc";
 
 describe("Vercel Blob boundary", () => {
-  it("publishes a unique pets PNG to the non-production public store and verifies HTTPS download", async () => {
+  it("publishes one immutable package to the non-production store", async () => {
     const calls: Array<{ pathname: string; options: Record<string, unknown> }> =
       [];
     const controller = new AbortController();
-    const url = await publishSpritesheet(Buffer.from("png"), {
+    await publishPetPackage(Buffer.from("zip"), petId, {
       signal: controller.signal,
       environment: "preview",
       productionToken: "prod-token",
       nonProductionToken: "preview-token",
-      randomUUID: () => "12345678-1234-1234-1234-123456789abc",
-      put: async (pathname, _body, options) => {
+      put: (async (
+        pathname: string,
+        _body: unknown,
+        options: Record<string, unknown>,
+      ) => {
         calls.push({ pathname, options });
         return {
           url: `https://store.public.blob.vercel-storage.com/${pathname}`,
+          downloadUrl: "",
+          pathname,
+          contentType: "application/zip",
+          contentDisposition: "",
         };
-      },
+      }) as never,
       fetchImpl: async () =>
-        new Response(Buffer.from("png"), {
-          status: 200,
-          headers: { "content-type": "image/png" },
+        new Response("zip", {
+          headers: { "content-type": "application/zip" },
         }),
     });
 
-    expect(url).toBe(
-      "https://store.public.blob.vercel-storage.com/pets/12345678-1234-1234-1234-123456789abc.png",
-    );
     expect(calls).toEqual([
       {
-        pathname: "pets/12345678-1234-1234-1234-123456789abc.png",
+        pathname: `pet-packages/${petId}.codex-pet.zip`,
         options: {
           access: "public",
           addRandomSuffix: false,
-          contentType: "image/png",
+          contentType: "application/zip",
           cacheControlMaxAge: 2419200,
           token: "preview-token",
           abortSignal: controller.signal,
@@ -46,17 +51,31 @@ describe("Vercel Blob boundary", () => {
     ]);
   });
 
-  it("uses only the production token while deleting every expired pets page", async () => {
+  it("rejects a published object with the wrong content type", async () => {
+    await expect(
+      publishPetPackage(Buffer.from("zip"), petId, {
+        environment: "production",
+        productionToken: "prod-token",
+        put: (async (pathname: string) => ({
+          url: `https://store.public.blob.vercel-storage.com/${pathname}`,
+        })) as never,
+        fetchImpl: async () =>
+          new Response("zip", { headers: { "content-type": "text/plain" } }),
+      }),
+    ).rejects.toThrow("SERVICE_UNAVAILABLE");
+  });
+
+  it("uses only the production token while deleting expired package pages", async () => {
     const deleted: string[][] = [];
     const pages = [
       {
         blobs: [
           {
-            url: "https://blob/old.png",
+            url: "https://blob/old.zip",
             uploadedAt: new Date("2026-07-01T00:00:00Z"),
           },
           {
-            url: "https://blob/new.png",
+            url: "https://blob/new.zip",
             uploadedAt: new Date("2026-08-01T00:00:00Z"),
           },
         ],
@@ -66,7 +85,7 @@ describe("Vercel Blob boundary", () => {
       {
         blobs: [
           {
-            url: "https://blob/old2.png",
+            url: "https://blob/old2.zip",
             uploadedAt: new Date("2026-07-02T00:00:00Z"),
           },
         ],
@@ -89,12 +108,12 @@ describe("Vercel Blob boundary", () => {
 
     expect(count).toBe(2);
     expect(listCalls).toEqual([
-      { prefix: "pets/", cursor: undefined, token: "prod-token" },
-      { prefix: "pets/", cursor: "next", token: "prod-token" },
+      { prefix: "pet-packages/", cursor: undefined, token: "prod-token" },
+      { prefix: "pet-packages/", cursor: "next", token: "prod-token" },
     ]);
     expect(deleted).toEqual([
-      ["https://blob/old.png"],
-      ["https://blob/old2.png"],
+      ["https://blob/old.zip"],
+      ["https://blob/old2.zip"],
     ]);
   });
 });

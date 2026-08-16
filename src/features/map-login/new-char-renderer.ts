@@ -35,6 +35,7 @@ export type CanvasCreatorState = {
   createPending: boolean;
   hasResult: boolean;
   modalOpen: boolean;
+  installCommand: string | null;
   focused: NewCharTarget | null;
 };
 
@@ -308,7 +309,25 @@ function drawModal(
   context.fillStyle = "#483521";
   context.fillText("Pet 생성이 완료되었습니다.", modal.x + 121, modal.y + 47);
   context.font = textFont;
-  context.fillText("28일 동안 설치할 수 있어요.", modal.x + 121, modal.y + 65);
+  context.fillText(
+    "터미널에서 설치 명령을 실행하세요.",
+    modal.x + 121,
+    modal.y + 62,
+  );
+  context.font = '9px Consolas, "Courier New", monospace';
+  const commandParts = state.installCommand?.split(" ") ?? [];
+  context.fillText(
+    commandParts.slice(0, 3).join(" "),
+    modal.x + 121,
+    modal.y + 77,
+  );
+  context.fillText(commandParts.at(-1) ?? "", modal.x + 121, modal.y + 89);
+  context.font = textFont;
+  context.fillText(
+    "설치 후 Settings > Pets에서 Refresh",
+    modal.x + 121,
+    modal.y + 101,
+  );
   context.textAlign = "left";
   context.fillStyle = "#65440e";
   context.fillText("이미지 삭제 요청", modal.x + 134, modal.y + 110);
@@ -319,7 +338,7 @@ function drawModal(
     layout.install,
     pointer.hovered === "install" || state.focused === "install",
     false,
-    "Codex에 설치",
+    "설치 명령 복사",
     camera,
   );
   drawTabButton(

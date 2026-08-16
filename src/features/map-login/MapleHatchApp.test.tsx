@@ -38,9 +38,11 @@ const character = {
 const petResult = {
   displayName: "테스트용사",
   description: "테스트",
-  spritesheetUrl: "https://example.com/pet.png",
-  deepLink:
-    "chatgpt://codex/pet/install?url=https%3A%2F%2Fexample.com%2Fpet.png",
+  petId: "12345678-1234-4234-9234-123456789abc",
+  packageUrl:
+    "https://example.com/api/pets/12345678-1234-4234-9234-123456789abc/package",
+  installCommand:
+    "npx maple-hatch-pet add 12345678-1234-4234-9234-123456789abc",
   expiresAt: "2026-09-08T00:00:00.000Z",
 };
 
@@ -72,6 +74,10 @@ beforeEach(() => {
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) =>
     window.setTimeout(() => callback(0), 0),
   );
+  Object.defineProperty(navigator, "clipboard", {
+    configurable: true,
+    value: { writeText: vi.fn(async () => undefined) },
+  });
   HTMLDialogElement.prototype.show = function show() {
     this.setAttribute("open", "");
   };
@@ -126,6 +132,12 @@ describe("MapleHatchApp NewChar editor", () => {
     expect(
       await screen.findByRole("dialog", { name: "Pet 설치 정보" }),
     ).toHaveAttribute("open");
+    const copyButton = screen.getByRole("button", {
+      name: "설치 명령 복사",
+    });
+    await waitFor(() => expect(copyButton).toHaveFocus());
+    await user.click(copyButton);
+    expect(screen.getByText("설치 명령을 복사했습니다.")).toBeVisible();
     await user.click(screen.getByRole("button", { name: "닫기" }));
     const installInfo = await screen.findByRole("button", {
       name: "설치 정보",

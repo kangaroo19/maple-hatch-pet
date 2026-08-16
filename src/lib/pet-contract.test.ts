@@ -11,7 +11,6 @@ import {
   assertAllowedCharacterImageUrl,
   buildCharacterFrameUrl,
 } from "@/lib/nexon-url";
-import { buildPetDeepLink } from "@/lib/pet-link";
 
 describe("pet contract", () => {
   it("normalizes all nine rows and fixes both running actions to A03", () => {
@@ -135,36 +134,5 @@ describe("NEXON image boundary", () => {
     expect(buildCharacterFrameUrl(base, "A03.2", "E06.0").href).toBe(
       "https://open.api.nexon.com/static/maplestory/character/look/abc123?action=A03.2&emotion=E06.0&wmotion=W04&width=400&height=400&x=200&y=280",
     );
-  });
-});
-
-describe("Codex v1 install link", () => {
-  it("contains only the supported encoded parameters and sprite version 1", () => {
-    const link = buildPetDeepLink({
-      name: "천 짱",
-      imageUrl: "https://store.public.blob.vercel-storage.com/pets/a.png",
-      description: "스카니아 마법사 캐릭터",
-    });
-
-    expect(link).toBe(
-      "codex://pets/install?name=%EC%B2%9C+%EC%A7%B1&imageUrl=https%3A%2F%2Fstore.public.blob.vercel-storage.com%2Fpets%2Fa.png&description=%EC%8A%A4%EC%B9%B4%EB%8B%88%EC%95%84+%EB%A7%88%EB%B2%95%EC%82%AC+%EC%BA%90%EB%A6%AD%ED%84%B0&spriteVersionNumber=1",
-    );
-  });
-
-  it("rejects a blank name and non-HTTPS asset URL", () => {
-    expect(() =>
-      buildPetDeepLink({
-        name: "  ",
-        imageUrl: "https://store.public.blob.vercel-storage.com/pets/a.png",
-        description: "캐릭터",
-      }),
-    ).toThrow("INTERNAL_ERROR");
-    expect(() =>
-      buildPetDeepLink({
-        name: "천짱",
-        imageUrl: "http://store.public.blob.vercel-storage.com/pets/a.png",
-        description: "캐릭터",
-      }),
-    ).toThrow("INTERNAL_ERROR");
   });
 });

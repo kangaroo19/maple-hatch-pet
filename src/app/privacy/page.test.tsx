@@ -11,5 +11,7 @@ describe("privacy page attribution", () => {
     expect(
       screen.getByRole("link", { name: "개인정보 처리 안내" }),
     ).toHaveAttribute("href", "/privacy");
+    expect(screen.getByText(/Pet ID를 아는 누구나/)).toBeVisible();
+    expect(screen.getByText(/조기 삭제를 요청할 때는 Pet ID/)).toBeVisible();
   });
 });

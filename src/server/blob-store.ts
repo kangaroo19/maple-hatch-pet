@@ -1,22 +1,14 @@
-import { randomUUID } from "node:crypto";
-
-import { del, list, put } from "@vercel/blob";
+import { del, get, list, put } from "@vercel/blob";
 
 import { AppError } from "@/lib/errors";
+import {
+  MAX_PET_PACKAGE_BYTES,
+  PET_PACKAGE_PREFIX,
+  petPackagePath,
+} from "@/server/pet-package";
 
-type PutOptions = {
-  access: "public";
-  addRandomSuffix: false;
-  contentType: "image/png";
-  cacheControlMaxAge: number;
-  token: string;
-  abortSignal?: AbortSignal;
-};
-type PutFunction = (
-  pathname: string,
-  body: Buffer,
-  options: PutOptions,
-) => Promise<{ url: string }>;
+type PutFunction = typeof put;
+type GetFunction = typeof get;
 type ListPage = {
   blobs: Array<{ url: string; uploadedAt: Date }>;
   cursor?: string;
@@ -37,22 +29,15 @@ function unavailable() {
     "SERVICE_UNAVAILABLE",
     503,
     true,
-    "이미지 저장소를 일시적으로 사용할 수 없습니다.",
+    "Pet 저장소를 일시적으로 사용할 수 없습니다.",
   );
 }
 
-export async function publishSpritesheet(
-  png: Buffer,
-  dependencies: {
-    environment?: string;
-    productionToken?: string;
-    nonProductionToken?: string;
-    randomUUID?: () => string;
-    put?: PutFunction;
-    fetchImpl?: typeof fetch;
-    signal?: AbortSignal;
-  } = {},
-): Promise<string> {
+function tokenFor(dependencies: {
+  environment?: string;
+  productionToken?: string;
+  nonProductionToken?: string;
+}): string {
   const environment =
     dependencies.environment ?? process.env.VERCEL_ENV ?? "development";
   const token =
@@ -61,16 +46,28 @@ export async function publishSpritesheet(
       : (dependencies.nonProductionToken ??
         process.env.BLOB_NONPROD_READ_WRITE_TOKEN);
   if (!token) throw unavailable();
-  const pathname = `pets/${(dependencies.randomUUID ?? randomUUID)()}.png`;
-  let result: { url: string };
+  return token;
+}
+
+export async function publishPetPackage(
+  packageBytes: Buffer,
+  petId: string,
+  dependencies: {
+    environment?: string;
+    productionToken?: string;
+    nonProductionToken?: string;
+    put?: PutFunction;
+    fetchImpl?: typeof fetch;
+    signal?: AbortSignal;
+  } = {},
+): Promise<void> {
+  const token = tokenFor(dependencies);
+  const pathname = petPackagePath(petId);
   try {
-    const putImpl: PutFunction =
-      dependencies.put ??
-      (async (name, body, options) => put(name, body, options));
-    result = await putImpl(pathname, png, {
+    const result = await (dependencies.put ?? put)(pathname, packageBytes, {
       access: "public",
       addRandomSuffix: false,
-      contentType: "image/png",
+      contentType: "application/zip",
       cacheControlMaxAge: 28 * 24 * 60 * 60,
       token,
       abortSignal: dependencies.signal,
@@ -86,15 +83,44 @@ export async function publishSpritesheet(
     });
     if (
       !response.ok ||
-      !response.headers
-        .get("content-type")
-        ?.toLowerCase()
-        .startsWith("image/png")
+      response.headers.get("content-type") !== "application/zip"
     ) {
       throw new Error();
     }
     await response.body?.cancel();
-    return url.href;
+  } catch {
+    throw unavailable();
+  }
+}
+
+export async function getPetPackage(
+  petId: string,
+  dependencies: {
+    environment?: string;
+    productionToken?: string;
+    nonProductionToken?: string;
+    get?: GetFunction;
+  } = {},
+): Promise<{
+  stream: ReadableStream<Uint8Array>;
+  size: number;
+} | null> {
+  const token = tokenFor(dependencies);
+  try {
+    const result = await (dependencies.get ?? get)(petPackagePath(petId), {
+      access: "public",
+      token,
+      useCache: false,
+    });
+    if (!result) return null;
+    if (
+      result.statusCode !== 200 ||
+      result.blob.contentType !== "application/zip" ||
+      result.blob.size > MAX_PET_PACKAGE_BYTES
+    ) {
+      throw new Error();
+    }
+    return { stream: result.stream, size: result.blob.size };
   } catch {
     throw unavailable();
   }
@@ -119,7 +145,11 @@ export async function cleanupExpiredPets(
   let deletedCount = 0;
   try {
     do {
-      const page = await listImpl({ prefix: "pets/", cursor, token });
+      const page = await listImpl({
+        prefix: PET_PACKAGE_PREFIX,
+        cursor,
+        token,
+      });
       for (const blob of page.blobs) {
         if (new Date(blob.uploadedAt).getTime() >= cutoff.getTime()) continue;
         await delImpl(blob.url, { token });
