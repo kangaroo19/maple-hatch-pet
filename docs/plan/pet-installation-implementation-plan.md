@@ -1,6 +1,6 @@
 # CLI 기반 Codex Pet 설치 흐름 구현계획
 
-- 상태: 문서화 계획 완료 후 실행
+- 상태: 실행 대기
 - 선행 계획: [CLI 설치 전환 문서화 실행계획](./documentation-update-plan.md)
 - 목적: 생성한 Maple 캐릭터 Pet을 `.codex-pet.zip`으로 발행하고 `npx` CLI로 로컬 Codex Pet 디렉터리에 설치한다.
 - 실행 제약: 이 계획을 수행할 때 서브에이전트를 생성하지 않고 단일 에이전트가 직접 작업한다.

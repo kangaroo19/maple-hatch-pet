@@ -1,6 +1,6 @@
 # Maple Hatch Pet
 
-메이플스토리 캐릭터를 기반으로 Codex Pet 스프라이트를 생성하고 설치하는 서비스의 제품 명세 저장소입니다.
+메이플스토리 캐릭터를 기반으로 Codex Pet 패키지를 생성하고 `npx maple-hatch-pet add <petId>`로 설치하는 서비스의 제품 명세 저장소입니다.
 
 현재 저장소에는 확정된 제품·API·운영·프런트엔드 계약에 따른 MVP 구현과 [`poc/map-login/`](poc/map-login/)의 MapLogin 장면 렌더링·공통 경고 UI 기준 구현이 포함되어 있습니다.
 
@@ -13,8 +13,8 @@
 - [MVP 명세](docs/product-spec/mvp.md)
 - [액션·표정 카탈로그](docs/product-spec/action-emotion-catalog.md)
 - [Pet 생성 흐름](docs/product-spec/pet-generation-flow.md)
-- [설치 계약](docs/product-spec/installation-contract.md)
+- [설치 사용자 계약](docs/product-spec/installation-contract.md)
+- [CLI 설치 계약](docs/product-spec/cli-installation-contract.md)
 - [MapLogin 프런트엔드 구현 문서](docs/frontend/index.md)
 - [MapLogin PoC 실행 안내](poc/map-login/README.md)
-- [CLI 설치 문서화 계획](docs/plan/documentation-update-plan.md)
 - [CLI 설치 흐름 구현 계획](docs/plan/pet-installation-implementation-plan.md)

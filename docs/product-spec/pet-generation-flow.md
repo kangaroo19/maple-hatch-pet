@@ -1,14 +1,14 @@
 # Pet 생성 비즈니스 로직
 
 - 상태: 구현 기준 확정
-- 최종 수정: 2026-08-09
-- 관련 문서: [Maple Hatch Pet MVP PRD](./mvp.md), [설치 계약](./installation-contract.md), [개발환경](../development-environment.md)
+- 최종 수정: 2026-08-16
+- 관련 문서: [Maple Hatch Pet MVP PRD](./mvp.md), [설치 사용자 계약](./installation-contract.md), [CLI 설치 계약](./cli-installation-contract.md), [개발환경](../development-environment.md)
 
 ## 1. 목적
 
 이 문서는 사용자가 캐릭터 조회와 상태 설정을 마친 뒤 `Pet 만들기` 버튼을 눌렀을 때, 서비스가 Codex v1 Pet을 생성해 설치 수단을 반환하기까지의 비즈니스 로직을 정의한다.
 
-생성된 PNG 스프라이트 시트는 Vercel Blob 공개 저장소에 발행한다. MVP는 Pet 메타데이터 데이터베이스와 NEXON 조회 캐시를 사용하지 않는다. 공개·내부 API 경로, 객체 접두사와 응답 스키마는 이 문서에서 고정한다.
+검증된 PNG 스프라이트 시트는 `pet.json`과 함께 `.codex-pet.zip`으로 묶어 Vercel Blob 공개 저장소에 발행한다. MVP는 Pet 메타데이터 데이터베이스와 NEXON 조회 캐시를 사용하지 않는다. 공개·내부 API 경로, 객체 접두사와 응답 스키마는 이 문서에서 고정한다.
 
 MVP 생성은 하나의 Node.js Route Handler가 동기 요청으로 처리한다. 작업 큐, 폴링과 실시간 진행 알림은 실행 한도에 가까운 처리 시간이나 타임아웃이 실제로 관찰된 뒤 별도 설계로 검토한다.
 
@@ -83,19 +83,34 @@ MVP 생성은 하나의 Node.js Route Handler가 동기 요청으로 처리한�
 {
   "displayName": "천짱",
   "description": "<world> <class> 캐릭터",
-  "spritesheetUrl": "https://<store-id>.public.blob.vercel-storage.com/pets/<asset>.png",
-  "deepLink": "codex://pets/install?...",
+  "petId": "123e4567-e89b-12d3-a456-426614174000",
+  "packageUrl": "https://<service-origin>/api/pets/123e4567-e89b-12d3-a456-426614174000/package",
+  "installCommand": "npx maple-hatch-pet add 123e4567-e89b-12d3-a456-426614174000",
   "expiresAt": "2026-09-06T12:34:56.000Z"
 }
 ```
 
-`expiresAt`은 생성 시각부터 정확히 28일 뒤의 UTC ISO 8601 값이다. `spritesheetUrl`은 생성 결과마다 고유하며 이미 발행한 URL의 이미지 내용을 다른 외형으로 바꾸지 않는다. 같은 캐릭터와 같은 설정으로 다시 생성해도 새 URL을 발행한다.
+`petId`는 생성마다 발급하는 소문자 UUID다. `packageUrl`은 같은 응답의 `petId`를 사용하는 Production 서비스의 절대 HTTPS 다운로드 URL이며 설치 모달에는 노출하지 않는다. `installCommand`는 정확히 `npx maple-hatch-pet add <petId>` 형식이다. `expiresAt`은 생성 시각부터 정확히 28일 뒤의 UTC ISO 8601 값이다. 같은 캐릭터와 같은 설정으로 다시 생성해도 새 `petId`와 패키지를 발행한다.
 
 경미한 잘림이나 상태 간 크기 차이는 생성을 막지 않으며 성공 응답과 설치 모달에는 포함하지 않는다.
 
-### 3.3 `GET /api/internal/cron/pet-assets`
+### 3.3 `GET /api/pets/<petId>/package`
 
-Vercel Cron만 호출하는 내부 정리 API다. `Authorization: Bearer <CRON_SECRET>`가 일치하지 않으면 요청을 거부한다. Production Blob 저장소의 `pets/` 접두사를 cursor로 끝까지 순회하고 각 객체의 `uploadedAt`이 현재 시각보다 28일 이상 이전이면 삭제한 뒤 다음 형태로 응답한다.
+CLI가 `petId`로 생성 패키지를 내려받는 공개 API다. 경로의 `petId`는 소문자 UUID여야 한다. 서버는 DB를 조회하지 않고 `pet-packages/<petId>.codex-pet.zip` 객체 키를 결정적으로 계산한다.
+
+성공 응답은 `application/zip` 콘텐츠 타입의 패키지 바이트를 반환한다. 리다이렉트나 Blob 원본 URL을 반환하지 않는다.
+
+| HTTP | 대표 코드 | 의미 |
+|---:|---|---|
+| 400 | `INVALID_REQUEST` | `petId` 형식이 잘못됨 |
+| 404 | `PET_PACKAGE_NOT_FOUND` | 패키지가 만료되었거나 존재하지 않음 |
+| 503 | `SERVICE_UNAVAILABLE` | Blob 저장소를 일시적으로 사용할 수 없음 |
+
+오류는 3.5의 공통 envelope을 사용한다. 패키지 바이트·크기·ZIP 검증과 CLI 보안 계약은 [CLI 설치 계약](./cli-installation-contract.md)을 따른다.
+
+### 3.4 `GET /api/internal/cron/pet-assets`
+
+Vercel Cron만 호출하는 내부 정리 API다. `Authorization: Bearer <CRON_SECRET>`가 일치하지 않으면 요청을 거부한다. Production Blob 저장소의 `pet-packages/` 접두사를 cursor로 끝까지 순회하고 각 객체의 `uploadedAt`이 현재 시각보다 28일 이상 이전이면 삭제한 뒤 다음 형태로 응답한다.
 
 ```json
 {
@@ -104,11 +119,11 @@ Vercel Cron만 호출하는 내부 정리 API다. `Authorization: Bearer <CRON_S
 }
 ```
 
-`cutoff`은 실행 시각에서 28일을 뺀 UTC 시각이다. 정리 작업은 매일 03:00 UTC에 예약한다. Vercel Hobby Cron은 지정된 시간의 한 시간 안에서 실행될 수 있으므로 `expiresAt`은 28일로 안내하되 모든 생성 PNG는 최대 30일 이내 삭제한다.
+`cutoff`은 실행 시각에서 28일을 뺀 UTC 시각이다. 정리 작업은 매일 03:00 UTC에 예약한다. Vercel Hobby Cron은 지정된 시간의 한 시간 안에서 실행될 수 있으므로 `expiresAt`은 28일로 안내하되 모든 생성 패키지는 최대 30일 이내 삭제한다.
 
-### 3.4 공통 오류
+### 3.5 공통 오류
 
-세 API의 오류 응답은 항상 같은 envelope을 사용한다.
+네 API의 오류 응답은 항상 같은 envelope을 사용한다.
 
 ```json
 {
@@ -124,6 +139,7 @@ Vercel Cron만 호출하는 내부 정리 API다. `Authorization: Bearer <CRON_S
 |---:|---|---|---|
 | 400 | `INVALID_REQUEST` | 닉네임, 카탈로그 버전, 상태 코드 또는 요청 형식이 잘못됨 | `false` |
 | 404 | `CHARACTER_NOT_FOUND` | 현재 조회 가능한 캐릭터가 없음 | `false` |
+| 404 | `PET_PACKAGE_NOT_FOUND` | 패키지가 만료되었거나 존재하지 않음 | `false` |
 | 409 | `UNUSABLE_CHARACTER_FRAMES` | 현재 외형과 선택한 설정으로 유효한 프레임을 구성할 수 없음 | `false` |
 | 429 | `RATE_LIMITED` | 서비스 또는 NEXON 요청 제한에 도달함 | `true` |
 | 502 | `UPSTREAM_ERROR` | NEXON API 또는 공식 이미지 응답이 실패함 | `true` |
@@ -144,9 +160,10 @@ flowchart TD
     F --> G["Codex v1 스프라이트 시트 조립"]
     G --> H{"결과물 검증"}
     H -->|"실패"| I["생성 실패 처리"]
-    H -->|"성공"| J["Vercel Blob에 고유 PNG 발행"]
-    J --> K["딥링크 구성"]
-    K --> L["딥링크 반환"]
+    H -->|"성공"| J["petId와 pet.json 생성"]
+    J --> K["ZIP 조립과 패키지 검증"]
+    K --> L["Vercel Blob에 고유 패키지 발행"]
+    L --> M["패키지 URL과 설치 명령 반환"]
 ```
 
 생성 시도는 다음 비즈니스 상태를 순서대로 지난다.
@@ -157,8 +174,8 @@ flowchart TD
 | `fetching-character` | NEXON API에서 최신 캐릭터 정보를 조회하고 있다. |
 | `resolving-frames` | 상태별 액션 하위 프레임과 반복 순서를 결정하고 있다. |
 | `rendering` | 공식 이미지를 수집하고 셀을 만들고 있다. |
-| `validating` | 완성된 v1 스프라이트 시트를 검증하고 있다. |
-| `publishing` | 검증된 자산을 HTTPS 주소로 발행하고 있다. |
+| `validating` | 완성된 v1 스프라이트 시트와 패키지를 검증하고 있다. |
+| `publishing` | 검증된 패키지를 HTTPS 주소로 발행하고 있다. |
 | `ready` | 설치 가능한 결과가 준비되었다. |
 | `failed` | 어느 단계에서든 생성이 중단되었다. |
 
@@ -293,21 +310,19 @@ NEXON이 반환한 원본 이미지 경계에서 이미 일부가 잘렸거나 �
 
 크기 차이 또는 일부 잘림은 발행을 막지 않는 판정이다. 잘못된 파일 크기, 빈 필수 셀, 불투명 배경 또는 용량 초과는 발행을 막는 오류다. 미리보기는 픽셀 검증을 수행하지 않으므로 생성 서버의 판정을 최종 결과로 사용한다.
 
-### 5.8 자산 발행과 딥링크 구성
+### 5.8 패키지 조립과 발행
 
-1. 검증된 PNG를 현재 환경의 Vercel Blob 공개 저장소에 `pets/` 접두사의 고유한 경로로 업로드한다.
-2. 업로드한 파일이 절대 HTTPS URL로 내려받아지는지 확인한다.
-3. 생성 시각부터 28일 뒤를 `expiresAt`으로 계산한다.
-4. 확인한 자산 URL로 딥링크를 구성한다.
-5. 생성 화면의 설치 모달에 필요한 `spritesheetUrl`, `deepLink`, `expiresAt`을 반환한다. 별도 설치 식별자나 CLI 명령은 만들지 않으며, 발행을 막지 않은 판정은 응답에 포함하지 않는다.
+1. 스프라이트 검증을 통과한 뒤 생성 결과마다 소문자 UUID `petId`를 발급한다.
+2. `id`가 `petId`와 일치하고 `spriteVersionNumber: 1`, `spritesheetPath: "spritesheet.png"`를 사용하는 `pet.json`을 만든다.
+3. ZIP 루트에 `pet.json`과 검증된 PNG를 `spritesheet.png`라는 이름으로 넣어 `<petId>.codex-pet.zip`을 조립한다.
+4. ZIP 엔트리, manifest 일치, 압축·해제 크기와 스프라이트 규격을 다시 검증한다.
+5. 검증된 패키지를 현재 환경의 Vercel Blob 공개 저장소에 `pet-packages/<petId>.codex-pet.zip` 경로로 업로드한다.
+6. 업로드한 패키지의 콘텐츠 타입과 HTTPS 다운로드 가능 여부를 확인한다.
+7. 생성 시각부터 28일 뒤를 `expiresAt`으로 계산한다.
+8. `packageUrl`과 `npx maple-hatch-pet add <petId>` 형식의 `installCommand`를 만든다.
+9. 생성 화면에 필요한 `displayName`, `description`, `petId`, `packageUrl`, `installCommand`, `expiresAt`을 반환한다. 발행을 막지 않은 판정은 응답에 포함하지 않는다.
 
-딥링크 형식은 다음과 같다.
-
-```text
-codex://pets/install?name=<encoded-name>&imageUrl=<encoded-https-url>&description=<encoded-description>&spriteVersionNumber=1
-```
-
-딥링크의 `imageUrl`은 2단계에서 확인한 스프라이트 시트 자산을 가리켜야 한다. 설치 지원 범위와 실패 처리 규칙은 [설치 계약](./installation-contract.md)을 따른다.
+`petId`는 Blob 객체 키, `pet.json.id`와 다운로드 경로를 연결하는 유일한 식별자다. 별도 DB나 메타데이터 테이블을 만들지 않는다. 이미 발행한 객체를 덮어쓰지 않으며 같은 입력으로 다시 생성해도 새로운 UUID와 객체를 사용한다. 패키지 구조와 검증 세부사항은 [CLI 설치 계약](./cli-installation-contract.md)을 따른다.
 
 ## 6. 실패와 재시도
 
@@ -319,30 +334,32 @@ codex://pets/install?name=<encoded-name>&imageUrl=<encoded-https-url>&descriptio
 | 빈 프레임 | 409 | 해당 상태와 프레임을 알려주고 설정 변경을 요구한다. |
 | 이미지 처리·결과 검증 | 500 | 중간 파일을 공개하지 않고 실패 이유를 비식별 로그에 남긴다. |
 | 내부 50초 제한 | 503 | 발행하지 않고 재시도 가능한 오류로 종료한다. |
-| 자산 업로드 | 503 | 딥링크와 설치 모달을 만들지 않고 종료한다. |
+| 패키지 조립·검증 | 500 | 중간 ZIP을 공개하지 않고 종료한다. |
+| 패키지 업로드 | 503 | 설치 명령과 설치 모달을 만들지 않고 종료한다. |
+| 패키지 다운로드 | 404/503 | 만료·미존재는 재생성을, 저장소 장애는 재시도를 안내한다. |
 | 요청 제한 | 429 | 지정된 시간이 지난 뒤 재시도하게 한다. |
 
 실패한 생성은 `ready` 상태가 될 수 없다. 사용자에게는 실패 단계의 내부 구현보다 다시 시도할 수 있는지와 설정을 바꿔야 하는지를 중심으로 안내한다.
 
 ## 7. 원자성과 중복 요청
 
-- 검증과 HTTPS 업로드가 모두 끝나기 전에는 설치 가능한 결과를 노출하지 않는다.
-- 실패한 생성의 중간 이미지와 임시 파일을 정상 Pet 자산으로 취급하지 않는다.
+- PNG·ZIP 검증과 HTTPS 업로드가 모두 끝나기 전에는 설치 가능한 결과를 노출하지 않는다.
+- 실패한 생성의 중간 이미지, manifest와 ZIP을 정상 Pet 패키지로 취급하지 않는다.
 - 사용자가 생성 버튼을 연속으로 눌러도 같은 화면에서 동시에 여러 생성 요청이 시작되지 않게 한다.
 - 서버는 같은 생성 요청이 재전송되더라도 부분 자산을 덮어쓰거나 서로 다른 단계의 결과를 섞지 않는다.
-- 성공한 생성은 항상 별개의 새 자산으로 발행하며 기존 URL의 자산을 변경하지 않는다.
+- 성공한 생성은 항상 별개의 새 `petId`와 패키지로 발행하며 기존 객체를 변경하지 않는다.
 
 ## 8. 로그 항목
 
 요청별 로그에는 요청 ID, API 경로, 처리 시간, 현재 또는 실패한 비즈니스 상태, HTTP 상태와 비밀이 아닌 오류 코드만 기록한다.
 
-닉네임, OCID, 캐릭터 이미지 URL, 생성 이미지 URL, NEXON API 키, 전체 원본 API 응답과 사용자 환경의 로컬 경로는 로그에 남기지 않는다.
+닉네임, OCID, 캐릭터 이미지 URL, `petId`, 패키지 URL, NEXON API 키, 전체 원본 API 응답과 사용자 환경의 로컬 경로는 로그에 남기지 않는다.
 
 ## 9. 구현 경계
 
 - API는 동기 Route Handler로 구현하며 `maxDuration = 60`, 내부 생성 제한 50초, 출시 목표 45초 이하를 사용한다.
 - Production과 Non-production Vercel Blob 공개 저장소 및 쓰기 토큰을 분리한다.
-- Supabase, 데이터베이스, `petId`, 결과 재조회 API, 작업 큐와 폴링은 MVP에 추가하지 않는다.
+- Supabase, 데이터베이스, 결과 재조회 API, 작업 큐와 폴링은 MVP에 추가하지 않는다. `petId`와 Blob 객체의 연결은 결정적 객체 키로만 처리한다.
 - 현재 동기 흐름이 내부 제한을 반복해서 넘는 것이 실제로 관찰될 때만 별도 설계로 비동기 전환을 검토한다.
 
 배포·환경변수·Cron·WAF 계약은 [개발환경](../development-environment.md)을 따른다.
