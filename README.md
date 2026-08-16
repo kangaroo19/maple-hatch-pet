@@ -4,7 +4,7 @@
 
 현재 저장소에는 확정된 제품·API·운영·프런트엔드 계약에 따른 MVP 구현과 [`poc/map-login/`](poc/map-login/)의 MapLogin 장면 렌더링·공통 경고 UI 기준 구현이 포함되어 있습니다.
 
-현재 구현 기준은 `docs/product-spec/`, `docs/development-environment.md`, `docs/frontend/` 순으로 확인합니다. `docs/superpowers/`의 명세와 계획은 결정 배경을 보존한 역사적 문서이며 현재 기준 문서와 충돌하면 현재 기준 문서를 우선합니다.
+현재 구현 기준은 `docs/product-spec/`, `docs/development-environment.md`, `docs/frontend/` 순으로 확인합니다. `docs/superpowers/specs/`의 명세는 결정 배경을 보존한 역사적 문서이며 현재 기준 문서와 충돌하면 현재 기준 문서를 우선합니다.
 
 ## 문서
 
@@ -16,4 +16,5 @@
 - [설치 계약](docs/product-spec/installation-contract.md)
 - [MapLogin 프런트엔드 구현 문서](docs/frontend/index.md)
 - [MapLogin PoC 실행 안내](poc/map-login/README.md)
-- [과거 결정 조정 계획](docs/superpowers/plans/2026-07-26-product-contract-reconciliation.md)
+- [CLI 설치 문서화 계획](docs/plan/documentation-update-plan.md)
+- [CLI 설치 흐름 구현 계획](docs/plan/pet-installation-implementation-plan.md)
