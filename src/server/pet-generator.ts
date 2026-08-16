@@ -4,7 +4,8 @@ import { AppError } from "@/lib/errors";
 import { buildCharacterFrameUrl } from "@/lib/nexon-url";
 import type { PlannedRow } from "@/lib/pet-contract";
 
-const SOURCE_SIZE = 400;
+const MIN_SOURCE_SIZE = 96;
+const MAX_SOURCE_SIZE = 1000;
 const CELL_WIDTH = 192;
 const CELL_HEIGHT = 208;
 const COLUMNS = 8;
@@ -20,6 +21,8 @@ type FetchImplementation = (
 ) => Promise<Response>;
 type SourceFrame = {
   pixels: Buffer;
+  width: number;
+  height: number;
   bounds: { left: number; top: number; right: number; bottom: number };
 };
 
@@ -71,6 +74,8 @@ async function downloadFrame(
     throw upstreamError();
 
   let pixels: Buffer;
+  let width: number;
+  let height: number;
   try {
     const encoded = Buffer.from(await response.arrayBuffer());
     const decoded = await sharp(encoded)
@@ -78,24 +83,28 @@ async function downloadFrame(
       .raw()
       .toBuffer({ resolveWithObject: true });
     if (
-      decoded.info.width !== SOURCE_SIZE ||
-      decoded.info.height !== SOURCE_SIZE ||
+      decoded.info.width < MIN_SOURCE_SIZE ||
+      decoded.info.width > MAX_SOURCE_SIZE ||
+      decoded.info.height < MIN_SOURCE_SIZE ||
+      decoded.info.height > MAX_SOURCE_SIZE ||
       decoded.info.channels !== 4
     ) {
       throw new Error("unexpected dimensions");
     }
     pixels = decoded.data;
+    width = decoded.info.width;
+    height = decoded.info.height;
   } catch {
     throw upstreamError();
   }
 
-  let left = SOURCE_SIZE;
-  let top = SOURCE_SIZE;
+  let left = width;
+  let top = height;
   let right = -1;
   let bottom = -1;
-  for (let y = 0; y < SOURCE_SIZE; y += 1) {
-    for (let x = 0; x < SOURCE_SIZE; x += 1) {
-      if (pixels[(y * SOURCE_SIZE + x) * 4 + 3] === 0) continue;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (pixels[(y * width + x) * 4 + 3] === 0) continue;
       left = Math.min(left, x);
       top = Math.min(top, y);
       right = Math.max(right, x);
@@ -103,7 +112,7 @@ async function downloadFrame(
     }
   }
   if (right < left || bottom < top) throw unusableFrame();
-  return { pixels, bounds: { left, top, right, bottom } };
+  return { pixels, width, height, bounds: { left, top, right, bottom } };
 }
 
 function alphaExists(pixels: Buffer): boolean {
@@ -141,6 +150,16 @@ export async function generateSpritesheet(
   );
 
   const allFrames = [...downloaded.values()];
+  const firstFrame = allFrames[0];
+  if (!firstFrame) throw unusableFrame();
+  if (
+    allFrames.some(
+      (frame) =>
+        frame.width !== firstFrame.width || frame.height !== firstFrame.height,
+    )
+  ) {
+    throw upstreamError();
+  }
   const globalBounds = allFrames.reduce(
     (bounds, frame) => ({
       left: Math.min(bounds.left, frame.bounds.left),
@@ -148,7 +167,7 @@ export async function generateSpritesheet(
       right: Math.max(bounds.right, frame.bounds.right),
       bottom: Math.max(bounds.bottom, frame.bounds.bottom),
     }),
-    { left: SOURCE_SIZE, top: SOURCE_SIZE, right: -1, bottom: -1 },
+    { left: firstFrame.width, top: firstFrame.height, right: -1, bottom: -1 },
   );
   const sourceWidth = globalBounds.right - globalBounds.left + 1;
   const sourceHeight = globalBounds.bottom - globalBounds.top + 1;
@@ -165,7 +184,7 @@ export async function generateSpritesheet(
   const rendered = new Map<string, Buffer>();
   for (const [href, frame] of downloaded) {
     const input = await sharp(frame.pixels, {
-      raw: { width: SOURCE_SIZE, height: SOURCE_SIZE, channels: 4 },
+      raw: { width: frame.width, height: frame.height, channels: 4 },
     })
       .extract({
         left: globalBounds.left,

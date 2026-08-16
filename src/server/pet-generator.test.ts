@@ -20,11 +20,11 @@ const rows = planFrames(
   }).states,
 );
 
-async function visibleFrame(): Promise<Buffer> {
+async function visibleFrame(size = 400): Promise<Buffer> {
   return sharp({
     create: {
-      width: 400,
-      height: 400,
+      width: size,
+      height: size,
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     },
@@ -39,8 +39,8 @@ async function visibleFrame(): Promise<Buffer> {
             background: "#ff3366ff",
           },
         },
-        left: 180,
-        top: 220,
+        left: Math.floor((size - 40) / 2),
+        top: Math.floor(size * 0.55),
       },
     ])
     .png()
@@ -90,6 +90,49 @@ describe("Codex v1 PNG generator", () => {
     expect(
       unusedCell.some((value, index) => index % 4 === 3 && value > 0),
     ).toBe(false);
+  });
+
+  it("uses the consistent decoded size when the official server returns 300 by 300", async () => {
+    const frame = await visibleFrame(300);
+    const png = await generateSpritesheet(
+      baseUrl,
+      rows,
+      new AbortController().signal,
+      async () =>
+        new Response(Uint8Array.from(frame).buffer, {
+          status: 200,
+          headers: { "content-type": "image/png" },
+        }),
+    );
+
+    await expect(sharp(png).metadata()).resolves.toMatchObject({
+      format: "png",
+      width: 1536,
+      height: 1872,
+      hasAlpha: true,
+    });
+  });
+
+  it("rejects official frames with inconsistent decoded sizes", async () => {
+    const smallFrame = await visibleFrame(300);
+    const requestedFrame = await visibleFrame();
+    let requestCount = 0;
+
+    await expect(
+      generateSpritesheet(
+        baseUrl,
+        rows,
+        new AbortController().signal,
+        async () => {
+          requestCount += 1;
+          const frame = requestCount === 1 ? smallFrame : requestedFrame;
+          return new Response(Uint8Array.from(frame).buffer, {
+            status: 200,
+            headers: { "content-type": "image/png" },
+          });
+        },
+      ),
+    ).rejects.toThrow("UPSTREAM_ERROR");
   });
 
   it("blocks publication when an official frame is fully transparent", async () => {
