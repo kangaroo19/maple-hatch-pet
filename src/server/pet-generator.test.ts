@@ -47,6 +47,28 @@ async function visibleFrame(size = 400): Promise<Buffer> {
     .toBuffer();
 }
 
+function visibleBounds(pixels: Buffer): {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+} {
+  let left = 192;
+  let top = 208;
+  let right = -1;
+  let bottom = -1;
+  for (let y = 0; y < 208; y += 1) {
+    for (let x = 0; x < 192; x += 1) {
+      if (pixels[(y * 192 + x) * 4 + 3] === 0) continue;
+      left = Math.min(left, x);
+      top = Math.min(top, y);
+      right = Math.max(right, x);
+      bottom = Math.max(bottom, y);
+    }
+  }
+  return { left, top, right, bottom };
+}
+
 describe("Codex v1 PNG generator", () => {
   it("creates a transparent 8 by 9 sheet and downloads each official URL once", async () => {
     const frame = await visibleFrame();
@@ -110,6 +132,31 @@ describe("Codex v1 PNG generator", () => {
       width: 1536,
       height: 1872,
       hasAlpha: true,
+    });
+  });
+
+  it("upscales small character frames to the shared cell safe area", async () => {
+    const frame = await visibleFrame();
+    const png = await generateSpritesheet(
+      baseUrl,
+      rows,
+      new AbortController().signal,
+      async () =>
+        new Response(Uint8Array.from(frame).buffer, {
+          status: 200,
+          headers: { "content-type": "image/png" },
+        }),
+    );
+    const cell = await sharp(png)
+      .extract({ left: 0, top: 0, width: 192, height: 208 })
+      .raw()
+      .toBuffer();
+
+    expect(visibleBounds(cell)).toEqual({
+      left: 32,
+      top: 8,
+      right: 159,
+      bottom: 199,
     });
   });
 
