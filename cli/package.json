@@ -1,14 +1,30 @@
 {
   "name": "maple-hatch-pet",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Install Maple Hatch Pet packages into Codex",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kangaroo19/maple-hatch-pet.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/kangaroo19/maple-hatch-pet#readme",
+  "bugs": {
+    "url": "https://github.com/kangaroo19/maple-hatch-pet/issues"
+  },
   "type": "module",
   "bin": {
     "maple-hatch-pet": "dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "engines": {
     "node": "24.x"
   },
@@ -16,14 +32,14 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
+    "prepublishOnly": "npm run typecheck && npm test",
     "prepack": "npm run build"
   },
   "dependencies": {
-    "adm-zip": "^0.5.16",
+    "adm-zip": "^0.6.0",
     "pngjs": "^7.0.0"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.5.7",
     "@types/node": "^24.0.0",
     "@types/pngjs": "^6.0.5",
     "typescript": "^5.9.0",

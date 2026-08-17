@@ -12,8 +12,8 @@ export async function main(args: string[]): Promise<number> {
     return 2;
   }
   try {
-    const { destination, replaced } = await installPet(args[1]!);
-    console.log(`${replaced ? "Pet 재설치" : "Pet 설치"} 완료: ${destination}`);
+    const { displayName, replaced } = await installPet(args[1]!);
+    console.log(`${displayName} Pet ${replaced ? "재설치" : "설치"} 완료`);
     console.log("Codex 데스크톱의 Settings > Pets에서 Refresh를 눌러 주세요.");
     return 0;
   } catch (error) {

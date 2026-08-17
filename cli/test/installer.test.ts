@@ -57,6 +57,7 @@ describe("installPet", () => {
     expect(requested).toBe(`${SERVICE_ORIGIN}/api/pets/${petId}/package`);
     expect(destination).toEqual({
       destination: path.join(root, "home", ".codex", "pets", petId),
+      displayName: "천짱",
       replaced: false,
     });
     expect(

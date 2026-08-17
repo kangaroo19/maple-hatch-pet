@@ -63,7 +63,7 @@ export async function installPet(
     homeDirectory?: string;
     temporaryDirectory?: string;
   } = {},
-): Promise<{ destination: string; replaced: boolean }> {
+): Promise<{ destination: string; displayName: string; replaced: boolean }> {
   assertPetId(petId);
   const temporaryRoot = await mkdtemp(
     path.join(dependencies.temporaryDirectory ?? tmpdir(), "maple-hatch-pet-"),
@@ -114,7 +114,11 @@ export async function installPet(
       throw error;
     }
     if (backedUp) await rm(backup, { recursive: true, force: true });
-    return { destination, replaced: backedUp };
+    return {
+      destination,
+      displayName: validated.manifest.displayName,
+      replaced: backedUp,
+    };
   } catch (error) {
     if (error instanceof CliError) throw error;
     throw new CliError(6, "Codex Pet 폴더에 설치하지 못했습니다.");
