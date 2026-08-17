@@ -172,7 +172,6 @@ export async function generateSpritesheet(
   const sourceWidth = globalBounds.right - globalBounds.left + 1;
   const sourceHeight = globalBounds.bottom - globalBounds.top + 1;
   const scale = Math.min(
-    1,
     (CELL_WIDTH - SAFE_MARGIN * 2) / sourceWidth,
     (CELL_HEIGHT - SAFE_MARGIN * 2) / sourceHeight,
   );
