@@ -45,12 +45,11 @@ const assetButton = (width: number, height: number, source: string) => ({
 });
 
 const fixture: NewCharManifest = {
-  formatVersion: 2,
+  formatVersion: 3,
   source: {
     login: "UI.wz/Login.img",
     newChar: "UI.wz/Login.img/NewChar",
     basic: "UI.wz/Basic.img",
-    uiWindow: "UI.wz/UIWindow.img",
     patchVersion: 43,
     keySource: "ZLZ.dll",
   },
@@ -83,11 +82,7 @@ const fixture: NewCharManifest = {
     disabled: asset(17, 16),
   },
   buttons: {
-    petCreate: assetButton(
-      96,
-      29,
-      "UI.wz/UIWindow.img/Minigame/Common/btStart",
-    ),
+    petCreate: assetButton(101, 35, "UI.wz/Login.img/CharSelect/BtNew"),
     findCharacter: assetButton(125, 52, "UI.wz/Login.img/Common/BtStart"),
   },
   tab: {
@@ -112,6 +107,12 @@ describe("NewChar manifest", () => {
     expect(validateNewChar(fixture)).toEqual(fixture);
   });
 
+  it("rejects the previous product manifest version", () => {
+    expect(() => validateNewChar({ ...fixture, formatVersion: 2 })).toThrow(
+      "NewChar 자산 데이터",
+    );
+  });
+
   it("rejects a missing scroll frame before rendering", () => {
     expect(() =>
       validateNewChar({
@@ -129,7 +130,10 @@ describe("NewChar manifest", () => {
           ...fixture.buttons,
           petCreate: {
             ...fixture.buttons.petCreate,
-            disabled: asset(95, 29),
+            disabled: {
+              ...fixture.buttons.petCreate.disabled,
+              width: 100,
+            },
           },
         },
       }),
@@ -175,12 +179,12 @@ describe("NewChar layout", () => {
     ]) {
       expect(rectContains(layout.scroll, control)).toBe(true);
     }
-    expect(layout.primary.x + layout.primary.width / 2).toBe(
-      layout.scroll.x + layout.scroll.width / 2,
-    );
-    expect(layout.primary.y + layout.primary.height / 2).toBe(
-      layout.scroll.y + layout.scroll.height / 2,
-    );
+    expect(layout.primary).toEqual({
+      x: layout.scroll.x + 70,
+      y: layout.scroll.y + 115,
+      width: 101,
+      height: 35,
+    });
     expect(layout.secondary).toEqual({ x: 8, y: 429, width: 125, height: 52 });
   });
 });

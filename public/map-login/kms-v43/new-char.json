@@ -1,10 +1,9 @@
 {
-  "formatVersion": 2,
+  "formatVersion": 3,
   "source": {
     "login": "UI.wz/Login.img",
     "newChar": "UI.wz/Login.img/NewChar",
     "basic": "UI.wz/Basic.img",
-    "uiWindow": "UI.wz/UIWindow.img",
     "patchVersion": 43,
     "keySource": "ZLZ.dll"
   },
@@ -288,27 +287,27 @@
     "petCreate": {
       "normal": {
         "asset": "/map-login/kms-v43/new-char/bt-pet-create-normal.png",
-        "width": 96,
-        "height": 29,
-        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/normal"
+        "width": 101,
+        "height": 35,
+        "source": "UI.wz/Login.img/CharSelect/BtNew/normal"
       },
       "mouseOver": {
         "asset": "/map-login/kms-v43/new-char/bt-pet-create-mouse-over.png",
-        "width": 96,
-        "height": 29,
-        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/mouseOver"
+        "width": 101,
+        "height": 35,
+        "source": "UI.wz/Login.img/CharSelect/BtNew/mouseOver"
       },
       "pressed": {
         "asset": "/map-login/kms-v43/new-char/bt-pet-create-pressed.png",
-        "width": 96,
-        "height": 29,
-        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/pressed"
+        "width": 101,
+        "height": 35,
+        "source": "UI.wz/Login.img/CharSelect/BtNew/pressed"
       },
       "disabled": {
         "asset": "/map-login/kms-v43/new-char/bt-pet-create-disabled.png",
-        "width": 96,
-        "height": 29,
-        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/disabled"
+        "width": 101,
+        "height": 35,
+        "source": "UI.wz/Login.img/CharSelect/BtNew/disabled"
       }
     },
     "findCharacter": {

@@ -61,7 +61,7 @@ PoC를 그대로 복사하는 것이 목표가 아니다. PoC에서 검증한 WZ
 - 조회 중에는 진행 문구 없이 `BtLogin/disabled`만 표시해 중복 제출을 막는다. 빈 닉네임과 조회·생성·저장 등 웹 흐름을 막는 오류는 `Login.img/Notice` 기반 공통 경고 다이얼로그로 표시하고, 닫은 뒤 지정된 native 입력 또는 버튼에 스크롤 없이 포커스를 복원한다.
 - 공통 경고는 확인 버튼 하나만 제공한다. 확인 또는 `Esc`로 닫고 배경 클릭은 무시하며, 닫은 뒤 호출자가 지정한 입력 또는 실행 버튼으로 포커스를 복원한다.
 - 로그인 제출 성공과 `다른 캐릭터 찾기`는 각각 약 1초의 일회성 자동 스크롤을 사용한다. 모션 감소 설정에서는 즉시 이동하며 다른 입력은 카메라 위치에 영향을 주지 않는다.
-- 생성 영역은 `NewChar/signboard/0` 좌표를 기준으로 캐릭터와 WZ 양피지를 같은 Canvas에 렌더링한다. 9개 상태는 비순환 좌우 화살표로 이동하고, 현재 액션·표정은 최대 8행의 Canvas 콤보박스로 편집한다. `Pet 만들기`는 `UIWindow.img/Minigame/Common/btStart`를 양피지 정중앙에, `다른 캐릭터 찾기`는 `Login.img/Common/BtStart`를 논리 viewport `(8, 429)`에 고정해 원본 이미지로 표시한다.
+- 생성 영역은 `NewChar/signboard/0` 좌표를 기준으로 캐릭터와 WZ 양피지를 같은 Canvas에 렌더링한다. 9개 상태는 비순환 좌우 화살표로 이동하고, 현재 액션·표정은 최대 8행의 Canvas 콤보박스로 편집한다. `Pet 만들기`는 `Login.img/CharSelect/BtNew`를 양피지 하단 `15px` 여백의 가로 중앙에, `다른 캐릭터 찾기`는 `Login.img/Common/BtStart`를 논리 viewport `(8, 429)`에 고정해 원본 이미지로 표시한다.
 - `Map.wz/Obj/login.img/NewChar/signboard/0`은 배치 계산에 필요한 좌표와 프레임 크기만 사용하고, Codex 편집 UI와 겹치는 원본 스탯 선택판 PNG는 선로딩하거나 장면에 그리지 않는다.
 - 액션·표정 변경은 왼쪽 캐릭터에 즉시 반영한다. 선택 UI는 [액션·표정 카탈로그 버전 1](../product-spec/action-emotion-catalog.md)의 한국어 표시명만 사용한다.
 - 생성 성공 후 같은 Canvas 장면에 NewChar 양피지와 `charAlert` 기반 설치 모달을 열고 설치 명령, `설치 명령 복사`, 28일 안내, 터미널 실행·Pets 새로고침 안내, `petId`가 본문에 포함된 `mailto:1000jjj@naver.com` 삭제 요청 링크와 닫기 버튼을 제공한다. ZIP 직접 다운로드 링크는 제공하지 않는다. 닫은 뒤에는 편집 화면의 `설치 정보` 버튼으로 다시 연다.
@@ -188,7 +188,7 @@ Canvas에는 MapLogin 장면임을 설명하는 접근 가능한 이름을 제�
 
 WZ 파일은 브라우저 번들에 포함하지 않는다. `extract.cjs`와 동일한 역할의 도구를 구현 작업 전에 명시적으로 실행해 scene, Notice manifest와 PNG를 만들고 승인된 결과만 `public/map-login/kms-v43/`에 커밋한다. Vercel 빌드 중에는 원본 WZ를 읽거나 자산을 다시 추출하지 않는다. Notice는 `backgrnd/1`과 `BtYes`의 `normal`, `mouseOver`, `pressed`만 추출하고 사용자 메시지는 PNG로 만들지 않는다.
 
-현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. `new-char.json` v2에는 `UI.wz/Login.img/Common/BtStart`의 네 상태(각 `125 × 52`)와 `UI.wz/UIWindow.img/Minigame/Common/btStart`의 네 상태(각 `96 × 29`)를 포함한다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
+현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. `new-char.json` v3에는 `UI.wz/Login.img/Common/BtStart`의 네 상태(각 `125 × 52`)와 `UI.wz/Login.img/CharSelect/BtNew`의 네 상태(각 `101 × 35`)를 포함한다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
 
 scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신하고 `formatVersion` 호환성을 확인한다. 이 정적 WZ 자산은 Pet 생성 PNG용 Vercel Blob에 올리지 않는다.
 
@@ -237,7 +237,7 @@ type PetResult = {
 
 - manifest와 모든 PNG가 정상 로드됨
 - `public/map-login/kms-v43/`의 scene, manifest와 필수 PNG가 같은 버전으로 로드됨
-- `new-char.json` v2의 출처·크기·origin·delay가 KMS v1.2.43 계약과 일치하고 필수 NewChar·Basic·UIWindow PNG가 모두 로드됨
+- `new-char.json` v3의 출처·크기·origin·delay가 KMS v1.2.43 계약과 일치하고 필수 NewChar·Basic PNG가 모두 로드됨
 - `Common/frame`은 `800 × 600` 화면에서 장면·편집 UI 다음에 고정되고, 두 번째 화면의 viewport 고정 `다른 캐릭터 찾기`만 그 위에 합성됨. `MSTitle`은 자산으로 유지되지만 화면에는 표시되지 않으며, `BtLogin` 4상태와 Canvas 입력이 첫 로그인 화면의 `Title/signboard/0` 패널에 장면·카메라 좌표로 결합됨
 - Notice 배경·버튼이 원본 크기로 로드되고 hover, focus와 active 상태가 각각 맞는 버튼 에셋을 사용함
 - 빈 입력과 차단 오류는 Notice로 표시되고, 조회 중은 진행 문구 없이 disabled 버튼으로 중복 제출이 차단됨
@@ -306,7 +306,7 @@ placement 좌표는 anchor이고 실제 이미지 왼쪽 위는 `anchor - origin
 - [ ] 제품 전환 외의 자동 상하 카메라 왕복이 없다.
 - [ ] 너비 `1024px` 미만에서는 MapLogin UI 대신 데스크톱 접속 안내를 표시한다.
 - [ ] 생성 영역이 `NewChar/signboard/0` 기준의 캐릭터와 WZ 양피지 Canvas UI로 구성되고 비순환 좌우 화살표로 한 상태씩 편집된다.
-- [ ] v43 scene, manifest, `Common/frame`, `MSTitle`, `BtLogin` 4상태, Notice, NewChar·Basic·UIWindow 자산과 필수 PNG가 `public/map-login/kms-v43/`에서 함께 제공된다.
+- [ ] v43 scene, manifest, `Common/frame`, `MSTitle`, `BtLogin` 4상태, Notice, NewChar·Basic 자산과 필수 PNG가 `public/map-login/kms-v43/`에서 함께 제공된다.
 - [ ] Canvas 로그인 입력과 `BtLogin`이 첫 화면 `Title/signboard/0` 패널의 장면·카메라 좌표를 사용하고, `MSTitle` 또는 화면에 보이는 HTML overlay를 표시하지 않는다.
 - [ ] 계정 저장, 회원가입, 비밀번호 찾기 등 비기능 컨트롤을 표시하지 않는다.
 - [ ] 생성 성공 후 같은 Canvas 장면의 설치 모달에 설치 명령, `설치 명령 복사` 버튼, 28일 안내, 터미널 실행·Pets 새로고침 안내와 이메일 삭제 요청 링크가 표시되고 `설치 정보`로 다시 열 수 있다.

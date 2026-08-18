@@ -204,12 +204,10 @@ async function main() {
   try {
     const loginImage = wz.wzDirectory.at("Login.img");
     const basicImage = wz.wzDirectory.at("Basic.img");
-    const uiWindowImage = wz.wzDirectory.at("UIWindow.img");
-    if (!loginImage || !basicImage || !uiWindowImage)
-      throw new Error("Login.img, Basic.img, or UIWindow.img was not found.");
+    if (!loginImage || !basicImage)
+      throw new Error("Login.img or Basic.img was not found.");
     await loginImage.parseImage();
     await basicImage.parseImage();
-    await uiWindowImage.parseImage();
     const manifest = {
       formatVersion: 1,
       source: {
@@ -305,12 +303,11 @@ async function main() {
       }
     }
     const newCharManifest = {
-      formatVersion: 2,
+      formatVersion: 3,
       source: {
         login: "UI.wz/Login.img",
         newChar: "UI.wz/Login.img/NewChar",
         basic: "UI.wz/Basic.img",
-        uiWindow: "UI.wz/UIWindow.img",
         patchVersion: 43,
         keySource: "ZLZ.dll",
       },
@@ -338,9 +335,9 @@ async function main() {
       ),
       buttons: {
         petCreate: await saveButton(
-          uiWindowImage,
-          "UIWindow.img",
-          "Minigame/Common/btStart",
+          loginImage,
+          "Login.img",
+          "CharSelect/BtNew",
           "bt-pet-create",
         ),
         findCharacter: await saveButton(
@@ -395,7 +392,7 @@ async function main() {
     for (const asset of Object.values(newCharManifest.comboButton))
       assertAsset(asset, 17, 16);
     for (const asset of Object.values(newCharManifest.buttons.petCreate))
-      assertAsset(asset, 96, 29);
+      assertAsset(asset, 101, 35);
     for (const asset of Object.values(newCharManifest.buttons.findCharacter))
       assertAsset(asset, 125, 52);
     for (const parts of Object.values(newCharManifest.tab)) {

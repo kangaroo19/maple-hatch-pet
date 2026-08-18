@@ -26,12 +26,11 @@ export type NewCharButton = Record<
 >;
 
 export type NewCharManifest = {
-  formatVersion: 2;
+  formatVersion: 3;
   source: {
     login: "UI.wz/Login.img";
     newChar: "UI.wz/Login.img/NewChar";
     basic: "UI.wz/Basic.img";
-    uiWindow: "UI.wz/UIWindow.img";
     patchVersion: 43;
     keySource: "ZLZ.dll";
   };
@@ -193,11 +192,10 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     });
 
   if (
-    manifest.formatVersion !== 2 ||
+    manifest.formatVersion !== 3 ||
     source?.login !== "UI.wz/Login.img" ||
     source?.newChar !== "UI.wz/Login.img/NewChar" ||
     source.basic !== "UI.wz/Basic.img" ||
-    source.uiWindow !== "UI.wz/UIWindow.img" ||
     source.patchVersion !== 43 ||
     source.keySource !== "ZLZ.dll" ||
     !validFrames(scroll?.open, openFrames) ||
@@ -209,9 +207,9 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     !buttons ||
     !validButton(
       buttons.petCreate,
-      96,
-      29,
-      "UI.wz/UIWindow.img/Minigame/Common/btStart",
+      101,
+      35,
+      "UI.wz/Login.img/CharSelect/BtNew",
     ) ||
     !validButton(
       buttons.findCharacter,
@@ -280,8 +278,8 @@ export function getNewCharLayout(
     action: { x: scroll.x + 20, y: scroll.y + 62, width: 202, height: 17 },
     emotion: { x: scroll.x + 20, y: scroll.y + 90, width: 202, height: 17 },
     primary: {
-      x: scroll.x + (scroll.width - petCreate.width) / 2,
-      y: scroll.y + (scroll.height - petCreate.height) / 2,
+      x: scroll.x + Math.floor((scroll.width - petCreate.width) / 2),
+      y: scroll.y + scroll.height - petCreate.height - 15,
       width: petCreate.width,
       height: petCreate.height,
     },
