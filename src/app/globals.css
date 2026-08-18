@@ -115,10 +115,13 @@ a {
   background: transparent;
 }
 .notice-dialog {
+  position: fixed;
+  inset: 0;
   width: 362px;
   height: 219px;
   max-width: none;
   max-height: none;
+  margin: auto;
   padding: 0;
   overflow: visible;
   border: 0;
