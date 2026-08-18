@@ -26,10 +26,12 @@ export type NewCharButton = Record<
 >;
 
 export type NewCharManifest = {
-  formatVersion: 1;
+  formatVersion: 2;
   source: {
+    login: "UI.wz/Login.img";
     newChar: "UI.wz/Login.img/NewChar";
     basic: "UI.wz/Basic.img";
+    uiWindow: "UI.wz/UIWindow.img";
     patchVersion: 43;
     keySource: "ZLZ.dll";
   };
@@ -40,6 +42,10 @@ export type NewCharManifest = {
     [NewCharAsset, NewCharAsset, NewCharAsset]
   >;
   comboButton: NewCharButton;
+  buttons: {
+    petCreate: NewCharButton;
+    findCharacter: NewCharButton;
+  };
   tab: Record<
     "normal" | "selected",
     {
@@ -84,6 +90,7 @@ export type NewCharControlState =
 
 export const NEW_CHAR_PANEL_SOURCE = "Map.wz/Obj/login.img/NewChar/signboard/0";
 export const NEW_CHAR_MUSHROOM_SOURCE = "Map.wz/Back/login.img/back/18";
+export const FIND_CHARACTER_VIEWPORT_POSITION = { x: 8, y: 429 } as const;
 
 const buttonStates = ["normal", "mouseOver", "pressed", "disabled"] as const;
 const comboStates = [...buttonStates, "selected"] as const;
@@ -116,11 +123,18 @@ function validFrame(
   return frame.delay === delay && frame.origin?.x === 0 && frame.origin.y === 0;
 }
 
-function validButton(value: unknown, width: number, height: number): boolean {
+function validButton(
+  value: unknown,
+  width: number,
+  height: number,
+  source?: string,
+): boolean {
   if (!value || typeof value !== "object") return false;
   const button = value as Partial<NewCharButton>;
-  return buttonStates.every((state) =>
-    validAsset(button[state], width, height),
+  return buttonStates.every(
+    (state) =>
+      validAsset(button[state], width, height) &&
+      (!source || button[state].source === `${source}/${state}`),
   );
 }
 
@@ -132,6 +146,7 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
   const scroll = manifest.scroll;
   const arrows = manifest.arrows;
   const combo = manifest.combo;
+  const buttons = manifest.buttons;
   const tab = manifest.tab;
   const openFrames: [number, number, number][] = [
     [242, 30, 250],
@@ -178,9 +193,11 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     });
 
   if (
-    manifest.formatVersion !== 1 ||
+    manifest.formatVersion !== 2 ||
+    source?.login !== "UI.wz/Login.img" ||
     source?.newChar !== "UI.wz/Login.img/NewChar" ||
     source.basic !== "UI.wz/Basic.img" ||
+    source.uiWindow !== "UI.wz/UIWindow.img" ||
     source.patchVersion !== 43 ||
     source.keySource !== "ZLZ.dll" ||
     !validFrames(scroll?.open, openFrames) ||
@@ -189,6 +206,19 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     !validButton(arrows?.right, 15, 16) ||
     !validCombo ||
     !validButton(manifest.comboButton, 17, 16) ||
+    !buttons ||
+    !validButton(
+      buttons.petCreate,
+      96,
+      29,
+      "UI.wz/UIWindow.img/Minigame/Common/btStart",
+    ) ||
+    !validButton(
+      buttons.findCharacter,
+      125,
+      52,
+      "UI.wz/Login.img/Common/BtStart",
+    ) ||
     !validTab ||
     !validAsset(manifest.alert, 187, 120)
   ) {
@@ -197,7 +227,10 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
   return manifest as NewCharManifest;
 }
 
-export function getNewCharLayout(scene: MapLoginScene): NewCharLayout {
+export function getNewCharLayout(
+  scene: MapLoginScene,
+  manifest: NewCharManifest,
+): NewCharLayout {
   const panelObject = scene.objects.find(
     (object) => object.source === NEW_CHAR_PANEL_SOURCE,
   );
@@ -219,6 +252,8 @@ export function getNewCharLayout(scene: MapLoginScene): NewCharLayout {
     width: 242,
     height: 165,
   };
+  const petCreate = manifest.buttons.petCreate.normal;
+  const findCharacter = manifest.buttons.findCharacter.normal;
   const modal = {
     x: -scene.map.centerX + (scene.map.width - 242) / 2,
     y: panel.y + 70,
@@ -244,12 +279,16 @@ export function getNewCharLayout(scene: MapLoginScene): NewCharLayout {
     },
     action: { x: scroll.x + 20, y: scroll.y + 62, width: 202, height: 17 },
     emotion: { x: scroll.x + 20, y: scroll.y + 90, width: 202, height: 17 },
-    primary: { x: scroll.x + 20, y: scroll.y + 126, width: 96, height: 24 },
+    primary: {
+      x: scroll.x + (scroll.width - petCreate.width) / 2,
+      y: scroll.y + (scroll.height - petCreate.height) / 2,
+      width: petCreate.width,
+      height: petCreate.height,
+    },
     secondary: {
-      x: scroll.x + 126,
-      y: scroll.y + 126,
-      width: 96,
-      height: 24,
+      ...FIND_CHARACTER_VIEWPORT_POSITION,
+      width: findCharacter.width,
+      height: findCharacter.height,
     },
     modal,
     install: {
@@ -293,13 +332,23 @@ function pointInRect(rect: Rect, point: { x: number; y: number }): boolean {
 
 export function hitTestNewChar(
   layout: NewCharLayout,
-  point: { x: number; y: number },
+  points: {
+    map: { x: number; y: number };
+    viewport: { x: number; y: number };
+  },
   modalOpen: boolean,
 ): NewCharTarget | null {
   const targets: NewCharTarget[] = modalOpen
     ? ["install", "delete", "close"]
-    : ["previous", "next", "action", "emotion", "primary", "secondary"];
-  return targets.find((target) => pointInRect(layout[target], point)) ?? null;
+    : ["previous", "next", "primary", "action", "emotion", "secondary"];
+  return (
+    targets.find((target) =>
+      pointInRect(
+        layout[target],
+        target === "secondary" ? points.viewport : points.map,
+      ),
+    ) ?? null
+  );
 }
 
 export function resolveNewCharControlState(input: {

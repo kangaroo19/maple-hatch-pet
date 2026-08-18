@@ -37,11 +37,20 @@ const button = {
   disabled: asset(15, 16),
 };
 
+const assetButton = (width: number, height: number, source: string) => ({
+  normal: { ...asset(width, height), source: `${source}/normal` },
+  mouseOver: { ...asset(width, height), source: `${source}/mouseOver` },
+  pressed: { ...asset(width, height), source: `${source}/pressed` },
+  disabled: { ...asset(width, height), source: `${source}/disabled` },
+});
+
 const fixture: NewCharManifest = {
-  formatVersion: 1,
+  formatVersion: 2,
   source: {
+    login: "UI.wz/Login.img",
     newChar: "UI.wz/Login.img/NewChar",
     basic: "UI.wz/Basic.img",
+    uiWindow: "UI.wz/UIWindow.img",
     patchVersion: 43,
     keySource: "ZLZ.dll",
   },
@@ -72,6 +81,14 @@ const fixture: NewCharManifest = {
     mouseOver: asset(17, 16),
     pressed: asset(17, 16),
     disabled: asset(17, 16),
+  },
+  buttons: {
+    petCreate: assetButton(
+      96,
+      29,
+      "UI.wz/UIWindow.img/Minigame/Common/btStart",
+    ),
+    findCharacter: assetButton(125, 52, "UI.wz/Login.img/Common/BtStart"),
   },
   tab: {
     normal: {
@@ -104,6 +121,21 @@ describe("NewChar manifest", () => {
     ).toThrow("NewChar 자산 데이터");
   });
 
+  it("rejects missing or incorrectly sized product button assets", () => {
+    expect(() =>
+      validateNewChar({
+        ...fixture,
+        buttons: {
+          ...fixture.buttons,
+          petCreate: {
+            ...fixture.buttons.petCreate,
+            disabled: asset(95, 29),
+          },
+        },
+      }),
+    ).toThrow("NewChar 자산 데이터");
+  });
+
   it("ships the versioned product manifest", () => {
     const path = "public/map-login/kms-v43/new-char.json";
     expect(existsSync(path)).toBe(true);
@@ -116,7 +148,7 @@ describe("NewChar manifest", () => {
 
 describe("NewChar layout", () => {
   it("anchors the editor to NewChar/signboard and keeps controls in the parchment", () => {
-    const layout = getNewCharLayout(scene);
+    const layout = getNewCharLayout(scene, fixture);
     const mushroom = scene.backgrounds.find(
       (background) => background.source === NEW_CHAR_MUSHROOM_SOURCE,
     );
@@ -140,10 +172,16 @@ describe("NewChar layout", () => {
       layout.action,
       layout.emotion,
       layout.primary,
-      layout.secondary,
     ]) {
       expect(rectContains(layout.scroll, control)).toBe(true);
     }
+    expect(layout.primary.x + layout.primary.width / 2).toBe(
+      layout.scroll.x + layout.scroll.width / 2,
+    );
+    expect(layout.primary.y + layout.primary.height / 2).toBe(
+      layout.scroll.y + layout.scroll.height / 2,
+    );
+    expect(layout.secondary).toEqual({ x: 8, y: 429, width: 125, height: 52 });
   });
 });
 
@@ -207,15 +245,32 @@ describe("NewChar state and dropdown navigation", () => {
   });
 
   it("limits editor and modal hit testing to the active surface", () => {
-    const layout = getNewCharLayout(scene);
+    const layout = getNewCharLayout(scene, fixture);
     const center = (rect: typeof layout.action) => ({
       x: rect.x + rect.width / 2,
       y: rect.y + rect.height / 2,
     });
+    const points = (
+      map: { x: number; y: number },
+      viewport = { x: 0, y: 0 },
+    ) => ({ map, viewport });
+    const visibleActionPoint = {
+      x: layout.action.x + 5,
+      y: layout.action.y + layout.action.height / 2,
+    };
 
-    expect(hitTestNewChar(layout, center(layout.action), false)).toBe("action");
-    expect(hitTestNewChar(layout, center(layout.action), true)).toBeNull();
-    expect(hitTestNewChar(layout, center(layout.install), true)).toBe(
+    expect(hitTestNewChar(layout, points(visibleActionPoint), false)).toBe(
+      "action",
+    );
+    expect(
+      hitTestNewChar(
+        layout,
+        points({ x: 0, y: 0 }, center(layout.secondary)),
+        false,
+      ),
+    ).toBe("secondary");
+    expect(hitTestNewChar(layout, points(visibleActionPoint), true)).toBeNull();
+    expect(hitTestNewChar(layout, points(center(layout.install)), true)).toBe(
       "install",
     );
   });

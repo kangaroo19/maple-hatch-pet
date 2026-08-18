@@ -30,6 +30,7 @@ import {
 } from "@/features/map-login/new-char";
 import {
   drawNewCharEditor,
+  drawNewCharViewportOverlay,
   getDropdownItems,
   getDropdownRowRect,
   getNewCharAssetSources,
@@ -141,6 +142,7 @@ export function MapSceneCanvas({
   const loginLayoutRef = useRef<LoginLayout | null>(null);
   const newCharLayoutRef = useRef<NewCharLayout | null>(null);
   const newCharManifestRef = useRef<NewCharManifest | null>(null);
+  const creatorControlsVisibleRef = useRef(false);
   const scaleRef = useRef(1);
   const loginPointerRef = useRef({ hovered: false, pressed: false });
   const creatorPointerRef = useRef<
@@ -340,7 +342,6 @@ export function MapSceneCanvas({
 
       sceneRef.current = scene;
       loginLayoutRef.current = getLoginLayout(scene);
-      newCharLayoutRef.current = getNewCharLayout(scene);
 
       async function loadCreatorAssets() {
         try {
@@ -357,6 +358,7 @@ export function MapSceneCanvas({
           );
           if (cancelled) return;
           creatorImages.forEach(([src, image]) => images.set(src, image));
+          newCharLayoutRef.current = getNewCharLayout(scene, manifest);
           newCharManifestRef.current = manifest;
         } catch (error) {
           if (
@@ -643,8 +645,9 @@ export function MapSceneCanvas({
         }
         const newCharLayout = newCharLayoutRef.current;
         const newChar = newCharManifestRef.current;
+        creatorControlsVisibleRef.current = false;
         if (newCharLayout && newChar) {
-          drawNewCharEditor({
+          creatorControlsVisibleRef.current = drawNewCharEditor({
             context: activeContext,
             images,
             preview:
@@ -666,6 +669,17 @@ export function MapSceneCanvas({
         }
         activeContext.globalAlpha = 1;
         activeContext.drawImage(images.get(login.frame.asset)!, 0, 0);
+        if (newCharLayout && newChar) {
+          drawNewCharViewportOverlay({
+            context: activeContext,
+            images,
+            manifest: newChar,
+            layout: newCharLayout,
+            state: current,
+            pointer: creatorPointerRef.current,
+            controlsVisible: creatorControlsVisibleRef.current,
+          });
+        }
         animationFrame = requestAnimationFrame(render);
       }
 
@@ -699,32 +713,36 @@ export function MapSceneCanvas({
       loginLayoutRef.current = null;
       newCharLayoutRef.current = null;
       newCharManifestRef.current = null;
+      creatorControlsVisibleRef.current = false;
     };
   }, [onReady, viewportRef]);
 
-  function mapPoint(event: ReactPointerEvent<HTMLCanvasElement>) {
+  function pointerPoints(event: ReactPointerEvent<HTMLCanvasElement>) {
     const scene = sceneRef.current;
     const viewport = viewportRef.current;
     if (!scene || !viewport) return null;
     const bounds = event.currentTarget.getBoundingClientRect();
     const scale = scaleRef.current;
+    const point = {
+      x: event.clientX - bounds.left,
+      y: event.clientY - bounds.top,
+    };
     const camera = getMapCamera(
       scene.map,
       viewport.scrollTop + SCENE_CAMERA_OFFSET_Y * scale,
       scale,
     );
-    return viewportPointToMap(
-      { x: event.clientX - bounds.left, y: event.clientY - bounds.top },
-      camera,
-      scale,
-    );
+    return {
+      map: viewportPointToMap(point, camera, scale),
+      viewport: { x: point.x / scale, y: point.y / scale },
+    };
   }
 
   function loginTargetAt(event: ReactPointerEvent<HTMLCanvasElement>) {
     const layout = loginLayoutRef.current;
-    const point = mapPoint(event);
-    if (!loginRef.current.state.visible || !layout || !point) return null;
-    return hitTestLogin(layout, point);
+    const points = pointerPoints(event);
+    if (!loginRef.current.state.visible || !layout || !points) return null;
+    return hitTestLogin(layout, points.map);
   }
 
   function optionAt(point: { x: number; y: number }) {
@@ -743,10 +761,17 @@ export function MapSceneCanvas({
 
   function creatorTargetAt(event: ReactPointerEvent<HTMLCanvasElement>) {
     const layout = newCharLayoutRef.current;
-    const point = mapPoint(event);
+    const points = pointerPoints(event);
     const state = creatorRef.current.state;
-    if (!state.visible || state.closing || !layout || !point) return null;
-    return hitTestNewChar(layout, point, state.modalOpen);
+    if (
+      !state.visible ||
+      state.closing ||
+      !creatorControlsVisibleRef.current ||
+      !layout ||
+      !points
+    )
+      return null;
+    return hitTestNewChar(layout, points, state.modalOpen);
   }
 
   function creatorTargetDisabled(target: NewCharTarget) {
@@ -767,7 +792,7 @@ export function MapSceneCanvas({
   function updatePointer(event: ReactPointerEvent<HTMLCanvasElement>) {
     const loginTarget = loginTargetAt(event);
     loginPointerRef.current.hovered = loginTarget === "button";
-    const point = mapPoint(event);
+    const point = pointerPoints(event)?.map;
     const option = point ? optionAt(point) : null;
     const creatorTarget = creatorTargetAt(event);
     creatorPointerRef.current.optionHovered = option?.row ?? null;
@@ -872,7 +897,7 @@ export function MapSceneCanvas({
             loginRef.current.onButtonFocus();
             return;
           }
-          const point = mapPoint(event);
+          const point = pointerPoints(event)?.map;
           const option = point ? optionAt(point) : null;
           if (option) {
             event.preventDefault();
@@ -898,7 +923,7 @@ export function MapSceneCanvas({
           loginPointerRef.current.pressed = false;
           if (loginActivate) loginRef.current.onButtonActivate();
 
-          const point = mapPoint(event);
+          const point = pointerPoints(event)?.map;
           const option = point ? optionAt(point) : null;
           const pressedOption = creatorPointerRef.current.optionPressed;
           creatorPointerRef.current.optionPressed = null;

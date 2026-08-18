@@ -63,6 +63,8 @@ export function getNewCharAssetSources(manifest: NewCharManifest): string[] {
     ...Object.values(manifest.arrows.right),
     ...Object.values(manifest.combo).flat(),
     ...Object.values(manifest.comboButton),
+    ...Object.values(manifest.buttons.petCreate),
+    ...Object.values(manifest.buttons.findCharacter),
     ...Object.values(manifest.tab).flatMap((tab) => Object.values(tab)),
     manifest.alert,
   ];
@@ -93,6 +95,18 @@ function imageFor(
 
 function screenRect(rect: Rect, camera: Camera): Rect {
   return { ...rect, x: rect.x - camera.left, y: rect.y - camera.top };
+}
+
+function drawWzButton(
+  context: CanvasRenderingContext2D,
+  images: Map<string, HTMLImageElement>,
+  button: NewCharManifest["buttons"]["petCreate"],
+  rect: Rect,
+  state: NewCharControlState,
+  camera?: Camera,
+) {
+  const target = camera ? screenRect(rect, camera) : rect;
+  context.drawImage(imageFor(images, button[state].asset), target.x, target.y);
 }
 
 function drawCombo(
@@ -369,7 +383,7 @@ export function drawNewCharEditor(input: {
   elapsed: number;
   transitionStartedAt: number;
   reducedMotion: boolean;
-}) {
+}): boolean {
   const {
     context,
     images,
@@ -386,14 +400,14 @@ export function drawNewCharEditor(input: {
     transitionStartedAt,
     reducedMotion,
   } = input;
-  if (!state.visible || !state.character) return;
+  if (!state.visible || !state.character) return false;
 
   drawCharacter(context, preview, layout, state, camera);
   const frames = state.closing ? manifest.scroll.close : manifest.scroll.open;
   const frame = reducedMotion
     ? frames.at(-1)
     : frameAtTimeOnce(frames, elapsed - transitionStartedAt);
-  if (!frame) return;
+  if (!frame) return false;
   const scroll = screenRect(layout.scroll, camera);
   context.drawImage(
     imageFor(images, frame.asset),
@@ -406,7 +420,7 @@ export function drawNewCharEditor(input: {
     state.closing ||
     (!reducedMotion && elapsed - transitionStartedAt < transitionDuration)
   ) {
-    return;
+    return false;
   }
 
   const stateIndex = PET_STATES.indexOf(state.selectedState);
@@ -482,32 +496,18 @@ export function drawNewCharEditor(input: {
     camera,
   );
 
-  const primaryHovered =
-    pointer.hovered === "primary" || state.focused === "primary";
-  const secondaryHovered =
-    pointer.hovered === "secondary" || state.focused === "secondary";
-  drawTabButton(
+  const primaryState = resolveNewCharControlState({
+    disabled: state.createPending,
+    pressed: pointer.pressed === "primary",
+    hovered: pointer.hovered === "primary",
+    focused: state.focused === "primary",
+  });
+  drawWzButton(
     context,
     images,
-    manifest,
+    manifest.buttons.petCreate,
     layout.primary,
-    primaryHovered || pointer.pressed === "primary",
-    state.createPending,
-    state.hasResult
-      ? "설치 정보"
-      : state.createPending
-        ? "만드는 중"
-        : "Pet 만들기",
-    camera,
-  );
-  drawTabButton(
-    context,
-    images,
-    manifest,
-    layout.secondary,
-    secondaryHovered || pointer.pressed === "secondary",
-    state.createPending,
-    "다른 캐릭터 찾기",
+    primaryState,
     camera,
   );
   drawDropdown(
@@ -534,4 +534,32 @@ export function drawNewCharEditor(input: {
       logicalHeight,
     );
   }
+  return true;
+}
+
+export function drawNewCharViewportOverlay(input: {
+  context: CanvasRenderingContext2D;
+  images: Map<string, HTMLImageElement>;
+  manifest: NewCharManifest;
+  layout: NewCharLayout;
+  state: CanvasCreatorState;
+  pointer: CreatorPointerState;
+  controlsVisible: boolean;
+}) {
+  const { context, images, manifest, layout, state, pointer, controlsVisible } =
+    input;
+  if (!controlsVisible || state.modalOpen) return;
+  const secondaryState = resolveNewCharControlState({
+    disabled: state.createPending,
+    pressed: pointer.pressed === "secondary",
+    hovered: pointer.hovered === "secondary",
+    focused: state.focused === "secondary",
+  });
+  drawWzButton(
+    context,
+    images,
+    manifest.buttons.findCharacter,
+    layout.secondary,
+    secondaryState,
+  );
 }

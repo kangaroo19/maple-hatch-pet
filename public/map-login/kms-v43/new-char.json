@@ -1,8 +1,10 @@
 {
-  "formatVersion": 1,
+  "formatVersion": 2,
   "source": {
+    "login": "UI.wz/Login.img",
     "newChar": "UI.wz/Login.img/NewChar",
     "basic": "UI.wz/Basic.img",
+    "uiWindow": "UI.wz/UIWindow.img",
     "patchVersion": 43,
     "keySource": "ZLZ.dll"
   },
@@ -280,6 +282,60 @@
       "width": 17,
       "height": 16,
       "source": "UI.wz/Basic.img/BtComboBox/disabled"
+    }
+  },
+  "buttons": {
+    "petCreate": {
+      "normal": {
+        "asset": "/map-login/kms-v43/new-char/bt-pet-create-normal.png",
+        "width": 96,
+        "height": 29,
+        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/normal"
+      },
+      "mouseOver": {
+        "asset": "/map-login/kms-v43/new-char/bt-pet-create-mouse-over.png",
+        "width": 96,
+        "height": 29,
+        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/mouseOver"
+      },
+      "pressed": {
+        "asset": "/map-login/kms-v43/new-char/bt-pet-create-pressed.png",
+        "width": 96,
+        "height": 29,
+        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/pressed"
+      },
+      "disabled": {
+        "asset": "/map-login/kms-v43/new-char/bt-pet-create-disabled.png",
+        "width": 96,
+        "height": 29,
+        "source": "UI.wz/UIWindow.img/Minigame/Common/btStart/disabled"
+      }
+    },
+    "findCharacter": {
+      "normal": {
+        "asset": "/map-login/kms-v43/new-char/bt-find-character-normal.png",
+        "width": 125,
+        "height": 52,
+        "source": "UI.wz/Login.img/Common/BtStart/normal"
+      },
+      "mouseOver": {
+        "asset": "/map-login/kms-v43/new-char/bt-find-character-mouse-over.png",
+        "width": 125,
+        "height": 52,
+        "source": "UI.wz/Login.img/Common/BtStart/mouseOver"
+      },
+      "pressed": {
+        "asset": "/map-login/kms-v43/new-char/bt-find-character-pressed.png",
+        "width": 125,
+        "height": 52,
+        "source": "UI.wz/Login.img/Common/BtStart/pressed"
+      },
+      "disabled": {
+        "asset": "/map-login/kms-v43/new-char/bt-find-character-disabled.png",
+        "width": 125,
+        "height": 52,
+        "source": "UI.wz/Login.img/Common/BtStart/disabled"
+      }
     }
   },
   "tab": {
