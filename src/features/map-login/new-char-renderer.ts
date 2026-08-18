@@ -10,6 +10,7 @@ import {
 import {
   frameAtTimeOnce,
   resolveNewCharControlState,
+  type NewCharButton,
   type NewCharControlState,
   type NewCharLayout,
   type NewCharManifest,
@@ -63,7 +64,6 @@ export function getNewCharAssetSources(manifest: NewCharManifest): string[] {
     ...Object.values(manifest.arrows.right),
     ...Object.values(manifest.combo).flat(),
     ...Object.values(manifest.comboButton),
-    ...Object.values(manifest.buttons.petCreate),
     ...Object.values(manifest.buttons.findCharacter),
     ...Object.values(manifest.tab).flatMap((tab) => Object.values(tab)),
     manifest.alert,
@@ -100,13 +100,140 @@ function screenRect(rect: Rect, camera: Camera): Rect {
 function drawWzButton(
   context: CanvasRenderingContext2D,
   images: Map<string, HTMLImageElement>,
-  button: NewCharManifest["buttons"]["petCreate"],
+  button: NewCharButton,
   rect: Rect,
   state: NewCharControlState,
   camera?: Camera,
 ) {
   const target = camera ? screenRect(rect, camera) : rect;
   context.drawImage(imageFor(images, button[state].asset), target.x, target.y);
+}
+
+export function resolvePrimaryButtonVisual(input: {
+  createPending: boolean;
+  hasResult: boolean;
+  pressed?: boolean;
+  hovered?: boolean;
+  focused?: boolean;
+}): { state: NewCharControlState; label: string } {
+  return {
+    state: resolveNewCharControlState({
+      disabled: input.createPending,
+      pressed: input.pressed,
+      hovered: input.hovered,
+      focused: input.focused,
+    }),
+    label: input.createPending
+      ? "만드는 중"
+      : input.hasResult
+        ? "설치 정보"
+        : "Pet 만들기",
+  };
+}
+
+const primaryButtonPalettes: Record<
+  NewCharControlState,
+  {
+    top: string;
+    bottom: string;
+    outer: string;
+    inner: string;
+    text: string;
+    highlight: string;
+  }
+> = {
+  normal: {
+    top: "#8C4B1F",
+    bottom: "#5B2C12",
+    outer: "#3B210D",
+    inner: "#D79A27",
+    text: "#FFECC2",
+    highlight: "rgba(255, 220, 128, 0.32)",
+  },
+  mouseOver: {
+    top: "#A85D25",
+    bottom: "#6C3515",
+    outer: "#3B210D",
+    inner: "#FFD266",
+    text: "#FFF7D6",
+    highlight: "rgba(255, 232, 155, 0.45)",
+  },
+  pressed: {
+    top: "#643014",
+    bottom: "#4A210D",
+    outer: "#321B0B",
+    inner: "#C88B21",
+    text: "#FFE8AE",
+    highlight: "rgba(224, 174, 79, 0.2)",
+  },
+  disabled: {
+    top: "#76604A",
+    bottom: "#544535",
+    outer: "#463A2F",
+    inner: "#988065",
+    text: "#C9BBA2",
+    highlight: "rgba(214, 197, 165, 0.15)",
+  },
+};
+
+function drawPrimaryButton(
+  context: CanvasRenderingContext2D,
+  rect: Rect,
+  visual: { state: NewCharControlState; label: string },
+  camera: Camera,
+) {
+  const target = screenRect(rect, camera);
+  const pressedOffset = visual.state === "pressed" ? 1 : 0;
+  const x = target.x;
+  const y = target.y + pressedOffset;
+  const palette = primaryButtonPalettes[visual.state];
+  const radius = 5;
+
+  context.save();
+  if (visual.state !== "pressed") {
+    context.beginPath();
+    context.roundRect(x, y + 2, target.width, target.height, radius);
+    context.fillStyle = "rgba(38, 18, 8, 0.68)";
+    context.fill();
+  }
+
+  const background = context.createLinearGradient(x, y, x, y + target.height);
+  background.addColorStop(0, palette.top);
+  background.addColorStop(1, palette.bottom);
+  context.beginPath();
+  context.roundRect(x, y, target.width, target.height, radius);
+  context.fillStyle = background;
+  context.fill();
+  context.lineWidth = 2;
+  context.strokeStyle = palette.outer;
+  context.stroke();
+
+  context.beginPath();
+  context.roundRect(x + 3, y + 3, target.width - 6, target.height - 6, 3);
+  context.lineWidth = 1;
+  context.strokeStyle = palette.inner;
+  context.stroke();
+
+  context.beginPath();
+  context.moveTo(x + 7, y + 5.5);
+  context.lineTo(x + target.width - 7, y + 5.5);
+  context.lineWidth = 1;
+  context.strokeStyle = palette.highlight;
+  context.stroke();
+
+  context.font = 'bold 12px Dotum, "돋움", sans-serif';
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillStyle = palette.text;
+  context.shadowColor = "rgba(31, 15, 6, 0.9)";
+  context.shadowOffsetY = 1;
+  context.shadowBlur = 0;
+  context.fillText(
+    visual.label,
+    x + target.width / 2,
+    y + target.height / 2 + 0.5,
+  );
+  context.restore();
 }
 
 function drawCombo(
@@ -496,20 +623,14 @@ export function drawNewCharEditor(input: {
     camera,
   );
 
-  const primaryState = resolveNewCharControlState({
-    disabled: state.createPending,
+  const primaryVisual = resolvePrimaryButtonVisual({
+    createPending: state.createPending,
+    hasResult: state.hasResult,
     pressed: pointer.pressed === "primary",
     hovered: pointer.hovered === "primary",
     focused: state.focused === "primary",
   });
-  drawWzButton(
-    context,
-    images,
-    manifest.buttons.petCreate,
-    layout.primary,
-    primaryState,
-    camera,
-  );
+  drawPrimaryButton(context, layout.primary, primaryVisual, camera);
   drawDropdown(
     context,
     images,
@@ -548,13 +669,16 @@ export function drawNewCharViewportOverlay(input: {
 }) {
   const { context, images, manifest, layout, state, pointer, controlsVisible } =
     input;
-  if (!controlsVisible || state.modalOpen) return;
-  const secondaryState = resolveNewCharControlState({
-    disabled: state.createPending,
+  const secondaryState = resolveFindCharacterOverlayState({
+    creatorVisible: state.visible,
+    controlsVisible,
+    modalOpen: state.modalOpen,
+    createPending: state.createPending,
     pressed: pointer.pressed === "secondary",
     hovered: pointer.hovered === "secondary",
     focused: state.focused === "secondary",
   });
+  if (!secondaryState) return;
   drawWzButton(
     context,
     images,
@@ -562,4 +686,23 @@ export function drawNewCharViewportOverlay(input: {
     layout.secondary,
     secondaryState,
   );
+}
+
+export function resolveFindCharacterOverlayState(input: {
+  creatorVisible: boolean;
+  controlsVisible: boolean;
+  modalOpen: boolean;
+  createPending: boolean;
+  pressed?: boolean;
+  hovered?: boolean;
+  focused?: boolean;
+}): NewCharControlState | null {
+  if (!input.creatorVisible) return "disabled";
+  if (!input.controlsVisible || input.modalOpen) return null;
+  return resolveNewCharControlState({
+    disabled: input.createPending,
+    pressed: input.pressed,
+    hovered: input.hovered,
+    focused: input.focused,
+  });
 }

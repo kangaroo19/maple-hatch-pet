@@ -45,7 +45,7 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 
 여기서 조회 성공은 새 닉네임의 중복 여부를 확인한다는 뜻이 아니라, 입력한 닉네임으로 실제 메이플스토리 캐릭터를 찾았다는 뜻이다. 사용자가 상태별 설정을 마치면 제품 명세의 Pet 생성 단계로 이어진다. 상태와 선택 범위의 상세 계약은 [MVP PRD](../product-spec/mvp.md)를 따른다.
 
-현재 PoC의 CSS 기반 로그인 폼은 접근성 흐름을 확인하기 위한 모의 UI이며 원본 로그인 패널의 시각 기준이 아니다. 제품은 KMS v1.2.43 `UI.wz/Login.img`에서 `Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`), `Title/BtLogin`의 `normal`·`mouseOver`·`pressed`·`disabled`(각 `95 × 48`), `Notice`, `NewChar`의 양피지·화살표·`charAlert`, `Common/BtStart`(`125 × 52`)와 `CharSelect/BtNew`(`101 × 35`) 자산을 추출하고 `UI.wz/Basic.img`에서 콤보박스와 탭 조각을 추출한다. `MSTitle`은 버전 자산으로 유지하되 화면에는 표시하지 않는다. 제품 Canvas는 고정 `800 × 600` 논리 뷰포트로 로그인과 NewChar 편집 UI를 렌더링한 뒤 `Common/frame`을 카메라와 무관하게 합성하고, 두 번째 화면의 `다른 캐릭터 찾기` 버튼만 프레임 위에 합성한다. 추출 결과는 최종 앱의 `public/map-login/kms-v43/`에 버전된 정적 자산으로 포함한다.
+현재 PoC의 CSS 기반 로그인 폼은 접근성 흐름을 확인하기 위한 모의 UI이며 원본 로그인 패널의 시각 기준이 아니다. 제품은 KMS v1.2.43 `UI.wz/Login.img`에서 `Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`), `Title/BtLogin`의 `normal`·`mouseOver`·`pressed`·`disabled`(각 `95 × 48`), `Notice`, `NewChar`의 양피지·화살표·`charAlert`와 `Common/BtStart`(`125 × 52`) 자산을 추출하고 `UI.wz/Basic.img`에서 콤보박스와 탭 조각을 추출한다. `Pet 만들기`는 외부 이미지 없이 Canvas로 직접 그린다. `MSTitle`은 버전 자산으로 유지하되 화면에는 표시하지 않는다. 제품 Canvas는 고정 `800 × 600` 논리 뷰포트로 로그인과 NewChar 편집 UI를 렌더링한 뒤 `Common/frame`을 카메라와 무관하게 합성하고, `다른 캐릭터 찾기` 버튼을 프레임 위에 합성한다. 추출 결과는 최종 앱의 `public/map-login/kms-v43/`에 버전된 정적 자산으로 포함한다.
 
 로그인 입력과 버튼은 현재 장면의 `Title/signboard/0` bounds와 카메라 변환을 기준으로 배치한다. 빈 입력에는 배경·테두리·placeholder를 추가하지 않으며 긴 닉네임은 입력 영역에 clip한다. 화면에 보이는 HTML input/button overlay는 만들지 않고, 화면 밖 native form은 한글 IME, 붙여넣기, 선택, Tab, Enter/Space와 접근성만 담당한다. 계정 저장, 회원가입, 비밀번호 찾기와 월드 선택처럼 제품 기능으로 연결되지 않는 버튼이나 컨트롤은 표시하지 않는다.
 
@@ -60,7 +60,7 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 - 현재 상태의 액션과 표정은 `Basic.img` 조각을 합성한 Canvas 콤보박스로 선택한다. 목록은 최대 8행이며 클릭, 휠, 화살표 키, Enter와 Esc를 지원한다. 공식 코드인 `A00`~`A41`, `E00`~`E24`는 UI에 노출하지 않고 내부 값으로 유지한다.
 - 상태, 액션 또는 표정을 선택하면 별도 미리보기 카드 없이 왼쪽 캐릭터가 해당 조합의 애니메이션을 즉시 반복 재생한다.
 - `running-left`와 `running-right`는 제품 명세대로 걷기 액션과 방향을 고정하고 표정만 변경할 수 있다.
-- `Pet 만들기`는 `Login.img/CharSelect/BtNew` 원본 버튼을 양피지 하단에서 `15px` 여백을 두고 가로 중앙에 둔다. `다른 캐릭터 찾기`는 `Login.img/Common/BtStart` 원본 버튼을 `800 × 600` 논리 viewport의 `(8, 429)`에 고정하고 프레임 위에 합성한다. 두 버튼에는 별도 Canvas 문구를 덧그리지 않는다.
+- `Pet 만들기`는 `112 × 30` 금장 우드 버튼을 Canvas로 직접 그리고 양피지 하단에서 `15px` 여백을 둔 `(scroll.x + 65, scroll.y + 120)`에 배치한다. 상태에 따라 `Pet 만들기`, `만드는 중`, `설치 정보` 문구를 표시한다. `다른 캐릭터 찾기`는 `Login.img/Common/BtStart` 원본 버튼을 `800 × 600` 논리 viewport의 `(8, 429)`에 고정하고 프레임 위에 합성한다. 첫 로그인 화면에서는 disabled 상태를 표시만 하고 입력 대상으로 취급하지 않는다.
 - 진입·이탈 시 원본 양피지 열림·닫힘 프레임을 한 번 재생한다. `다른 캐릭터 찾기`는 닫힘 뒤 캐릭터와 상태 설정을 초기화하고 약 1초 동안 로그인 화면으로 자동 스크롤한다. 모션 감소 설정에서는 최종 프레임과 목적지로 즉시 전환한다.
 - 화면 밖 native 버튼과 `select`를 Canvas 상태와 동기화해 키보드와 스크린리더 입력을 제공한다.
 
@@ -118,8 +118,8 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 - v43 WZ 추출 결과인 scene, Notice·NewChar manifest와 PNG를 최종 앱의 `public/map-login/kms-v43/`에 커밋하고 Next.js 정적 자산으로 제공한다.
 - 제품 빌드나 Vercel 배포 중에 원본 WZ를 다시 읽지 않는다. 원본 WZ와 DLL은 저장소 밖 읽기 전용 입력이다.
 - scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신한다.
-- `Common/frame`은 `800 × 600` 고정 화면에서 장면과 편집 UI 다음에 표시하고, 두 번째 화면의 viewport 고정 `다른 캐릭터 찾기`만 그 위에 합성한다. `MSTitle`은 자산으로 유지하되 표시하지 않는다. 첫 로그인 화면의 `Title/signboard/0` 패널에는 `BtLogin` 4상태와 Canvas 입력을 장면·카메라 좌표로 배치한다.
-- `new-char.json`은 `formatVersion: 3`이며 `NewChar` 양피지·화살표·`charAlert`, `Basic.img` 콤보박스·탭 조각과 `Login.img/Common/BtStart`·`Login.img/CharSelect/BtNew` 버튼의 출처, 크기, origin과 delay를 고정한다.
+- `Common/frame`은 `800 × 600` 고정 화면에서 장면과 편집 UI 다음에 표시하고, viewport 고정 `다른 캐릭터 찾기`를 그 위에 합성한다. 첫 로그인 화면에서는 disabled 상태만 표시하고 두 번째 화면에서만 상호작용한다. `MSTitle`은 자산으로 유지하되 표시하지 않는다. 첫 로그인 화면의 `Title/signboard/0` 패널에는 `BtLogin` 4상태와 Canvas 입력을 장면·카메라 좌표로 배치한다.
+- `new-char.json`은 `formatVersion: 4`이며 `NewChar` 양피지·화살표·`charAlert`, `Basic.img` 콤보박스·탭 조각과 `Login.img/Common/BtStart` 버튼의 출처, 크기, origin과 delay를 고정한다. Canvas 기반 `Pet 만들기`는 manifest 자산 계약에 포함하지 않는다.
 - 비기능 계정 컨트롤은 만들지 않는다.
 - WZ 추출 자산을 비상업 Production에서 공개 제공하는 권리는 별도로 확인되지 않았다. 사용자는 이 위험을 인지하고 MVP 전제로 수용했으며, 이는 법적 허가나 권리 확인을 뜻하지 않는다.
 

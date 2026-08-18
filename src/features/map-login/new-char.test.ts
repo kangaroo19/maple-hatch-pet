@@ -15,6 +15,10 @@ import {
   validateNewChar,
   type NewCharManifest,
 } from "@/features/map-login/new-char";
+import {
+  resolveFindCharacterOverlayState,
+  resolvePrimaryButtonVisual,
+} from "@/features/map-login/new-char-renderer";
 import { validateScene } from "@/features/map-login/scene";
 
 const scene = validateScene(
@@ -45,7 +49,7 @@ const assetButton = (width: number, height: number, source: string) => ({
 });
 
 const fixture: NewCharManifest = {
-  formatVersion: 3,
+  formatVersion: 4,
   source: {
     login: "UI.wz/Login.img",
     newChar: "UI.wz/Login.img/NewChar",
@@ -82,7 +86,6 @@ const fixture: NewCharManifest = {
     disabled: asset(17, 16),
   },
   buttons: {
-    petCreate: assetButton(101, 35, "UI.wz/Login.img/CharSelect/BtNew"),
     findCharacter: assetButton(125, 52, "UI.wz/Login.img/Common/BtStart"),
   },
   tab: {
@@ -108,7 +111,7 @@ describe("NewChar manifest", () => {
   });
 
   it("rejects the previous product manifest version", () => {
-    expect(() => validateNewChar({ ...fixture, formatVersion: 2 })).toThrow(
+    expect(() => validateNewChar({ ...fixture, formatVersion: 3 })).toThrow(
       "NewChar 자산 데이터",
     );
   });
@@ -122,17 +125,28 @@ describe("NewChar manifest", () => {
     ).toThrow("NewChar 자산 데이터");
   });
 
-  it("rejects missing or incorrectly sized product button assets", () => {
+  it("rejects the removed petCreate WZ asset contract", () => {
     expect(() =>
       validateNewChar({
         ...fixture,
         buttons: {
           ...fixture.buttons,
-          petCreate: {
-            ...fixture.buttons.petCreate,
+          petCreate: assetButton(101, 35, "UI.wz/Login.img/CharSelect/BtNew"),
+        },
+      }),
+    ).toThrow("NewChar 자산 데이터");
+  });
+
+  it("rejects an incorrectly sized find-character button asset", () => {
+    expect(() =>
+      validateNewChar({
+        ...fixture,
+        buttons: {
+          findCharacter: {
+            ...fixture.buttons.findCharacter,
             disabled: {
-              ...fixture.buttons.petCreate.disabled,
-              width: 100,
+              ...fixture.buttons.findCharacter.disabled,
+              width: 124,
             },
           },
         },
@@ -180,10 +194,10 @@ describe("NewChar layout", () => {
       expect(rectContains(layout.scroll, control)).toBe(true);
     }
     expect(layout.primary).toEqual({
-      x: layout.scroll.x + 70,
-      y: layout.scroll.y + 115,
-      width: 101,
-      height: 35,
+      x: layout.scroll.x + 65,
+      y: layout.scroll.y + 120,
+      width: 112,
+      height: 30,
     });
     expect(layout.secondary).toEqual({ x: 8, y: 429, width: 125, height: 52 });
   });
@@ -246,6 +260,67 @@ describe("NewChar state and dropdown navigation", () => {
       "mouseOver",
     );
     expect(resolveNewCharControlState({ disabled: false })).toBe("normal");
+  });
+
+  it("selects the Canvas primary button state and label", () => {
+    expect(
+      resolvePrimaryButtonVisual({ createPending: false, hasResult: false }),
+    ).toEqual({ state: "normal", label: "Pet 만들기" });
+    expect(
+      resolvePrimaryButtonVisual({
+        createPending: false,
+        hasResult: false,
+        hovered: true,
+      }),
+    ).toEqual({ state: "mouseOver", label: "Pet 만들기" });
+    expect(
+      resolvePrimaryButtonVisual({
+        createPending: false,
+        hasResult: false,
+        focused: true,
+      }),
+    ).toEqual({ state: "mouseOver", label: "Pet 만들기" });
+    expect(
+      resolvePrimaryButtonVisual({
+        createPending: false,
+        hasResult: false,
+        pressed: true,
+      }),
+    ).toEqual({ state: "pressed", label: "Pet 만들기" });
+    expect(
+      resolvePrimaryButtonVisual({ createPending: true, hasResult: false }),
+    ).toEqual({ state: "disabled", label: "만드는 중" });
+    expect(
+      resolvePrimaryButtonVisual({ createPending: false, hasResult: true }),
+    ).toEqual({ state: "normal", label: "설치 정보" });
+  });
+
+  it("shows find-character disabled on login and interactive in the editor", () => {
+    expect(
+      resolveFindCharacterOverlayState({
+        creatorVisible: false,
+        controlsVisible: false,
+        modalOpen: false,
+        createPending: false,
+      }),
+    ).toBe("disabled");
+    expect(
+      resolveFindCharacterOverlayState({
+        creatorVisible: true,
+        controlsVisible: true,
+        modalOpen: false,
+        createPending: false,
+        hovered: true,
+      }),
+    ).toBe("mouseOver");
+    expect(
+      resolveFindCharacterOverlayState({
+        creatorVisible: true,
+        controlsVisible: false,
+        modalOpen: false,
+        createPending: false,
+      }),
+    ).toBeNull();
   });
 
   it("limits editor and modal hit testing to the active surface", () => {

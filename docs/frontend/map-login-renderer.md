@@ -367,7 +367,7 @@ y += camera.centerY × (100 + ry) / 100
 6. `layer`, `z`, `order`로 정렬된 오브젝트를 그린다.
 7. `front`가 참인 배경을 원본 순서대로 그린다.
 8. 제품 로그인 또는 NewChar Canvas UI를 그린다.
-9. 제품 통합에서는 `UI.wz/Login.img/Common/frame`을 화면 좌표 `(0, 0)`에 그린 뒤, 두 번째 화면의 viewport 고정 `다른 캐릭터 찾기` 버튼만 프레임 위에 그린다.
+9. 제품 통합에서는 `UI.wz/Login.img/Common/frame`을 화면 좌표 `(0, 0)`에 그린 뒤 viewport 고정 `다른 캐릭터 찾기` 버튼을 프레임 위에 그린다. 첫 화면에서는 disabled 상태를 표시만 하고 두 번째 화면에서만 상호작용한다.
 10. 다음 animation frame을 요청한다.
 
 `setTransform()`을 매 프레임 사용하므로 이전 프레임의 scale이 누적되지 않는다. 애니메이션은 스크롤 이벤트에 묶이지 않아 사용자가 멈춘 위치에서도 계속 진행된다.

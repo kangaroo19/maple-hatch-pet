@@ -26,7 +26,7 @@ export type NewCharButton = Record<
 >;
 
 export type NewCharManifest = {
-  formatVersion: 3;
+  formatVersion: 4;
   source: {
     login: "UI.wz/Login.img";
     newChar: "UI.wz/Login.img/NewChar";
@@ -42,7 +42,6 @@ export type NewCharManifest = {
   >;
   comboButton: NewCharButton;
   buttons: {
-    petCreate: NewCharButton;
     findCharacter: NewCharButton;
   };
   tab: Record<
@@ -90,6 +89,7 @@ export type NewCharControlState =
 export const NEW_CHAR_PANEL_SOURCE = "Map.wz/Obj/login.img/NewChar/signboard/0";
 export const NEW_CHAR_MUSHROOM_SOURCE = "Map.wz/Back/login.img/back/18";
 export const FIND_CHARACTER_VIEWPORT_POSITION = { x: 8, y: 429 } as const;
+export const PET_CREATE_BUTTON_SIZE = { width: 112, height: 30 } as const;
 
 const buttonStates = ["normal", "mouseOver", "pressed", "disabled"] as const;
 const comboStates = [...buttonStates, "selected"] as const;
@@ -192,7 +192,7 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     });
 
   if (
-    manifest.formatVersion !== 3 ||
+    manifest.formatVersion !== 4 ||
     source?.login !== "UI.wz/Login.img" ||
     source?.newChar !== "UI.wz/Login.img/NewChar" ||
     source.basic !== "UI.wz/Basic.img" ||
@@ -205,12 +205,8 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     !validCombo ||
     !validButton(manifest.comboButton, 17, 16) ||
     !buttons ||
-    !validButton(
-      buttons.petCreate,
-      101,
-      35,
-      "UI.wz/Login.img/CharSelect/BtNew",
-    ) ||
+    Object.keys(buttons).length !== 1 ||
+    !("findCharacter" in buttons) ||
     !validButton(
       buttons.findCharacter,
       125,
@@ -250,7 +246,6 @@ export function getNewCharLayout(
     width: 242,
     height: 165,
   };
-  const petCreate = manifest.buttons.petCreate.normal;
   const findCharacter = manifest.buttons.findCharacter.normal;
   const modal = {
     x: -scene.map.centerX + (scene.map.width - 242) / 2,
@@ -278,10 +273,9 @@ export function getNewCharLayout(
     action: { x: scroll.x + 20, y: scroll.y + 62, width: 202, height: 17 },
     emotion: { x: scroll.x + 20, y: scroll.y + 90, width: 202, height: 17 },
     primary: {
-      x: scroll.x + Math.floor((scroll.width - petCreate.width) / 2),
-      y: scroll.y + scroll.height - petCreate.height - 15,
-      width: petCreate.width,
-      height: petCreate.height,
+      x: scroll.x + 65,
+      y: scroll.y + 120,
+      ...PET_CREATE_BUTTON_SIZE,
     },
     secondary: {
       ...FIND_CHARACTER_VIEWPORT_POSITION,

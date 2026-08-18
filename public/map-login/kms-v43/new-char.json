@@ -1,5 +1,5 @@
 {
-  "formatVersion": 3,
+  "formatVersion": 4,
   "source": {
     "login": "UI.wz/Login.img",
     "newChar": "UI.wz/Login.img/NewChar",
@@ -284,32 +284,6 @@
     }
   },
   "buttons": {
-    "petCreate": {
-      "normal": {
-        "asset": "/map-login/kms-v43/new-char/bt-pet-create-normal.png",
-        "width": 101,
-        "height": 35,
-        "source": "UI.wz/Login.img/CharSelect/BtNew/normal"
-      },
-      "mouseOver": {
-        "asset": "/map-login/kms-v43/new-char/bt-pet-create-mouse-over.png",
-        "width": 101,
-        "height": 35,
-        "source": "UI.wz/Login.img/CharSelect/BtNew/mouseOver"
-      },
-      "pressed": {
-        "asset": "/map-login/kms-v43/new-char/bt-pet-create-pressed.png",
-        "width": 101,
-        "height": 35,
-        "source": "UI.wz/Login.img/CharSelect/BtNew/pressed"
-      },
-      "disabled": {
-        "asset": "/map-login/kms-v43/new-char/bt-pet-create-disabled.png",
-        "width": 101,
-        "height": 35,
-        "source": "UI.wz/Login.img/CharSelect/BtNew/disabled"
-      }
-    },
     "findCharacter": {
       "normal": {
         "asset": "/map-login/kms-v43/new-char/bt-find-character-normal.png",

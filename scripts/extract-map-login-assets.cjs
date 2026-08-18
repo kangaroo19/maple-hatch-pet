@@ -303,7 +303,7 @@ async function main() {
       }
     }
     const newCharManifest = {
-      formatVersion: 3,
+      formatVersion: 4,
       source: {
         login: "UI.wz/Login.img",
         newChar: "UI.wz/Login.img/NewChar",
@@ -334,12 +334,6 @@ async function main() {
         "bt-combo",
       ),
       buttons: {
-        petCreate: await saveButton(
-          loginImage,
-          "Login.img",
-          "CharSelect/BtNew",
-          "bt-pet-create",
-        ),
         findCharacter: await saveButton(
           loginImage,
           "Login.img",
@@ -391,8 +385,6 @@ async function main() {
     }
     for (const asset of Object.values(newCharManifest.comboButton))
       assertAsset(asset, 17, 16);
-    for (const asset of Object.values(newCharManifest.buttons.petCreate))
-      assertAsset(asset, 101, 35);
     for (const asset of Object.values(newCharManifest.buttons.findCharacter))
       assertAsset(asset, 125, 52);
     for (const parts of Object.values(newCharManifest.tab)) {
