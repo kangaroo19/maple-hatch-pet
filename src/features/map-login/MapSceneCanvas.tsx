@@ -57,6 +57,8 @@ import {
   type EmotionCode,
 } from "@/lib/pet-contract";
 
+const SCENE_CAMERA_OFFSET_Y = 60;
+
 export type CanvasLoginState = {
   visible: boolean;
   nickname: string;
@@ -541,7 +543,11 @@ export function MapSceneCanvas({
       const startedAt = performance.now();
       function render(now: number) {
         const elapsed = now - startedAt;
-        const camera = getMapCamera(scene.map, activeViewport.scrollTop, scale);
+        const camera = getMapCamera(
+          scene.map,
+          activeViewport.scrollTop + SCENE_CAMERA_OFFSET_Y * scale,
+          scale,
+        );
         activeContext.setTransform(deviceScale, 0, 0, deviceScale, 0, 0);
         activeContext.globalAlpha = 1;
         activeContext.fillStyle = "#050a11";
@@ -702,7 +708,11 @@ export function MapSceneCanvas({
     if (!scene || !viewport) return null;
     const bounds = event.currentTarget.getBoundingClientRect();
     const scale = scaleRef.current;
-    const camera = getMapCamera(scene.map, viewport.scrollTop, scale);
+    const camera = getMapCamera(
+      scene.map,
+      viewport.scrollTop + SCENE_CAMERA_OFFSET_Y * scale,
+      scale,
+    );
     return viewportPointToMap(
       { x: event.clientX - bounds.left, y: event.clientY - bounds.top },
       camera,
