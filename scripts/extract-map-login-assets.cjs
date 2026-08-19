@@ -257,21 +257,6 @@ async function main() {
     );
 
     const buttonStates = ["normal", "mouseOver", "pressed", "disabled"];
-    const comboStates = [...buttonStates, "selected"];
-    const combo = {};
-    for (const state of comboStates) {
-      combo[state] = [];
-      for (const part of ["0", "1", "2"]) {
-        combo[state].push(
-          await saveNewCharCanvas(
-            basicImage,
-            "Basic.img",
-            `ComboBox/${state}/${part}`,
-            `combo-${state === "mouseOver" ? "mouse-over" : state}-${part}.png`,
-          ),
-        );
-      }
-    }
     const tab = {};
     for (const [state, suffix] of [
       ["normal", "0"],
@@ -303,7 +288,7 @@ async function main() {
       }
     }
     const newCharManifest = {
-      formatVersion: 4,
+      formatVersion: 5,
       source: {
         login: "UI.wz/Login.img",
         newChar: "UI.wz/Login.img/NewChar",
@@ -326,13 +311,6 @@ async function main() {
           "bt-right",
         ),
       },
-      combo,
-      comboButton: await saveButton(
-        basicImage,
-        "Basic.img",
-        "BtComboBox",
-        "bt-combo",
-      ),
       buttons: {
         findCharacter: await saveButton(
           loginImage,
@@ -378,13 +356,6 @@ async function main() {
     }
     for (const arrow of Object.values(newCharManifest.arrows))
       for (const asset of Object.values(arrow)) assertAsset(asset, 15, 16);
-    for (const parts of Object.values(newCharManifest.combo)) {
-      assertAsset(parts[0], 5, 17);
-      assertAsset(parts[1], 5, 17);
-      assertAsset(parts[2], 18, 17);
-    }
-    for (const asset of Object.values(newCharManifest.comboButton))
-      assertAsset(asset, 17, 16);
     for (const asset of Object.values(newCharManifest.buttons.findCharacter))
       assertAsset(asset, 125, 52);
     for (const parts of Object.values(newCharManifest.tab)) {

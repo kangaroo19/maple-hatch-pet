@@ -49,7 +49,7 @@ const assetButton = (width: number, height: number, source: string) => ({
 });
 
 const fixture: NewCharManifest = {
-  formatVersion: 4,
+  formatVersion: 5,
   source: {
     login: "UI.wz/Login.img",
     newChar: "UI.wz/Login.img/NewChar",
@@ -72,19 +72,6 @@ const fixture: NewCharManifest = {
     ],
   },
   arrows: { left: button, right: button },
-  combo: {
-    normal: [asset(5, 17), asset(5, 17), asset(18, 17)],
-    mouseOver: [asset(5, 17), asset(5, 17), asset(18, 17)],
-    pressed: [asset(5, 17), asset(5, 17), asset(18, 17)],
-    disabled: [asset(5, 17), asset(5, 17), asset(18, 17)],
-    selected: [asset(5, 17), asset(5, 17), asset(18, 17)],
-  },
-  comboButton: {
-    normal: asset(17, 16),
-    mouseOver: asset(17, 16),
-    pressed: asset(17, 16),
-    disabled: asset(17, 16),
-  },
   buttons: {
     findCharacter: assetButton(125, 52, "UI.wz/Login.img/Common/BtStart"),
   },
@@ -111,7 +98,7 @@ describe("NewChar manifest", () => {
   });
 
   it("rejects the previous product manifest version", () => {
-    expect(() => validateNewChar({ ...fixture, formatVersion: 3 })).toThrow(
+    expect(() => validateNewChar({ ...fixture, formatVersion: 4 })).toThrow(
       "NewChar 자산 데이터",
     );
   });
@@ -196,6 +183,24 @@ describe("NewChar layout", () => {
     expect(layout.primary).toEqual({
       x: layout.scroll.x + 65,
       y: layout.scroll.y + 120,
+      width: 112,
+      height: 30,
+    });
+    expect(layout.installPanel).toEqual({
+      x: layout.scroll.x - 12,
+      y: layout.scroll.y + 177,
+      width: 266,
+      height: 98,
+    });
+    expect(layout.installCommand).toEqual({
+      x: layout.installPanel.x + 12,
+      y: layout.installPanel.y + 10,
+      width: 242,
+      height: 38,
+    });
+    expect(layout.copyCommand).toEqual({
+      x: layout.scroll.x + 65,
+      y: layout.installCommand.y + 46,
       width: 112,
       height: 30,
     });
@@ -289,10 +294,10 @@ describe("NewChar state and dropdown navigation", () => {
     ).toEqual({ state: "pressed", label: "Pet 만들기" });
     expect(
       resolvePrimaryButtonVisual({ createPending: true, hasResult: false }),
-    ).toEqual({ state: "disabled", label: "만드는 중" });
+    ).toEqual({ state: "disabled", label: "Pet 만들기" });
     expect(
       resolvePrimaryButtonVisual({ createPending: false, hasResult: true }),
-    ).toEqual({ state: "normal", label: "설치 정보" });
+    ).toEqual({ state: "normal", label: "Pet 만들기" });
   });
 
   it("shows find-character disabled on login and interactive in the editor", () => {
@@ -300,7 +305,6 @@ describe("NewChar state and dropdown navigation", () => {
       resolveFindCharacterOverlayState({
         creatorVisible: false,
         controlsVisible: false,
-        modalOpen: false,
         createPending: false,
       }),
     ).toBe("disabled");
@@ -308,7 +312,6 @@ describe("NewChar state and dropdown navigation", () => {
       resolveFindCharacterOverlayState({
         creatorVisible: true,
         controlsVisible: true,
-        modalOpen: false,
         createPending: false,
         hovered: true,
       }),
@@ -317,13 +320,12 @@ describe("NewChar state and dropdown navigation", () => {
       resolveFindCharacterOverlayState({
         creatorVisible: true,
         controlsVisible: false,
-        modalOpen: false,
         createPending: false,
       }),
     ).toBeNull();
   });
 
-  it("limits editor and modal hit testing to the active surface", () => {
+  it("hit-tests the editor and copy button on their active surfaces", () => {
     const layout = getNewCharLayout(scene, fixture);
     const center = (rect: typeof layout.action) => ({
       x: rect.x + rect.width / 2,
@@ -338,19 +340,12 @@ describe("NewChar state and dropdown navigation", () => {
       y: layout.action.y + layout.action.height / 2,
     };
 
-    expect(hitTestNewChar(layout, points(visibleActionPoint), false)).toBe(
-      "action",
-    );
+    expect(hitTestNewChar(layout, points(visibleActionPoint))).toBe("action");
     expect(
-      hitTestNewChar(
-        layout,
-        points({ x: 0, y: 0 }, center(layout.secondary)),
-        false,
-      ),
+      hitTestNewChar(layout, points({ x: 0, y: 0 }, center(layout.secondary))),
     ).toBe("secondary");
-    expect(hitTestNewChar(layout, points(visibleActionPoint), true)).toBeNull();
-    expect(hitTestNewChar(layout, points(center(layout.install)), true)).toBe(
-      "install",
+    expect(hitTestNewChar(layout, points(center(layout.copyCommand)))).toBe(
+      "copyCommand",
     );
   });
 });

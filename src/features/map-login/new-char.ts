@@ -26,7 +26,7 @@ export type NewCharButton = Record<
 >;
 
 export type NewCharManifest = {
-  formatVersion: 4;
+  formatVersion: 5;
   source: {
     login: "UI.wz/Login.img";
     newChar: "UI.wz/Login.img/NewChar";
@@ -36,11 +36,6 @@ export type NewCharManifest = {
   };
   scroll: { open: NewCharFrame[]; close: NewCharFrame[] };
   arrows: { left: NewCharButton; right: NewCharButton };
-  combo: Record<
-    "normal" | "mouseOver" | "pressed" | "disabled" | "selected",
-    [NewCharAsset, NewCharAsset, NewCharAsset]
-  >;
-  comboButton: NewCharButton;
   buttons: {
     findCharacter: NewCharButton;
   };
@@ -66,10 +61,9 @@ export type NewCharLayout = {
   emotion: Rect;
   primary: Rect;
   secondary: Rect;
-  modal: Rect;
-  install: Rect;
-  delete: Rect;
-  close: Rect;
+  installPanel: Rect;
+  installCommand: Rect;
+  copyCommand: Rect;
 };
 
 export type NewCharTarget =
@@ -79,9 +73,7 @@ export type NewCharTarget =
   | "emotion"
   | "primary"
   | "secondary"
-  | "install"
-  | "delete"
-  | "close";
+  | "copyCommand";
 
 export type NewCharControlState =
   "normal" | "mouseOver" | "pressed" | "disabled";
@@ -92,7 +84,6 @@ export const FIND_CHARACTER_VIEWPORT_POSITION = { x: 8, y: 429 } as const;
 export const PET_CREATE_BUTTON_SIZE = { width: 112, height: 30 } as const;
 
 const buttonStates = ["normal", "mouseOver", "pressed", "disabled"] as const;
-const comboStates = [...buttonStates, "selected"] as const;
 
 function validAsset(
   value: unknown,
@@ -144,7 +135,6 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
   const source = manifest.source;
   const scroll = manifest.scroll;
   const arrows = manifest.arrows;
-  const combo = manifest.combo;
   const buttons = manifest.buttons;
   const tab = manifest.tab;
   const openFrames: [number, number, number][] = [
@@ -167,18 +157,6 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     contract.every(([width, height, delay], index) =>
       validFrame(frames[index], width, height, delay),
     );
-  const validCombo =
-    combo &&
-    comboStates.every((state) => {
-      const parts = combo[state];
-      return (
-        Array.isArray(parts) &&
-        parts.length === 3 &&
-        validAsset(parts[0], 5, 17) &&
-        validAsset(parts[1], 5, 17) &&
-        validAsset(parts[2], 18, 17)
-      );
-    });
   const validTab =
     tab &&
     (["normal", "selected"] as const).every((state) => {
@@ -192,7 +170,7 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     });
 
   if (
-    manifest.formatVersion !== 4 ||
+    manifest.formatVersion !== 5 ||
     source?.login !== "UI.wz/Login.img" ||
     source?.newChar !== "UI.wz/Login.img/NewChar" ||
     source.basic !== "UI.wz/Basic.img" ||
@@ -202,8 +180,6 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     !validFrames(scroll?.close, closeFrames) ||
     !validButton(arrows?.left, 15, 16) ||
     !validButton(arrows?.right, 15, 16) ||
-    !validCombo ||
-    !validButton(manifest.comboButton, 17, 16) ||
     !buttons ||
     Object.keys(buttons).length !== 1 ||
     !("findCharacter" in buttons) ||
@@ -247,11 +223,17 @@ export function getNewCharLayout(
     height: 165,
   };
   const findCharacter = manifest.buttons.findCharacter.normal;
-  const modal = {
-    x: -scene.map.centerX + (scene.map.width - 242) / 2,
-    y: panel.y + 70,
+  const installPanel = {
+    x: scroll.x - 12,
+    y: scroll.y + scroll.height + 12,
+    width: 266,
+    height: 98,
+  };
+  const installCommand = {
+    x: installPanel.x + 12,
+    y: installPanel.y + 10,
     width: 242,
-    height: 165,
+    height: 38,
   };
   const characterSize = 360;
   return {
@@ -282,24 +264,12 @@ export function getNewCharLayout(
       width: findCharacter.width,
       height: findCharacter.height,
     },
-    modal,
-    install: {
-      x: modal.x + 18,
-      y: modal.y + 128,
-      width: 96,
-      height: 24,
-    },
-    delete: {
-      x: modal.x + 132,
-      y: modal.y + 102,
-      width: 92,
-      height: 16,
-    },
-    close: {
-      x: modal.x + 128,
-      y: modal.y + 128,
-      width: 96,
-      height: 24,
+    installPanel,
+    installCommand,
+    copyCommand: {
+      x: scroll.x + 65,
+      y: installCommand.y + installCommand.height + 8,
+      ...PET_CREATE_BUTTON_SIZE,
     },
   };
 }
@@ -328,11 +298,16 @@ export function hitTestNewChar(
     map: { x: number; y: number };
     viewport: { x: number; y: number };
   },
-  modalOpen: boolean,
 ): NewCharTarget | null {
-  const targets: NewCharTarget[] = modalOpen
-    ? ["install", "delete", "close"]
-    : ["previous", "next", "primary", "action", "emotion", "secondary"];
+  const targets: NewCharTarget[] = [
+    "previous",
+    "next",
+    "primary",
+    "action",
+    "emotion",
+    "copyCommand",
+    "secondary",
+  ];
   return (
     targets.find((target) =>
       pointInRect(

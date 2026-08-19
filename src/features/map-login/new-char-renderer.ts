@@ -35,8 +35,8 @@ export type CanvasCreatorState = {
   selectedEmotion: EmotionCode;
   createPending: boolean;
   hasResult: boolean;
-  modalOpen: boolean;
   installCommand: string | null;
+  copyState: "idle" | "success" | "error";
   focused: NewCharTarget | null;
 };
 
@@ -62,8 +62,6 @@ export function getNewCharAssetSources(manifest: NewCharManifest): string[] {
     ...manifest.scroll.close,
     ...Object.values(manifest.arrows.left),
     ...Object.values(manifest.arrows.right),
-    ...Object.values(manifest.combo).flat(),
-    ...Object.values(manifest.comboButton),
     ...Object.values(manifest.buttons.findCharacter),
     ...Object.values(manifest.tab).flatMap((tab) => Object.values(tab)),
     manifest.alert,
@@ -123,11 +121,7 @@ export function resolvePrimaryButtonVisual(input: {
       hovered: input.hovered,
       focused: input.focused,
     }),
-    label: input.createPending
-      ? "만드는 중"
-      : input.hasResult
-        ? "설치 정보"
-        : "Pet 만들기",
+    label: "Pet 만들기",
   };
 }
 
@@ -238,43 +232,100 @@ function drawPrimaryButton(
 
 function drawCombo(
   context: CanvasRenderingContext2D,
-  images: Map<string, HTMLImageElement>,
-  manifest: NewCharManifest,
   rect: Rect,
   state: NewCharControlState | "selected",
   label: string,
   camera: Camera,
+  showArrow = true,
 ) {
   const target = screenRect(rect, camera);
-  const [left, fill, right] = manifest.combo[state];
-  context.drawImage(imageFor(images, left.asset), target.x, target.y);
-  context.drawImage(
-    imageFor(images, fill.asset),
-    target.x + left.width,
-    target.y,
-    Math.max(1, target.width - left.width - right.width),
-    target.height,
-  );
-  context.drawImage(
-    imageFor(images, right.asset),
-    target.x + target.width - right.width,
-    target.y,
-  );
-  const buttonState =
-    state === "selected" ? "mouseOver" : (state as NewCharControlState);
-  context.drawImage(
-    imageFor(images, manifest.comboButton[buttonState].asset),
-    target.x + target.width - manifest.comboButton[buttonState].width,
-    target.y,
-  );
+  const pressedOffset = state === "pressed" ? 1 : 0;
+  const x = target.x;
+  const y = target.y + pressedOffset;
+  const palette = {
+    normal: {
+      top: "#f6e9c8",
+      bottom: "#dfc99d",
+      border: "#68492c",
+      text: "#30271e",
+    },
+    mouseOver: {
+      top: "#fff3cf",
+      bottom: "#e8cf96",
+      border: "#bd8124",
+      text: "#30271e",
+    },
+    pressed: {
+      top: "#d8bd87",
+      bottom: "#c5a66e",
+      border: "#70471f",
+      text: "#30271e",
+    },
+    disabled: {
+      top: "#d7cdb9",
+      bottom: "#bdb29f",
+      border: "#8e816e",
+      text: "#81796e",
+    },
+    selected: {
+      top: "#f2d98e",
+      bottom: "#d9b75f",
+      border: "#a66b1b",
+      text: "#30271e",
+    },
+  }[state];
+
   context.save();
+  const background = context.createLinearGradient(x, y, x, y + target.height);
+  background.addColorStop(0, palette.top);
+  background.addColorStop(1, palette.bottom);
   context.beginPath();
-  context.rect(target.x + 3, target.y, target.width - 23, target.height);
+  context.roundRect(x, y, target.width, target.height, 2);
+  context.fillStyle = background;
+  context.fill();
+  context.lineWidth = 1;
+  context.strokeStyle = palette.border;
+  context.stroke();
+  context.beginPath();
+  context.moveTo(x + 2, y + 2.5);
+  context.lineTo(x + target.width - 2, y + 2.5);
+  context.strokeStyle = "rgba(255, 255, 236, 0.62)";
+  context.stroke();
+
+  const arrowWidth = showArrow ? 17 : 0;
+  if (showArrow) {
+    const arrowX = x + target.width - arrowWidth;
+    const arrowBackground = context.createLinearGradient(
+      arrowX,
+      y,
+      arrowX,
+      y + target.height,
+    );
+    arrowBackground.addColorStop(0, "rgba(137, 91, 42, 0.24)");
+    arrowBackground.addColorStop(1, "rgba(91, 55, 27, 0.34)");
+    context.fillStyle = arrowBackground;
+    context.fillRect(arrowX, y + 1, arrowWidth - 1, target.height - 2);
+    context.beginPath();
+    context.moveTo(arrowX, y + 2);
+    context.lineTo(arrowX, y + target.height - 2);
+    context.strokeStyle = palette.border;
+    context.stroke();
+    context.beginPath();
+    context.moveTo(arrowX + 5, y + 6);
+    context.lineTo(arrowX + 12, y + 6);
+    context.lineTo(arrowX + 8.5, y + 10);
+    context.closePath();
+    context.fillStyle = state === "disabled" ? "#8a8174" : "#51341f";
+    context.fill();
+  }
+
+  context.beginPath();
+  context.rect(x + 3, y, target.width - arrowWidth - 6, target.height);
   context.clip();
   context.font = textFont;
   context.textBaseline = "middle";
-  context.fillStyle = state === "disabled" ? "#8b8479" : "#30271e";
-  context.fillText(label, target.x + 6, target.y + target.height / 2 + 1);
+  context.fillStyle = palette.text;
+  context.fillText(label, x + 6, y + target.height / 2 + 1);
   context.restore();
 }
 
@@ -393,8 +444,6 @@ function drawArrow(
 
 function drawDropdown(
   context: CanvasRenderingContext2D,
-  images: Map<string, HTMLImageElement>,
-  manifest: NewCharManifest,
   layout: NewCharLayout,
   state: CanvasCreatorState,
   dropdown: CreatorDropdownState,
@@ -411,88 +460,145 @@ function drawDropdown(
       item.code === selectedCode || pointer.optionHovered === row;
     drawCombo(
       context,
-      images,
-      manifest,
       getDropdownRowRect(control, row),
       selected ? "selected" : "normal",
       item.label,
       camera,
+      false,
     );
   });
 }
 
-function drawModal(
+function drawInstallControls(
   context: CanvasRenderingContext2D,
-  images: Map<string, HTMLImageElement>,
-  manifest: NewCharManifest,
   layout: NewCharLayout,
   state: CanvasCreatorState,
   pointer: CreatorPointerState,
   camera: Camera,
-  logicalWidth: number,
-  logicalHeight: number,
 ) {
+  const panel = screenRect(layout.installPanel, camera);
+  const command = screenRect(layout.installCommand, camera);
   context.save();
-  context.fillStyle = "#00000099";
-  context.fillRect(0, 0, logicalWidth, logicalHeight);
-  const modal = screenRect(layout.modal, camera);
-  const scroll = manifest.scroll.open.at(-1)!;
-  context.drawImage(imageFor(images, scroll.asset), modal.x, modal.y);
-  const alertX = modal.x + (modal.width - manifest.alert.width) / 2;
-  context.drawImage(
-    imageFor(images, manifest.alert.asset),
-    alertX,
-    modal.y + 3,
+  context.beginPath();
+  context.roundRect(panel.x, panel.y + 4, panel.width, panel.height, 7);
+  context.fillStyle = "rgba(28, 13, 7, 0.62)";
+  context.fill();
+
+  const panelBackground = context.createLinearGradient(
+    panel.x,
+    panel.y,
+    panel.x,
+    panel.y + panel.height,
   );
-  context.font = boldFont;
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillStyle = "#483521";
-  context.fillText("Pet 생성이 완료되었습니다.", modal.x + 121, modal.y + 47);
-  context.font = textFont;
-  context.fillText(
-    "터미널에서 설치 명령을 실행하세요.",
-    modal.x + 121,
-    modal.y + 62,
+  panelBackground.addColorStop(0, "#6a3c20");
+  panelBackground.addColorStop(0.52, "#4a2816");
+  panelBackground.addColorStop(1, "#2f180e");
+  context.beginPath();
+  context.roundRect(panel.x, panel.y, panel.width, panel.height, 7);
+  context.fillStyle = panelBackground;
+  context.fill();
+  context.lineWidth = 2;
+  context.strokeStyle = "#2a1409";
+  context.stroke();
+
+  context.beginPath();
+  context.roundRect(
+    panel.x + 3,
+    panel.y + 3,
+    panel.width - 6,
+    panel.height - 6,
+    5,
   );
+  context.lineWidth = 1;
+  context.strokeStyle = "#d4a64b";
+  context.stroke();
+  context.beginPath();
+  context.roundRect(
+    panel.x + 6,
+    panel.y + 6,
+    panel.width - 12,
+    panel.height - 12,
+    3,
+  );
+  context.strokeStyle = "#80511f";
+  context.stroke();
+
+  const background = context.createLinearGradient(
+    command.x,
+    command.y,
+    command.x,
+    command.y + command.height,
+  );
+  background.addColorStop(0, "#35271f");
+  background.addColorStop(1, "#1f1713");
+  context.beginPath();
+  context.roundRect(command.x, command.y, command.width, command.height, 4);
+  context.fillStyle = background;
+  context.fill();
+  context.lineWidth = 2;
+  context.strokeStyle = "#6f4d2c";
+  context.stroke();
+  context.beginPath();
+  context.roundRect(
+    command.x + 3,
+    command.y + 3,
+    command.width - 6,
+    command.height - 6,
+    2,
+  );
+  context.lineWidth = 1;
+  context.strokeStyle = "#b4874e";
+  context.stroke();
+
+  context.beginPath();
+  context.rect(
+    command.x + 8,
+    command.y + 3,
+    command.width - 16,
+    command.height - 6,
+  );
+  context.clip();
   context.font = '9px Consolas, "Courier New", monospace';
-  const commandParts = state.installCommand?.split(" ") ?? [];
-  context.fillText(
-    commandParts.slice(0, 3).join(" "),
-    modal.x + 121,
-    modal.y + 77,
-  );
-  context.fillText(commandParts.at(-1) ?? "", modal.x + 121, modal.y + 89);
-  context.font = textFont;
-  context.fillText(
-    "설치 후 Settings > Pets에서 Refresh",
-    modal.x + 121,
-    modal.y + 101,
-  );
   context.textAlign = "left";
-  context.fillStyle = "#65440e";
-  context.fillText("이미지 삭제 요청", modal.x + 134, modal.y + 110);
-  drawTabButton(
-    context,
-    images,
-    manifest,
-    layout.install,
-    pointer.hovered === "install" || state.focused === "install",
-    false,
-    "설치 명령 복사",
-    camera,
-  );
-  drawTabButton(
-    context,
-    images,
-    manifest,
-    layout.close,
-    pointer.hovered === "close" || state.focused === "close",
-    false,
-    "닫기",
-    camera,
-  );
+  context.textBaseline = "middle";
+  context.fillStyle = state.installCommand ? "#f5dfb4" : "#aa9680";
+  if (state.installCommand) {
+    const parts = state.installCommand.split(" ");
+    context.fillText(
+      parts.slice(0, -1).join(" "),
+      command.x + 9,
+      command.y + 13,
+    );
+    context.fillText(parts.at(-1) ?? "", command.x + 9, command.y + 27);
+  } else {
+    context.font = textFont;
+    context.fillText(
+      "Pet을 만들면 설치 명령이 표시됩니다.",
+      command.x + 9,
+      command.y + command.height / 2 + 1,
+    );
+  }
   context.restore();
+
+  drawPrimaryButton(
+    context,
+    layout.copyCommand,
+    {
+      state: resolveNewCharControlState({
+        disabled: !state.installCommand || state.createPending,
+        pressed: pointer.pressed === "copyCommand",
+        hovered: pointer.hovered === "copyCommand",
+        focused: state.focused === "copyCommand",
+      }),
+      label:
+        state.copyState === "success"
+          ? "복사 완료"
+          : state.copyState === "error"
+            ? "복사 실패"
+            : "명령어 복사",
+    },
+    camera,
+  );
 }
 
 export function drawNewCharEditor(input: {
@@ -505,8 +611,6 @@ export function drawNewCharEditor(input: {
   pointer: CreatorPointerState;
   dropdown: CreatorDropdownState;
   camera: Camera;
-  logicalWidth: number;
-  logicalHeight: number;
   elapsed: number;
   transitionStartedAt: number;
   reducedMotion: boolean;
@@ -521,8 +625,6 @@ export function drawNewCharEditor(input: {
     pointer,
     dropdown,
     camera,
-    logicalWidth,
-    logicalHeight,
     elapsed,
     transitionStartedAt,
     reducedMotion,
@@ -606,8 +708,6 @@ export function drawNewCharEditor(input: {
   const emotion = EMOTIONS.find((item) => item.code === state.selectedEmotion)!;
   drawCombo(
     context,
-    images,
-    manifest,
     layout.action,
     dropdown?.kind === "action" ? "selected" : actionState,
     `액션  ${action.label}`,
@@ -615,8 +715,6 @@ export function drawNewCharEditor(input: {
   );
   drawCombo(
     context,
-    images,
-    manifest,
     layout.emotion,
     dropdown?.kind === "emotion" ? "selected" : emotionState,
     `표정  ${emotion.label}`,
@@ -631,30 +729,8 @@ export function drawNewCharEditor(input: {
     focused: state.focused === "primary",
   });
   drawPrimaryButton(context, layout.primary, primaryVisual, camera);
-  drawDropdown(
-    context,
-    images,
-    manifest,
-    layout,
-    state,
-    dropdown,
-    pointer,
-    camera,
-  );
-
-  if (state.modalOpen) {
-    drawModal(
-      context,
-      images,
-      manifest,
-      layout,
-      state,
-      pointer,
-      camera,
-      logicalWidth,
-      logicalHeight,
-    );
-  }
+  drawInstallControls(context, layout, state, pointer, camera);
+  drawDropdown(context, layout, state, dropdown, pointer, camera);
   return true;
 }
 
@@ -672,7 +748,6 @@ export function drawNewCharViewportOverlay(input: {
   const secondaryState = resolveFindCharacterOverlayState({
     creatorVisible: state.visible,
     controlsVisible,
-    modalOpen: state.modalOpen,
     createPending: state.createPending,
     pressed: pointer.pressed === "secondary",
     hovered: pointer.hovered === "secondary",
@@ -691,14 +766,13 @@ export function drawNewCharViewportOverlay(input: {
 export function resolveFindCharacterOverlayState(input: {
   creatorVisible: boolean;
   controlsVisible: boolean;
-  modalOpen: boolean;
   createPending: boolean;
   pressed?: boolean;
   hovered?: boolean;
   focused?: boolean;
 }): NewCharControlState | null {
   if (!input.creatorVisible) return "disabled";
-  if (!input.controlsVisible || input.modalOpen) return null;
+  if (!input.controlsVisible) return null;
   return resolveNewCharControlState({
     disabled: input.createPending,
     pressed: input.pressed,

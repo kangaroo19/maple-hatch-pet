@@ -92,9 +92,7 @@ type Props = {
   onEmotionChange: (value: EmotionCode) => void;
   onPrimaryActivate: () => void;
   onSecondaryActivate: () => void;
-  onInstallActivate: () => void;
-  onDeleteActivate: () => void;
-  onModalClose: () => void;
+  onCopyCommandActivate: () => void;
 };
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -133,9 +131,7 @@ export function MapSceneCanvas({
   onEmotionChange,
   onPrimaryActivate,
   onSecondaryActivate,
-  onInstallActivate,
-  onDeleteActivate,
-  onModalClose,
+  onCopyCommandActivate,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<MapLoginScene | null>(null);
@@ -181,9 +177,7 @@ export function MapSceneCanvas({
     onEmotionChange,
     onPrimaryActivate,
     onSecondaryActivate,
-    onInstallActivate,
-    onDeleteActivate,
-    onModalClose,
+    onCopyCommandActivate,
   });
   const [failed, setFailed] = useState(false);
   const [creatorAssetsFailed, setCreatorAssetsFailed] = useState(false);
@@ -208,15 +202,9 @@ export function MapSceneCanvas({
       onEmotionChange,
       onPrimaryActivate,
       onSecondaryActivate,
-      onInstallActivate,
-      onDeleteActivate,
-      onModalClose,
+      onCopyCommandActivate,
     };
-    if (
-      !creatorState.visible ||
-      creatorState.closing ||
-      creatorState.modalOpen
-    ) {
+    if (!creatorState.visible || creatorState.closing) {
       dropdownRef.current = null;
     }
   }, [
@@ -224,10 +212,8 @@ export function MapSceneCanvas({
     creatorKeyboardCommand,
     onActionChange,
     onCreatorFocus,
-    onDeleteActivate,
     onEmotionChange,
-    onInstallActivate,
-    onModalClose,
+    onCopyCommandActivate,
     onPrimaryActivate,
     onSecondaryActivate,
     onStateMove,
@@ -660,8 +646,6 @@ export function MapSceneCanvas({
             pointer: creatorPointerRef.current,
             dropdown: dropdownRef.current,
             camera,
-            logicalWidth: MAP_LOGIN_VIEWPORT.width,
-            logicalHeight: MAP_LOGIN_VIEWPORT.height,
             elapsed,
             transitionStartedAt: transitionRef.current.startedAt,
             reducedMotion: reducedMotionRef.current,
@@ -771,14 +755,14 @@ export function MapSceneCanvas({
       !points
     )
       return null;
-    return hitTestNewChar(layout, points, state.modalOpen);
+    return hitTestNewChar(layout, points);
   }
 
   function creatorTargetDisabled(target: NewCharTarget) {
     const state = creatorRef.current.state;
     const index = PET_STATES.indexOf(state.selectedState);
-    if (state.createPending)
-      return !["install", "delete", "close"].includes(target);
+    if (state.createPending) return true;
+    if (target === "copyCommand") return !state.installCommand;
     if (target === "previous") return index === 0;
     if (target === "next") return index === PET_STATES.length - 1;
     if (target === "action")
@@ -841,9 +825,7 @@ export function MapSceneCanvas({
     else if (target === "action" || target === "emotion") openDropdown(target);
     else if (target === "primary") callbacks.onPrimaryActivate();
     else if (target === "secondary") callbacks.onSecondaryActivate();
-    else if (target === "install") callbacks.onInstallActivate();
-    else if (target === "delete") callbacks.onDeleteActivate();
-    else callbacks.onModalClose();
+    else callbacks.onCopyCommandActivate();
   }
 
   if (failed)

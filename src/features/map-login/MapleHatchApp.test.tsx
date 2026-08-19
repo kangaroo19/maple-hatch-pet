@@ -78,13 +78,6 @@ beforeEach(() => {
     configurable: true,
     value: { writeText: vi.fn(async () => undefined) },
   });
-  HTMLDialogElement.prototype.show = function show() {
-    this.setAttribute("open", "");
-  };
-  HTMLDialogElement.prototype.close = function close() {
-    this.removeAttribute("open");
-    this.dispatchEvent(new Event("close"));
-  };
 });
 
 afterEach(cleanup);
@@ -128,31 +121,23 @@ describe("MapleHatchApp NewChar editor", () => {
       "emotion:Enter",
     );
 
+    const copyButton = screen.getByRole("button", { name: "명령어 복사" });
+    expect(copyButton).toBeDisabled();
     await user.click(screen.getByRole("button", { name: "Pet 만들기" }));
-    expect(
-      await screen.findByRole("dialog", { name: "Pet 설치 정보" }),
-    ).toHaveAttribute("open");
-    const copyButton = screen.getByRole("button", {
-      name: "설치 명령 복사",
-    });
-    await waitFor(() => expect(copyButton).toHaveFocus());
+    await waitFor(() => expect(copyButton).toBeEnabled());
     await user.click(copyButton);
-    expect(screen.getByText("설치 명령을 복사했습니다.")).toBeVisible();
-    await user.click(screen.getByRole("button", { name: "닫기" }));
-    const installInfo = await screen.findByRole("button", {
-      name: "설치 정보",
-    });
-    await waitFor(() => expect(installInfo).toHaveFocus());
+    expect(screen.getByText("설치 명령을 복사했습니다.")).toBeInTheDocument();
 
     await user.click(next);
     expect(screen.getByTestId("canvas-state")).toHaveTextContent(
       "running-right:true",
     );
     expect(action).toBeDisabled();
-    expect(screen.getByRole("button", { name: "설치 정보" })).toBeVisible();
+    expect(copyButton).toBeEnabled();
 
     await user.selectOptions(emotion, "E02");
     expect(screen.getByRole("button", { name: "Pet 만들기" })).toBeVisible();
+    expect(copyButton).toBeDisabled();
     expect(screen.getByTestId("canvas-state")).toHaveTextContent(
       "running-right:false",
     );

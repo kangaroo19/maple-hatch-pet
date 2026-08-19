@@ -98,8 +98,7 @@ a {
   color: #ffd1d1;
 }
 .native-login-form,
-.native-creator-form,
-.native-install-dialog {
+.native-creator-form {
   position: fixed;
   width: 1px;
   height: 1px;
@@ -110,9 +109,6 @@ a {
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   white-space: nowrap;
-}
-.native-install-dialog::backdrop {
-  background: transparent;
 }
 .notice-dialog {
   position: fixed;

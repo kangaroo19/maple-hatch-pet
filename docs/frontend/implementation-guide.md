@@ -64,8 +64,8 @@ PoC를 그대로 복사하는 것이 목표가 아니다. PoC에서 검증한 WZ
 - 생성 영역은 `NewChar/signboard/0` 좌표를 기준으로 캐릭터와 WZ 양피지를 같은 Canvas에 렌더링한다. 9개 상태는 비순환 좌우 화살표로 이동하고, 현재 액션·표정은 최대 8행의 Canvas 콤보박스로 편집한다. `Pet 만들기`는 `112 × 30` 금장 우드 버튼을 Canvas로 직접 그려 양피지 하단 `(scroll.x + 65, scroll.y + 120)`에 배치한다. `다른 캐릭터 찾기`는 `Login.img/Common/BtStart`를 논리 viewport `(8, 429)`에 고정해 원본 이미지로 표시하며, 첫 로그인 화면에서는 disabled 상태를 표시만 한다.
 - `Map.wz/Obj/login.img/NewChar/signboard/0`은 배치 계산에 필요한 좌표와 프레임 크기만 사용하고, Codex 편집 UI와 겹치는 원본 스탯 선택판 PNG는 선로딩하거나 장면에 그리지 않는다.
 - 액션·표정 변경은 왼쪽 캐릭터에 즉시 반영한다. 선택 UI는 [액션·표정 카탈로그 버전 1](../product-spec/action-emotion-catalog.md)의 한국어 표시명만 사용한다.
-- 생성 성공 후 같은 Canvas 장면에 NewChar 양피지와 `charAlert` 기반 설치 모달을 열고 설치 명령, `설치 명령 복사`, 28일 안내, 터미널 실행·Pets 새로고침 안내, `petId`가 본문에 포함된 `mailto:1000jjj@naver.com` 삭제 요청 링크와 닫기 버튼을 제공한다. ZIP 직접 다운로드 링크는 제공하지 않는다. 닫은 뒤에는 편집 화면의 `설치 정보` 버튼으로 다시 연다.
-- 생성 후 액션·표정을 바꾸면 생성 결과와 설치 모달을 제거한다. 좌우 화살표로 상태 미리보기만 전환하면 결과를 유지한다.
+- 양피지 아래에는 WZ 자산 없이 Canvas로 그린 금장 우드 패널을 두고 설치 명령 칸과 복사 버튼을 항상 표시한다. 생성 성공 후 서버가 반환한 설치 명령으로 칸을 갱신하고 복사 버튼을 활성화하며 별도 모달, 안내문, 삭제 요청 링크와 닫기 버튼은 제공하지 않는다.
+- 생성 후 액션·표정을 바꾸면 생성 결과와 설치 명령을 제거한다. 좌우 화살표로 상태 미리보기만 전환하면 결과를 유지하고, `Pet 만들기`를 다시 누르면 새 결과로 교체한다.
 - 새로고침하거나 화면을 닫으면 생성 결과를 복원하지 않는다. 브라우저 저장소나 결과 재조회 API를 추가하지 않는다.
 - 모든 화면에 `Data based on NEXON Open API`와 `/privacy` 링크를 상시 표시한다.
 
@@ -188,7 +188,7 @@ Canvas에는 MapLogin 장면임을 설명하는 접근 가능한 이름을 제�
 
 WZ 파일은 브라우저 번들에 포함하지 않는다. `extract.cjs`와 동일한 역할의 도구를 구현 작업 전에 명시적으로 실행해 scene, Notice manifest와 PNG를 만들고 승인된 결과만 `public/map-login/kms-v43/`에 커밋한다. Vercel 빌드 중에는 원본 WZ를 읽거나 자산을 다시 추출하지 않는다. Notice는 `backgrnd/1`과 `BtYes`의 `normal`, `mouseOver`, `pressed`만 추출하고 사용자 메시지는 PNG로 만들지 않는다.
 
-현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. `new-char.json` v4에는 `UI.wz/Login.img/Common/BtStart`의 네 상태(각 `125 × 52`)를 포함하며 Canvas 기반 `Pet 만들기` 자산은 포함하지 않는다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
+현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. `new-char.json` v5에는 `UI.wz/Login.img/Common/BtStart`의 네 상태(각 `125 × 52`)를 포함하며 Canvas 기반 액션·표정 선택기와 `Pet 만들기` 자산은 포함하지 않는다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
 
 scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신하고 `formatVersion` 호환성을 확인한다. 이 정적 WZ 자산은 Pet 생성 PNG용 Vercel Blob에 올리지 않는다.
 
@@ -211,15 +211,15 @@ type PetResult = {
 
 구현 순서는 다음과 같다.
 
-1. 성공 응답을 받은 뒤에만 `PetResult`를 상태에 저장하고 설치 모달을 연다.
-2. `installCommand`를 선택 가능한 텍스트로 렌더링하며 `petId`로 클라이언트에서 다시 조립하지 않는다.
-3. `설치 명령 복사`가 Clipboard API로 명령을 복사하게 한다.
+1. 생성 전부터 양피지 아래에 안내 문구가 있는 명령 칸과 disabled 복사 버튼을 렌더링한다.
+2. 성공 응답을 받은 뒤 `PetResult`를 상태에 저장하고 `installCommand` 전체를 두 줄로 렌더링하며 `petId`로 클라이언트에서 다시 조립하지 않는다.
+3. `명령어 복사`가 Clipboard API로 명령을 복사하게 한다.
 4. 성공은 하나의 `aria-live="polite"` 상태 영역에 짧게 표시하고 연속 클릭으로 메시지를 쌓지 않는다.
-5. API 부재나 복사 실패는 같은 영역에서 직접 선택·복사하라고 알리되 모달을 닫거나 명령을 숨기지 않는다.
-6. `expiresAt`에 맞춘 28일 만료 안내, 터미널 실행과 설치 후 Settings > Pets의 Refresh·선택 절차를 표시한다.
+5. API 부재나 복사 실패는 버튼을 잠시 `복사 실패`로 바꾸고 접근 가능한 상태 영역에 상세 메시지를 전달하되 명령은 숨기지 않는다.
+6. 만료, 터미널 실행과 Settings > Pets 안내는 이 Canvas 설치 영역에 표시하지 않는다.
 7. `packageUrl`은 응답 계약 검증에만 유지하고 화면 텍스트, anchor나 다운로드 버튼으로 렌더링하지 않는다.
 
-모달 닫기·재열기, 포커스 트랩, Esc 닫기와 호출자 포커스 복원은 기존 계약을 유지한다. 액션·표정 변경 시 결과를 제거하고 상태 미리보기 전환 시에는 유지한다.
+설치 영역에는 닫기·재열기, 포커스 트랩과 Esc 동작이 없다. 액션·표정 변경 시 결과를 제거하고 상태 미리보기 전환 시에는 유지한다.
 
 ### 8단계: 검증
 
@@ -237,7 +237,7 @@ type PetResult = {
 
 - manifest와 모든 PNG가 정상 로드됨
 - `public/map-login/kms-v43/`의 scene, manifest와 필수 PNG가 같은 버전으로 로드됨
-- `new-char.json` v4의 출처·크기·origin·delay가 KMS v1.2.43 계약과 일치하고 필수 NewChar·Basic PNG가 모두 로드됨
+- `new-char.json` v5의 출처·크기·origin·delay가 KMS v1.2.43 계약과 일치하고 필수 NewChar·Basic PNG가 모두 로드됨
 - `Common/frame`은 `800 × 600` 화면에서 장면·편집 UI 다음에 고정되고, viewport 고정 `다른 캐릭터 찾기`가 그 위에 합성됨. 첫 화면에서는 disabled 상태만 표시되고 두 번째 화면에서만 상호작용함. `MSTitle`은 자산으로 유지되지만 화면에는 표시되지 않으며, `BtLogin` 4상태와 Canvas 입력이 첫 로그인 화면의 `Title/signboard/0` 패널에 장면·카메라 좌표로 결합됨
 - Notice 배경·버튼이 원본 크기로 로드되고 hover, focus와 active 상태가 각각 맞는 버튼 에셋을 사용함
 - 빈 입력과 차단 오류는 Notice로 표시되고, 조회 중은 진행 문구 없이 disabled 버튼으로 중복 제출이 차단됨
@@ -247,9 +247,9 @@ type PetResult = {
 - 모션 감소 설정에서는 목적지로 즉시 이동함
 - 전환 후에도 휠·터치·스크롤바가 카메라 위치를 바꾸지 않음
 - `다른 캐릭터 찾기`가 설정을 초기화하고 로그인 화면으로 돌아감
-- 생성 성공 모달에 설치 명령과 복사 버튼, 28일 안내, 터미널 실행·Pets 새로고침 안내와 `petId`가 이메일 본문에 포함된 삭제 요청 링크가 표시되고 닫은 뒤 `설치 정보`로 다시 열림
+- 생성 전부터 양피지 아래에 명령 칸과 disabled 복사 버튼이 표시되고, 생성 성공 후 명령과 활성 복사 버튼으로 갱신됨
 - 복사 성공·실패가 접근 가능한 단일 상태 영역에 표시되고 ZIP 다운로드 링크가 없음
-- 새로고침 뒤 마지막 생성 결과와 설치 모달이 복원되지 않음
+- 새로고침 뒤 마지막 생성 결과와 설치 명령이 복원되지 않음
 - 모든 화면에 `Data based on NEXON Open API`와 `/privacy` 링크가 표시됨
 - 같은 스크롤 위치에서 배경이나 장식이 시간에 따라 변화
 - 두 제품 전환 외의 자동 카메라 이동이나 왕복 없음
@@ -309,9 +309,9 @@ placement 좌표는 anchor이고 실제 이미지 왼쪽 위는 `anchor - origin
 - [ ] v43 scene, manifest, `Common/frame`, `MSTitle`, `BtLogin` 4상태, Notice, NewChar·Basic 자산과 필수 PNG가 `public/map-login/kms-v43/`에서 함께 제공된다.
 - [ ] Canvas 로그인 입력과 `BtLogin`이 첫 화면 `Title/signboard/0` 패널의 장면·카메라 좌표를 사용하고, `MSTitle` 또는 화면에 보이는 HTML overlay를 표시하지 않는다.
 - [ ] 계정 저장, 회원가입, 비밀번호 찾기 등 비기능 컨트롤을 표시하지 않는다.
-- [ ] 생성 성공 후 같은 Canvas 장면의 설치 모달에 설치 명령, `설치 명령 복사` 버튼, 28일 안내, 터미널 실행·Pets 새로고침 안내와 이메일 삭제 요청 링크가 표시되고 `설치 정보`로 다시 열 수 있다.
+- [ ] 생성 전부터 양피지 아래에 설치 명령 칸과 disabled `명령어 복사` 버튼이 표시되고 생성 성공 후 명령과 활성 버튼으로 갱신된다.
 - [ ] 복사 성공·실패가 접근 가능한 단일 상태 영역에 표시되고 `packageUrl`이나 ZIP 직접 다운로드 링크는 렌더링되지 않는다.
-- [ ] 액션·표정 변경은 기존 생성 결과와 설치 모달을 제거하지만 상태 미리보기 전환은 유지한다.
+- [ ] 액션·표정 변경은 기존 생성 결과와 설치 명령을 제거하지만 상태 미리보기 전환은 유지한다.
 - [ ] 새로고침 뒤 생성 결과를 복원하지 않는다.
 - [ ] 모든 화면에 NEXON 출처 문구와 `/privacy` 링크가 표시된다.
 - [ ] 로딩, 성공과 실패 상태가 화면에 구분되어 표시된다.
