@@ -45,18 +45,18 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 
 여기서 조회 성공은 새 닉네임의 중복 여부를 확인한다는 뜻이 아니라, 입력한 닉네임으로 실제 메이플스토리 캐릭터를 찾았다는 뜻이다. 사용자가 상태별 설정을 마치면 제품 명세의 Pet 생성 단계로 이어진다. 상태와 선택 범위의 상세 계약은 [MVP PRD](../product-spec/mvp.md)를 따른다.
 
-현재 PoC의 CSS 기반 로그인 폼은 접근성 흐름을 확인하기 위한 모의 UI이며 원본 로그인 패널의 시각 기준이 아니다. 제품은 KMS v1.2.43 `UI.wz/Login.img`에서 `Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`), `Title/BtLogin`의 `normal`·`mouseOver`·`pressed`·`disabled`(각 `95 × 48`), `Notice`, `NewChar`의 양피지·화살표·`charAlert`와 `Common/BtStart`(`125 × 52`) 자산을 추출하고 `UI.wz/Basic.img`에서 탭 조각을 추출한다. 액션·표정 선택기와 `Pet 만들기`는 외부 이미지 없이 Canvas로 직접 그린다. `MSTitle`은 버전 자산으로 유지하되 화면에는 표시하지 않는다. 제품 Canvas는 고정 `800 × 600` 논리 뷰포트로 로그인과 NewChar 편집 UI를 렌더링한 뒤 `Common/frame`을 카메라와 무관하게 합성하고, `다른 캐릭터 찾기` 버튼을 프레임 위에 합성한다. 추출 결과는 최종 앱의 `public/map-login/kms-v43/`에 버전된 정적 자산으로 포함한다.
+현재 PoC의 CSS 기반 로그인 폼은 접근성 흐름을 확인하기 위한 모의 UI이며 원본 로그인 패널의 시각 기준이 아니다. 제품은 KMS v1.2.43 `UI.wz/Login.img`에서 `Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`), `Title/BtLogin`의 `normal`·`mouseOver`·`pressed`·`disabled`(각 `95 × 48`), `Notice`, `NewChar`의 양피지·`charAlert`와 `Common/BtStart`(`125 × 52`) 자산을 추출하고 `UI.wz/Basic.img`에서 탭 조각을 추출한다. 상태 화살표, 액션·표정 선택기와 `Pet 만들기`는 외부 이미지 없이 Canvas로 직접 그린다. `MSTitle`은 버전 자산으로 유지하되 화면에는 표시하지 않는다. 제품 Canvas는 고정 `800 × 600` 논리 뷰포트로 로그인과 NewChar 편집 UI를 렌더링한 뒤 `Common/frame`을 카메라와 무관하게 합성하고, `다른 캐릭터 찾기` 버튼을 프레임 위에 합성한다. 추출 결과는 최종 앱의 `public/map-login/kms-v43/`에 버전된 정적 자산으로 포함한다.
 
 로그인 입력과 버튼은 현재 장면의 `Title/signboard/0` bounds와 카메라 변환을 기준으로 배치한다. 빈 입력에는 배경·테두리·placeholder를 추가하지 않으며 긴 닉네임은 입력 영역에 clip한다. 화면에 보이는 HTML input/button overlay는 만들지 않고, 화면 밖 native form은 한글 IME, 붙여넣기, 선택, Tab, Enter/Space와 접근성만 담당한다. 계정 저장, 회원가입, 비밀번호 찾기와 월드 선택처럼 제품 기능으로 연결되지 않는 버튼이나 컨트롤은 표시하지 않는다.
 
-모든 제품 화면에는 `Data based on NEXON Open API`를 상시 표시하고 `/privacy` 링크를 제공한다. MapLogin 화면에서는 프레임 하단 중앙의 접근 가능한 HTML 오버레이로 표시한다.
+MapLogin 화면에는 별도 하단 바를 표시하지 않는다. 개인정보 처리 안내는 `/privacy`에서 제공한다.
 
 ### 캐릭터 생성 영역
 
 - `NewChar/signboard/0` 좌표를 기준으로 조회한 캐릭터와 WZ 양피지 편집 UI를 같은 Canvas 장면에 표시한다. 화면에 보이는 HTML 캐릭터 카드나 편집 패널은 만들지 않는다.
 - 원본 `Map.wz/Obj/login.img/NewChar/signboard/0`의 좌표 메타데이터는 편집 UI 배치 기준으로 유지하되, Codex 상태·액션·표정 UI와 겹치는 기존 스탯 선택판 이미지는 장면에 렌더링하지 않는다.
-- 처음에는 `기본 (IDLE)` 상태를 선택한다.
-- 9개 상태는 비순환 좌우 화살표로 한 상태씩 이동한다. 양 끝 화살표에는 WZ disabled 자산을 사용하고 제목은 `기본 (IDLE) · 1/9` 형식으로 표시한다.
+- 처음에는 `기본` 상태를 선택한다.
+- 9개 상태는 비순환 좌우 화살표로 한 상태씩 이동한다. 화살표는 WZ 에셋 없이 Canvas로 직접 그리고 hover·pressed·disabled 상태를 색으로 구분하며, 제목은 영문 내부 상태명 없이 `기본 · 1/9` 형식으로 표시한다.
 - 현재 상태의 액션과 표정은 WZ 에셋 없이 Canvas로 직접 그린 선택기로 고른다. 밝은 베이지 그라디언트, 갈색 테두리와 직접 그린 화살표를 사용하고 hover·pressed·disabled·selected 상태를 색으로 구분한다. 목록은 최대 8행이며 클릭, 휠, 화살표 키, Enter와 Esc를 지원한다. 공식 코드인 `A00`~`A41`, `E00`~`E24`는 UI에 노출하지 않고 내부 값으로 유지한다.
 - 상태, 액션 또는 표정을 선택하면 별도 미리보기 카드 없이 왼쪽 캐릭터가 해당 조합의 애니메이션을 즉시 반복 재생한다.
 - `running-left`와 `running-right`는 제품 명세대로 걷기 액션과 방향을 고정하고 표정만 변경할 수 있다.
@@ -64,17 +64,17 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 - 진입·이탈 시 원본 양피지 열림·닫힘 프레임을 한 번 재생한다. `다른 캐릭터 찾기`는 닫힘 뒤 캐릭터와 상태 설정을 초기화하고 약 1초 동안 로그인 화면으로 자동 스크롤한다. 모션 감소 설정에서는 최종 프레임과 목적지로 즉시 전환한다.
 - 화면 밖 native 버튼과 `select`를 Canvas 상태와 동기화해 키보드와 스크린리더 입력을 제공한다.
 
-| 내부 상태 | 표시 이름 | 선택 상태 제목 |
-|---|---|---|
-| `idle` | 기본 | 기본 (IDLE) |
-| `running-right` | 오른쪽 달리기 | 오른쪽 달리기 (RUNNING-RIGHT) |
-| `running-left` | 왼쪽 달리기 | 왼쪽 달리기 (RUNNING-LEFT) |
-| `waving` | 손 흔들기 | 손 흔들기 (WAVING) |
-| `jumping` | 점프 | 점프 (JUMPING) |
-| `failed` | 실패 | 실패 (FAILED) |
-| `waiting` | 대기 | 대기 (WAITING) |
-| `running` | 실행 중 | 실행 중 (RUNNING) |
-| `review` | 검토 | 검토 (REVIEW) |
+| 내부 상태 | 표시 이름 |
+|---|---|
+| `idle` | 기본 |
+| `running-right` | 오른쪽 달리기 |
+| `running-left` | 왼쪽 달리기 |
+| `waving` | 손 흔들기 |
+| `jumping` | 점프 |
+| `failed` | 실패 |
+| `waiting` | 대기 |
+| `running` | 실행 중 |
+| `review` | 검토 |
 
 ### 생성 성공과 설치 명령
 
@@ -118,7 +118,7 @@ MapLogin 장면을 추출한 목적은 구버전 로그인 화면을 기술적�
 - 제품 빌드나 Vercel 배포 중에 원본 WZ를 다시 읽지 않는다. 원본 WZ와 DLL은 저장소 밖 읽기 전용 입력이다.
 - scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신한다.
 - `Common/frame`은 `800 × 600` 고정 화면에서 장면과 편집 UI 다음에 표시하고, viewport 고정 `다른 캐릭터 찾기`를 그 위에 합성한다. 첫 로그인 화면에서는 disabled 상태만 표시하고 두 번째 화면에서만 상호작용한다. `MSTitle`은 자산으로 유지하되 표시하지 않는다. 첫 로그인 화면의 `Title/signboard/0` 패널에는 `BtLogin` 4상태와 Canvas 입력을 장면·카메라 좌표로 배치한다.
-- `new-char.json`은 `formatVersion: 5`이며 `NewChar` 양피지·화살표·`charAlert`, `Basic.img` 탭 조각과 `Login.img/Common/BtStart` 버튼의 출처, 크기, origin과 delay를 고정한다. Canvas 기반 액션·표정 선택기와 `Pet 만들기`는 manifest 자산 계약에 포함하지 않는다.
+- `new-char.json`은 `formatVersion: 5`이며 `NewChar` 양피지·`charAlert`, `Basic.img` 탭 조각과 `Login.img/Common/BtStart` 버튼의 출처, 크기, origin과 delay를 고정한다. Canvas 기반 상태 화살표, 액션·표정 선택기와 `Pet 만들기`는 런타임에서 외부 이미지 없이 그린다.
 - 비기능 계정 컨트롤은 만들지 않는다.
 - WZ 추출 자산을 비상업 Production에서 공개 제공하는 권리는 별도로 확인되지 않았다. 사용자는 이 위험을 인지하고 MVP 전제로 수용했으며, 이는 법적 허가나 권리 확인을 뜻하지 않는다.
 

@@ -60,8 +60,6 @@ export function getNewCharAssetSources(manifest: NewCharManifest): string[] {
   const assets = [
     ...manifest.scroll.open,
     ...manifest.scroll.close,
-    ...Object.values(manifest.arrows.left),
-    ...Object.values(manifest.arrows.right),
     ...Object.values(manifest.buttons.findCharacter),
     ...Object.values(manifest.tab).flatMap((tab) => Object.values(tab)),
     manifest.alert,
@@ -421,8 +419,6 @@ function drawCharacter(
 
 function drawArrow(
   context: CanvasRenderingContext2D,
-  images: Map<string, HTMLImageElement>,
-  manifest: NewCharManifest,
   layout: NewCharLayout,
   target: "previous" | "next",
   disabled: boolean,
@@ -436,10 +432,66 @@ function drawArrow(
     hovered: pointer.hovered === target,
     focused,
   });
-  const button =
-    target === "previous" ? manifest.arrows.left : manifest.arrows.right;
   const rect = screenRect(layout[target], camera);
-  context.drawImage(imageFor(images, button[state].asset), rect.x, rect.y);
+  const pressedOffset = state === "pressed" ? 1 : 0;
+  const x = rect.x;
+  const y = rect.y + pressedOffset;
+  const palette = {
+    normal: {
+      top: "#f6e9c8",
+      bottom: "#dfc99d",
+      border: "#68492c",
+      icon: "#51341f",
+    },
+    mouseOver: {
+      top: "#fff3cf",
+      bottom: "#e8cf96",
+      border: "#bd8124",
+      icon: "#51341f",
+    },
+    pressed: {
+      top: "#d8bd87",
+      bottom: "#c5a66e",
+      border: "#70471f",
+      icon: "#3f2818",
+    },
+    disabled: {
+      top: "#d7cdb9",
+      bottom: "#bdb29f",
+      border: "#8e816e",
+      icon: "#8a8174",
+    },
+  }[state];
+
+  context.save();
+  const background = context.createLinearGradient(x, y, x, y + rect.height);
+  background.addColorStop(0, palette.top);
+  background.addColorStop(1, palette.bottom);
+  context.beginPath();
+  context.roundRect(x, y, rect.width, rect.height, 2);
+  context.fillStyle = background;
+  context.fill();
+  context.lineWidth = 1;
+  context.strokeStyle = palette.border;
+  context.stroke();
+
+  context.beginPath();
+  context.moveTo(x + 2, y + 2.5);
+  context.lineTo(x + rect.width - 2, y + 2.5);
+  context.strokeStyle = "rgba(255, 255, 236, 0.62)";
+  context.stroke();
+
+  const direction = target === "previous" ? -1 : 1;
+  const centerX = x + rect.width / 2;
+  const centerY = y + rect.height / 2;
+  context.beginPath();
+  context.moveTo(centerX - direction * 3, centerY - 4);
+  context.lineTo(centerX - direction * 3, centerY + 4);
+  context.lineTo(centerX + direction * 2, centerY);
+  context.closePath();
+  context.fillStyle = palette.icon;
+  context.fill();
+  context.restore();
 }
 
 function drawDropdown(
@@ -658,8 +710,6 @@ export function drawNewCharEditor(input: {
     state.selectedState === "running-right";
   drawArrow(
     context,
-    images,
-    manifest,
     layout,
     "previous",
     stateIndex === 0 || state.createPending,
@@ -669,8 +719,6 @@ export function drawNewCharEditor(input: {
   );
   drawArrow(
     context,
-    images,
-    manifest,
     layout,
     "next",
     stateIndex === PET_STATES.length - 1 || state.createPending,
@@ -686,9 +734,9 @@ export function drawNewCharEditor(input: {
   context.font = boldFont;
   context.fillStyle = "#493622";
   context.fillText(
-    `${STATE_LABELS[state.selectedState]} (${state.selectedState.toUpperCase()}) · ${stateIndex + 1}/${PET_STATES.length}`,
+    `${STATE_LABELS[state.selectedState]} · ${stateIndex + 1}/${PET_STATES.length}`,
     scrollScreen.x + scrollScreen.width / 2,
-    scrollScreen.y + 24,
+    scrollScreen.y + 28,
   );
   context.restore();
 

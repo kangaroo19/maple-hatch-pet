@@ -245,10 +245,10 @@ export function getNewCharLayout(
       width: characterSize,
       height: characterSize,
     },
-    previous: { x: scroll.x + 12, y: scroll.y + 16, width: 15, height: 16 },
+    previous: { x: scroll.x + 18, y: scroll.y + 20, width: 15, height: 16 },
     next: {
       x: scroll.x + scroll.width - 27,
-      y: scroll.y + 16,
+      y: scroll.y + 20,
       width: 15,
       height: 16,
     },

@@ -38,21 +38,6 @@ a {
   white-space: nowrap;
   border: 0;
 }
-.attribution {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-  padding: 8px 12px;
-  border: 1px solid #ffffff26;
-  border-radius: 999px;
-  background: #07111ddd;
-  color: #c9dded;
-  font-size: 12px;
-  backdrop-filter: blur(10px);
-}
-.attribution a {
-  color: #8fd7ff;
-}
 .map-shell {
   min-height: 100vh;
   display: grid;
@@ -83,14 +68,6 @@ a {
   display: block;
   width: 100%;
   background: #050a11;
-}
-.frame-attribution {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  bottom: 8px;
-  transform: translateX(-50%);
-  white-space: nowrap;
 }
 .scene-fatal,
 .notice-fallback {
@@ -180,14 +157,6 @@ a {
 .privacy-page {
   min-height: 100vh;
   padding: 70px 24px 110px;
-}
-.privacy-attribution {
-  width: fit-content;
-  margin: 24px auto 0;
-}
-.standalone-attribution {
-  width: fit-content;
-  margin: 20px auto 0;
 }
 .privacy-page article {
   width: min(760px, 100%);

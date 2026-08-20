@@ -1,7 +1,5 @@
 import Link from "next/link";
 
-import { Attribution } from "@/components/Attribution";
-
 export default function PrivacyPage() {
   return (
     <main className="privacy-page">
@@ -42,7 +40,6 @@ export default function PrivacyPage() {
           Maple Hatch Pet으로 돌아가기
         </Link>
       </article>
-      <Attribution className="privacy-attribution" />
     </main>
   );
 }

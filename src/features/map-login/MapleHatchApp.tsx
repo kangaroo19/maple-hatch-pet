@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { buildCharacterFrameUrl } from "@/lib/nexon-url";
-import { Attribution } from "@/components/Attribution";
 import {
   ACTIONS,
   DEFAULT_STATES,
@@ -353,7 +352,6 @@ export function MapleHatchApp() {
     return (
       <main className="desktop-required">
         <p>너비 1024px 이상의 데스크톱 브라우저에서 이용해 주세요.</p>
-        <Attribution className="standalone-attribution" />
       </main>
     );
   }
@@ -361,7 +359,6 @@ export function MapleHatchApp() {
     return (
       <main className="app-loading">
         <p>화면을 준비하는 중…</p>
-        <Attribution className="standalone-attribution" />
       </main>
     );
 
@@ -482,8 +479,8 @@ export function MapleHatchApp() {
             {character && (
               <section className="native-creator-form" aria-label="Pet 편집">
                 <p aria-live="polite">
-                  {STATE_LABELS[selectedState]} ({selectedState.toUpperCase()})
-                  · {PET_STATES.indexOf(selectedState) + 1}/{PET_STATES.length}
+                  {STATE_LABELS[selectedState]} ·{" "}
+                  {PET_STATES.indexOf(selectedState) + 1}/{PET_STATES.length}
                 </p>
                 <button
                   ref={previousButtonRef}
@@ -628,7 +625,6 @@ export function MapleHatchApp() {
             )}
           </div>
         </div>
-        <Attribution className="frame-attribution" />
       </div>
       <NoticeDialog notice={notice} onClose={() => setNotice(null)} />
     </main>

@@ -83,21 +83,16 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("MapleHatchApp NewChar editor", () => {
-  it("uses the framed stage without a separate product header", () => {
+  it("uses the framed stage without a separate product header or footer", () => {
     const { container } = render(<MapleHatchApp />);
 
     expect(
       screen.queryByRole("heading", { name: "Maple Hatch Pet" }),
     ).not.toBeInTheDocument();
-    const stage = container.querySelector(".map-stage");
+    expect(container.querySelector("footer")).toBeNull();
     expect(
-      stage?.querySelector(":scope > .frame-attribution"),
-    ).toContainElement(
-      screen.getByRole("link", { name: "개인정보 처리 안내" }),
-    );
-    expect(
-      container.querySelector(".map-viewport .frame-attribution"),
-    ).toBeNull();
+      screen.queryByText("Data based on NEXON Open API"),
+    ).not.toBeInTheDocument();
   });
 
   it("keeps per-state values, preserves results across states, and invalidates changed selections", async () => {
@@ -112,7 +107,7 @@ describe("MapleHatchApp NewChar editor", () => {
     const next = screen.getByRole("button", { name: "다음 상태" });
     const action = screen.getByLabelText("액션") as HTMLSelectElement;
     const emotion = screen.getByLabelText("표정") as HTMLSelectElement;
-    expect(editor).toHaveTextContent("기본 (IDLE) · 1/9");
+    expect(editor).toHaveTextContent("기본 · 1/9");
     expect(previous).toBeDisabled();
 
     await user.click(emotion);

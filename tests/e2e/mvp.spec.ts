@@ -116,7 +116,9 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   );
 
   await page.goto("/");
-  await expect(page.getByText("Data based on NEXON Open API")).toBeVisible();
+  await expect(
+    page.getByText("Data based on NEXON Open API"),
+  ).toHaveCount(0);
   await clickCanvasLoginTarget(page, "button");
   await expect(page.getByRole("alertdialog")).toContainText(
     "닉네임을 입력해 주세요.",
@@ -128,7 +130,7 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   await page.keyboard.type("천짱");
   await clickCanvasLoginTarget(page, "button");
   const editor = page.getByRole("region", { name: "Pet 편집" });
-  await expect(editor).toContainText("기본 (IDLE) · 1/9");
+  await expect(editor).toContainText("기본 · 1/9");
   await expect(page.getByRole("button", { name: "이전 상태" })).toBeDisabled();
   const emotion = page.getByLabel("표정");
   await emotion.focus();
@@ -242,7 +244,7 @@ test("Canvas input performs one successful lookup without reloading scene assets
   await clickCanvasLoginTarget(page, "button");
 
   await expect(page.getByRole("region", { name: "Pet 편집" })).toContainText(
-    "기본 (IDLE) · 1/9",
+    "기본 · 1/9",
   );
   expect(sceneRequests).toBe(initialSceneRequests);
 });
@@ -264,7 +266,7 @@ test("Canvas login blocks duplicate submissions while lookup is pending", async 
   await clickCanvasLoginTarget(page, "button");
 
   await expect(page.getByRole("region", { name: "Pet 편집" })).toContainText(
-    "기본 (IDLE) · 1/9",
+    "기본 · 1/9",
   );
   expect(lookupRequests).toBe(1);
 });
@@ -290,7 +292,7 @@ test("camera transitions only through login and find-another-character actions",
   await page.keyboard.insertText("천짱");
   await clickCanvasLoginTarget(page, "button");
   await expect(page.getByRole("region", { name: "Pet 편집" })).toContainText(
-    "기본 (IDLE) · 1/9",
+    "기본 · 1/9",
   );
   await expect
     .poll(() => viewport.evaluate((element) => element.scrollTop))

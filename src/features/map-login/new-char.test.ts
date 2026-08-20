@@ -16,6 +16,7 @@ import {
   type NewCharManifest,
 } from "@/features/map-login/new-char";
 import {
+  getNewCharAssetSources,
   resolveFindCharacterOverlayState,
   resolvePrimaryButtonVisual,
 } from "@/features/map-login/new-char-renderer";
@@ -149,6 +150,10 @@ describe("NewChar manifest", () => {
       validateNewChar(JSON.parse(readFileSync(path, "utf8"))),
     ).toBeTruthy();
   });
+
+  it("does not preload the WZ state arrow assets", () => {
+    expect(getNewCharAssetSources(fixture)).not.toContain("/asset-15-16.png");
+  });
 });
 
 describe("NewChar layout", () => {
@@ -185,6 +190,18 @@ describe("NewChar layout", () => {
       y: layout.scroll.y + 120,
       width: 112,
       height: 30,
+    });
+    expect(layout.previous).toEqual({
+      x: layout.scroll.x + 18,
+      y: layout.scroll.y + 20,
+      width: 15,
+      height: 16,
+    });
+    expect(layout.next).toEqual({
+      x: layout.scroll.x + layout.scroll.width - 27,
+      y: layout.scroll.y + 20,
+      width: 15,
+      height: 16,
     });
     expect(layout.installPanel).toEqual({
       x: layout.scroll.x - 12,
