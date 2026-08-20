@@ -456,11 +456,17 @@ export function MapSceneCanvas({
           activeContext.fillStyle = "#477eae";
           activeContext.fillRect(selectionX, y + 3, selectionWidth, 18);
         }
-        activeContext.fillStyle = "#fff4d5";
+        activeContext.fillStyle = state.nickname
+          ? "#fff4d5"
+          : "rgba(255, 244, 213, 0.56)";
         activeContext.shadowColor = "#3b1a08";
         activeContext.shadowBlur = 1;
         activeContext.shadowOffsetY = 1;
-        activeContext.fillText(state.nickname, textX, textY);
+        activeContext.fillText(
+          state.nickname || "캐릭터 닉네임",
+          textX,
+          textY,
+        );
         if (
           state.inputFocused &&
           !state.disabled &&
@@ -476,6 +482,19 @@ export function MapSceneCanvas({
             input.height - 8,
           );
         }
+        activeContext.restore();
+
+        const passwordIndicator = layout.passwordIndicator;
+        const passwordX = passwordIndicator.x - camera.left;
+        const passwordY = passwordIndicator.y - camera.top;
+        activeContext.save();
+        activeContext.fillStyle = "rgba(48, 24, 8, 0.58)";
+        activeContext.fillRect(
+          Math.floor(passwordX),
+          Math.floor(passwordY),
+          passwordIndicator.width,
+          passwordIndicator.height,
+        );
         activeContext.restore();
       }
 

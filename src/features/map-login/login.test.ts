@@ -37,6 +37,7 @@ describe("MapLogin first-screen login layout", () => {
     };
 
     expect(rectContains(layout.panel, layout.input)).toBe(true);
+    expect(rectContains(layout.panel, layout.passwordIndicator)).toBe(true);
     expect(rectContains(layout.panel, layout.button)).toBe(true);
     expect(rectsOverlap(layout.input, secondScreenBounds)).toBe(false);
     expect(rectsOverlap(layout.button, secondScreenBounds)).toBe(false);
@@ -74,6 +75,14 @@ describe("MapLogin first-screen login layout", () => {
         y: layout.button.y + layout.button.height / 2,
       }),
     ).toBe("button");
+    expect(
+      hitTestLogin(layout, {
+        x:
+          layout.passwordIndicator.x + layout.passwordIndicator.width / 2,
+        y:
+          layout.passwordIndicator.y + layout.passwordIndicator.height / 2,
+      }),
+    ).toBe(null);
     expect(hitTestLogin(layout, { x: layout.panel.x, y: layout.panel.y })).toBe(
       null,
     );

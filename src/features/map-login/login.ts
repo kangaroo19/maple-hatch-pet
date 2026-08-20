@@ -10,6 +10,7 @@ export type Rect = {
 export type LoginLayout = {
   panel: Rect;
   input: Rect;
+  passwordIndicator: Rect;
   button: Rect;
 };
 
@@ -51,6 +52,12 @@ export function getLoginLayout(scene: MapLoginScene): LoginLayout {
     input: {
       x: panel.x + 113,
       y: panel.y + 20,
+      width: 150,
+      height: 27,
+    },
+    passwordIndicator: {
+      x: panel.x + 113,
+      y: panel.y + 49,
       width: 150,
       height: 27,
     },

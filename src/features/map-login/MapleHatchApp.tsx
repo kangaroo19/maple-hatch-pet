@@ -419,6 +419,7 @@ export function MapleHatchApp() {
               onBlur={() => setInputFocused(false)}
               disabled={lookupPending}
               autoComplete="off"
+              placeholder="캐릭터 닉네임"
             />
             <button
               ref={lookupButtonRef}
