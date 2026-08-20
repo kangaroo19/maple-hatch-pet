@@ -20,6 +20,7 @@ import {
 } from "@/features/map-login/MapSceneCanvas";
 import {
   movePetState,
+  randomizeStateInputs,
   type NewCharTarget,
 } from "@/features/map-login/new-char";
 import {
@@ -61,6 +62,7 @@ export function MapleHatchApp() {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const actionSelectRef = useRef<HTMLSelectElement>(null);
   const emotionSelectRef = useRef<HTMLSelectElement>(null);
+  const randomizeButtonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const resetButtonRef = useRef<HTMLButtonElement>(null);
   const copyButtonRef = useRef<HTMLButtonElement>(null);
@@ -94,6 +96,7 @@ export function MapleHatchApp() {
     useState<CanvasCreatorKeyboardCommand>(null);
   const [notice, setNotice] = useState<NoticeState>(null);
   const [frameIndex, setFrameIndex] = useState(0);
+  const [randomizeRevision, setRandomizeRevision] = useState(0);
 
   useEffect(() => {
     const query = window.matchMedia("(min-width: 1024px)");
@@ -235,6 +238,7 @@ export function MapleHatchApp() {
       setCharacter(found);
       setStates(initialStates());
       setSelectedState("idle");
+      setRandomizeRevision(0);
       setResult(null);
       clearCopyFeedback();
       setCreatorClosing(false);
@@ -264,6 +268,13 @@ export function MapleHatchApp() {
       ...current,
       [selectedState]: { ...current[selectedState], [field]: value },
     }));
+    setResult(null);
+    clearCopyFeedback();
+  }
+
+  function randomizeAllStates() {
+    setStates(randomizeStateInputs());
+    setRandomizeRevision((current) => current + 1);
     setResult(null);
     clearCopyFeedback();
   }
@@ -304,6 +315,7 @@ export function MapleHatchApp() {
     setSelection({ start: 0, end: 0 });
     setStates(initialStates());
     setSelectedState("idle");
+    setRandomizeRevision(0);
     setResult(null);
     clearCopyFeedback();
     setCreatorClosing(false);
@@ -330,6 +342,7 @@ export function MapleHatchApp() {
       next: nextButtonRef.current,
       action: actionSelectRef.current,
       emotion: emotionSelectRef.current,
+      randomize: randomizeButtonRef.current,
       primary: createButtonRef.current,
       secondary: resetButtonRef.current,
       copyCommand: copyButtonRef.current,
@@ -461,6 +474,7 @@ export function MapleHatchApp() {
                 installCommand: result?.installCommand ?? null,
                 copyState,
                 focused: creatorFocused,
+                randomizeRevision,
               }}
               creatorKeyboardCommand={creatorKeyboardCommand}
               onInputFocus={() => focusNativeControl(nicknameRef.current)}
@@ -472,6 +486,7 @@ export function MapleHatchApp() {
               }
               onActionChange={(value) => updateSelection("action", value)}
               onEmotionChange={(value) => updateSelection("emotion", value)}
+              onRandomize={randomizeAllStates}
               onPrimaryActivate={() => void createPet()}
               onSecondaryActivate={reset}
               onCopyCommandActivate={() => copyButtonRef.current?.click()}
@@ -586,6 +601,16 @@ export function MapleHatchApp() {
                     </option>
                   ))}
                 </select>
+                <button
+                  ref={randomizeButtonRef}
+                  type="button"
+                  disabled={createPending || creatorClosing}
+                  onFocus={() => setCreatorFocused("randomize")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onClick={randomizeAllStates}
+                >
+                  모든 상태 랜덤 설정
+                </button>
                 <button
                   ref={createButtonRef}
                   type="button"

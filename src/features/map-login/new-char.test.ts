@@ -10,6 +10,7 @@ import {
   hitTestNewChar,
   moveDropdownOption,
   movePetState,
+  randomizeStateInputs,
   rectContains,
   resolveNewCharControlState,
   validateNewChar,
@@ -17,6 +18,7 @@ import {
 } from "@/features/map-login/new-char";
 import {
   getNewCharAssetSources,
+  getDiceFrameIndex,
   resolveFindCharacterOverlayState,
   resolvePrimaryButtonVisual,
 } from "@/features/map-login/new-char-renderer";
@@ -50,7 +52,7 @@ const assetButton = (width: number, height: number, source: string) => ({
 });
 
 const fixture: NewCharManifest = {
-  formatVersion: 5,
+  formatVersion: 7,
   source: {
     login: "UI.wz/Login.img",
     newChar: "UI.wz/Login.img/NewChar",
@@ -90,6 +92,32 @@ const fixture: NewCharManifest = {
       fill: asset(1, 24),
     },
   },
+  dice: [
+    {
+      ...asset(37, 26),
+      source: "UI.wz/Login.img/NewChar/dice/0",
+      delay: 100,
+      origin: { x: 0, y: -30 },
+    },
+    {
+      ...asset(25, 54),
+      source: "UI.wz/Login.img/NewChar/dice/1",
+      delay: 100,
+      origin: { x: 0, y: -2 },
+    },
+    {
+      ...asset(27, 56),
+      source: "UI.wz/Login.img/NewChar/dice/2",
+      delay: 100,
+      origin: { x: 0, y: 0 },
+    },
+    {
+      ...asset(28, 43),
+      source: "UI.wz/Login.img/NewChar/dice/3",
+      delay: 100,
+      origin: { x: 0, y: -13 },
+    },
+  ],
   alert: asset(187, 120),
 };
 
@@ -99,7 +127,7 @@ describe("NewChar manifest", () => {
   });
 
   it("rejects the previous product manifest version", () => {
-    expect(() => validateNewChar({ ...fixture, formatVersion: 4 })).toThrow(
+    expect(() => validateNewChar({ ...fixture, formatVersion: 6 })).toThrow(
       "NewChar 자산 데이터",
     );
   });
@@ -153,6 +181,14 @@ describe("NewChar manifest", () => {
 
   it("does not preload the WZ state arrow assets", () => {
     expect(getNewCharAssetSources(fixture)).not.toContain("/asset-15-16.png");
+    expect(getNewCharAssetSources(fixture)).toEqual(
+      expect.arrayContaining([
+        "/asset-37-26.png",
+        "/asset-25-54.png",
+        "/asset-27-56.png",
+        "/asset-28-43.png",
+      ]),
+    );
   });
 });
 
@@ -181,6 +217,7 @@ describe("NewChar layout", () => {
       layout.next,
       layout.action,
       layout.emotion,
+      layout.randomize,
       layout.primary,
     ]) {
       expect(rectContains(layout.scroll, control)).toBe(true);
@@ -202,6 +239,18 @@ describe("NewChar layout", () => {
       y: layout.scroll.y + 20,
       width: 15,
       height: 16,
+    });
+    expect(layout.action.width).toBe(101);
+    expect(layout.emotion.width).toBe(101);
+    expect(layout.randomize).toEqual({
+      x: layout.action.x + 101 + (101 - fixture.dice[0]!.width) / 2,
+      y:
+        layout.action.y +
+        (layout.emotion.y + layout.emotion.height - layout.action.y -
+          fixture.dice[0]!.height) /
+          2,
+      width: fixture.dice[0]!.width,
+      height: fixture.dice[0]!.height,
     });
     expect(layout.installPanel).toEqual({
       x: layout.scroll.x - 12,
@@ -358,11 +407,31 @@ describe("NewChar state and dropdown navigation", () => {
     };
 
     expect(hitTestNewChar(layout, points(visibleActionPoint))).toBe("action");
+    expect(hitTestNewChar(layout, points(center(layout.randomize)))).toBe(
+      "randomize",
+    );
     expect(
       hitTestNewChar(layout, points({ x: 0, y: 0 }, center(layout.secondary))),
     ).toBe("secondary");
     expect(hitTestNewChar(layout, points(center(layout.copyCommand)))).toBe(
       "copyCommand",
     );
+  });
+});
+
+describe("NewChar randomization", () => {
+  it("plays all four dice frames once and returns to the resting frame", () => {
+    expect([0, 100, 200, 300, 400].map((time) => getDiceFrameIndex(time, 0, false))).toEqual([0, 1, 2, 3, 0]);
+    expect(getDiceFrameIndex(200, 0, true)).toBe(0);
+  });
+
+  it("randomizes every editable field and keeps running actions fixed", () => {
+    const states = randomizeStateInputs(() => 0.999999);
+
+    expect(Object.keys(states)).toHaveLength(9);
+    expect(states.idle).toEqual({ action: "A41", emotion: "E24" });
+    expect(states.review).toEqual({ action: "A41", emotion: "E24" });
+    expect(states["running-left"]).toEqual({ emotion: "E24" });
+    expect(states["running-right"]).toEqual({ emotion: "E24" });
   });
 });

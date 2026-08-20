@@ -90,6 +90,7 @@ type Props = {
   onStateMove: (direction: -1 | 1) => void;
   onActionChange: (value: ActionCode) => void;
   onEmotionChange: (value: EmotionCode) => void;
+  onRandomize: () => void;
   onPrimaryActivate: () => void;
   onSecondaryActivate: () => void;
   onCopyCommandActivate: () => void;
@@ -129,6 +130,7 @@ export function MapSceneCanvas({
   onStateMove,
   onActionChange,
   onEmotionChange,
+  onRandomize,
   onPrimaryActivate,
   onSecondaryActivate,
   onCopyCommandActivate,
@@ -162,6 +164,10 @@ export function MapSceneCanvas({
     closing: creatorState.closing,
     startedAt: 0,
   });
+  const diceAnimationRef = useRef({
+    revision: creatorState.randomizeRevision,
+    startedAt: Number.NEGATIVE_INFINITY,
+  });
   const loginRef = useRef({
     state: loginState,
     onInputFocus,
@@ -175,6 +181,7 @@ export function MapSceneCanvas({
     onStateMove,
     onActionChange,
     onEmotionChange,
+    onRandomize,
     onPrimaryActivate,
     onSecondaryActivate,
     onCopyCommandActivate,
@@ -200,6 +207,7 @@ export function MapSceneCanvas({
       onStateMove,
       onActionChange,
       onEmotionChange,
+      onRandomize,
       onPrimaryActivate,
       onSecondaryActivate,
       onCopyCommandActivate,
@@ -213,6 +221,7 @@ export function MapSceneCanvas({
     onActionChange,
     onCreatorFocus,
     onEmotionChange,
+    onRandomize,
     onCopyCommandActivate,
     onPrimaryActivate,
     onSecondaryActivate,
@@ -604,6 +613,15 @@ export function MapSceneCanvas({
         drawLogin(elapsed, camera, login);
 
         const current = creatorRef.current.state;
+        if (diceAnimationRef.current.revision !== current.randomizeRevision) {
+          diceAnimationRef.current = {
+            revision: current.randomizeRevision,
+            startedAt:
+              current.randomizeRevision === 0
+                ? Number.NEGATIVE_INFINITY
+                : elapsed,
+          };
+        }
         const keyboardCommand = creatorRef.current.keyboardCommand;
         if (
           keyboardCommand &&
@@ -649,6 +667,7 @@ export function MapSceneCanvas({
             elapsed,
             transitionStartedAt: transitionRef.current.startedAt,
             reducedMotion: reducedMotionRef.current,
+            diceAnimationStartedAt: diceAnimationRef.current.startedAt,
           });
         }
         activeContext.globalAlpha = 1;
@@ -823,7 +842,10 @@ export function MapSceneCanvas({
     if (target === "previous") callbacks.onStateMove(-1);
     else if (target === "next") callbacks.onStateMove(1);
     else if (target === "action" || target === "emotion") openDropdown(target);
-    else if (target === "primary") callbacks.onPrimaryActivate();
+    else if (target === "randomize") {
+      dropdownRef.current = null;
+      callbacks.onRandomize();
+    } else if (target === "primary") callbacks.onPrimaryActivate();
     else if (target === "secondary") callbacks.onSecondaryActivate();
     else callbacks.onCopyCommandActivate();
   }

@@ -123,12 +123,16 @@ describe("MapleHatchApp NewChar editor", () => {
     await user.click(copyButton);
     expect(screen.getByText("설치 명령을 복사했습니다.")).toBeInTheDocument();
 
+    await user.click(
+      screen.getByRole("button", { name: "모든 상태 랜덤 설정" }),
+    );
+    expect(copyButton).toBeDisabled();
+
     await user.click(next);
     expect(screen.getByTestId("canvas-state")).toHaveTextContent(
-      "running-right:true",
+      "running-right:false",
     );
     expect(action).toBeDisabled();
-    expect(copyButton).toBeEnabled();
 
     await user.selectOptions(emotion, "E02");
     expect(screen.getByRole("button", { name: "Pet 만들기" })).toBeVisible();

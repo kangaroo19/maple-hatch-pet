@@ -1,4 +1,10 @@
-import { PET_STATES, type PetState } from "@/lib/pet-contract";
+import {
+  ACTIONS,
+  EMOTIONS,
+  PET_STATES,
+  type PetState,
+  type StateInputs,
+} from "@/lib/pet-contract";
 import type { MapLoginScene } from "@/features/map-login/scene";
 
 export type Rect = {
@@ -26,7 +32,7 @@ export type NewCharButton = Record<
 >;
 
 export type NewCharManifest = {
-  formatVersion: 5;
+  formatVersion: 7;
   source: {
     login: "UI.wz/Login.img";
     newChar: "UI.wz/Login.img/NewChar";
@@ -48,6 +54,7 @@ export type NewCharManifest = {
       fill: NewCharAsset;
     }
   >;
+  dice: NewCharFrame[];
   alert: NewCharAsset;
 };
 
@@ -59,6 +66,7 @@ export type NewCharLayout = {
   next: Rect;
   action: Rect;
   emotion: Rect;
+  randomize: Rect;
   primary: Rect;
   secondary: Rect;
   installPanel: Rect;
@@ -71,6 +79,7 @@ export type NewCharTarget =
   | "next"
   | "action"
   | "emotion"
+  | "randomize"
   | "primary"
   | "secondary"
   | "copyCommand";
@@ -107,10 +116,15 @@ function validFrame(
   width: number,
   height: number,
   delay: number,
+  origin = { x: 0, y: 0 },
 ): value is NewCharFrame {
   if (!validAsset(value, width, height)) return false;
   const frame = value as Partial<NewCharFrame>;
-  return frame.delay === delay && frame.origin?.x === 0 && frame.origin.y === 0;
+  return (
+    frame.delay === delay &&
+    frame.origin?.x === origin.x &&
+    frame.origin.y === origin.y
+  );
 }
 
 function validButton(
@@ -170,7 +184,7 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
     });
 
   if (
-    manifest.formatVersion !== 5 ||
+    manifest.formatVersion !== 7 ||
     source?.login !== "UI.wz/Login.img" ||
     source?.newChar !== "UI.wz/Login.img/NewChar" ||
     source.basic !== "UI.wz/Basic.img" ||
@@ -190,6 +204,18 @@ export function validateNewChar(candidate: unknown): NewCharManifest {
       "UI.wz/Login.img/Common/BtStart",
     ) ||
     !validTab ||
+    manifest.dice?.length !== 4 ||
+    ![
+      [37, 26, 0, -30],
+      [25, 54, 0, -2],
+      [27, 56, 0, 0],
+      [28, 43, 0, -13],
+    ].every(([width, height, originX, originY], index) =>
+      validFrame(manifest.dice?.[index], width, height, 100, {
+        x: originX,
+        y: originY,
+      }),
+    ) ||
     !validAsset(manifest.alert, 187, 120)
   ) {
     throw new Error("NewChar 자산 데이터가 올바르지 않습니다.");
@@ -236,6 +262,17 @@ export function getNewCharLayout(
     height: 38,
   };
   const characterSize = 360;
+  const selectorWidth = 101;
+  const selectorX = scroll.x + 20;
+  const actionY = scroll.y + 62;
+  const emotionY = scroll.y + 90;
+  const restingDice = manifest.dice[0]!;
+  const randomizeArea = {
+    x: selectorX + selectorWidth,
+    y: actionY,
+    width: selectorWidth,
+    height: emotionY + 17 - actionY,
+  };
   return {
     panel,
     scroll,
@@ -252,8 +289,14 @@ export function getNewCharLayout(
       width: 15,
       height: 16,
     },
-    action: { x: scroll.x + 20, y: scroll.y + 62, width: 202, height: 17 },
-    emotion: { x: scroll.x + 20, y: scroll.y + 90, width: 202, height: 17 },
+    action: { x: selectorX, y: actionY, width: selectorWidth, height: 17 },
+    emotion: { x: selectorX, y: emotionY, width: selectorWidth, height: 17 },
+    randomize: {
+      x: randomizeArea.x + (randomizeArea.width - restingDice.width) / 2,
+      y: randomizeArea.y + (randomizeArea.height - restingDice.height) / 2,
+      width: restingDice.width,
+      height: restingDice.height,
+    },
     primary: {
       x: scroll.x + 65,
       y: scroll.y + 120,
@@ -305,6 +348,7 @@ export function hitTestNewChar(
     "primary",
     "action",
     "emotion",
+    "randomize",
     "copyCommand",
     "secondary",
   ];
@@ -347,6 +391,26 @@ export function movePetState(current: PetState, direction: -1 | 1): PetState {
   const index = PET_STATES.indexOf(current);
   const next = Math.min(PET_STATES.length - 1, Math.max(0, index + direction));
   return PET_STATES[next] ?? "idle";
+}
+
+export function randomizeStateInputs(
+  random: () => number = Math.random,
+): StateInputs {
+  const pick = <T,>(items: readonly T[]): T => {
+    const index = Math.min(
+      items.length - 1,
+      Math.max(0, Math.floor(random() * items.length)),
+    );
+    return items[index]!;
+  };
+  return Object.fromEntries(
+    PET_STATES.map((state) => {
+      const emotion = pick(EMOTIONS).code;
+      if (state === "running-left" || state === "running-right")
+        return [state, { emotion }];
+      return [state, { action: pick(ACTIONS).code, emotion }];
+    }),
+  ) as StateInputs;
 }
 
 export function getDropdownWindow(

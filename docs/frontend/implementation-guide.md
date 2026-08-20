@@ -61,11 +61,11 @@ PoC를 그대로 복사하는 것이 목표가 아니다. PoC에서 검증한 WZ
 - 조회 중에는 진행 문구 없이 `BtLogin/disabled`만 표시해 중복 제출을 막는다. 빈 닉네임과 조회·생성·저장 등 웹 흐름을 막는 오류는 `Login.img/Notice` 기반 공통 경고 다이얼로그로 표시하고, 닫은 뒤 지정된 native 입력 또는 버튼에 스크롤 없이 포커스를 복원한다.
 - 공통 경고는 확인 버튼 하나만 제공한다. 확인 또는 `Esc`로 닫고 배경 클릭은 무시하며, 닫은 뒤 호출자가 지정한 입력 또는 실행 버튼으로 포커스를 복원한다.
 - 로그인 제출 성공과 `다른 캐릭터 찾기`는 각각 약 1초의 일회성 자동 스크롤을 사용한다. 모션 감소 설정에서는 즉시 이동하며 다른 입력은 카메라 위치에 영향을 주지 않는다.
-- 생성 영역은 `NewChar/signboard/0` 좌표를 기준으로 캐릭터와 WZ 양피지를 같은 Canvas에 렌더링한다. 9개 상태는 WZ 에셋 없이 직접 그린 비순환 좌우 화살표로 이동하고, 현재 액션·표정은 최대 8행의 Canvas 콤보박스로 편집한다. `Pet 만들기`는 `112 × 30` 금장 우드 버튼을 Canvas로 직접 그려 양피지 하단 `(scroll.x + 65, scroll.y + 120)`에 배치한다. `다른 캐릭터 찾기`는 `Login.img/Common/BtStart`를 논리 viewport `(8, 429)`에 고정해 원본 이미지로 표시하며, 첫 로그인 화면에서는 disabled 상태를 표시만 한다.
+- 생성 영역은 `NewChar/signboard/0` 좌표를 기준으로 캐릭터와 WZ 양피지를 같은 Canvas에 렌더링한다. 9개 상태는 WZ 에셋 없이 직접 그린 비순환 좌우 화살표로 이동하고, 현재 액션·표정은 너비 `101px`, 최대 8행의 Canvas 콤보박스로 편집한다. 기존 선택기 영역의 오른쪽 `101 × 45px`에는 `Login.img/NewChar/dice` 첫 프레임을 원본 크기로 가운데 배치한다. 클릭하면 WZ origin을 공통 기준점으로 유지한 4프레임을 100ms씩 한 번 재생하고, 달리기 두 상태의 고정 액션을 제외한 모든 편집 값을 무작위로 지정한다. `Pet 만들기`는 `112 × 30` 금장 우드 버튼을 Canvas로 직접 그려 양피지 하단 `(scroll.x + 65, scroll.y + 120)`에 배치한다. `다른 캐릭터 찾기`는 `Login.img/Common/BtStart`를 논리 viewport `(8, 429)`에 고정해 원본 이미지로 표시하며, 첫 로그인 화면에서는 disabled 상태를 표시만 한다.
 - `Map.wz/Obj/login.img/NewChar/signboard/0`은 배치 계산에 필요한 좌표와 프레임 크기만 사용하고, Codex 편집 UI와 겹치는 원본 스탯 선택판 PNG는 선로딩하거나 장면에 그리지 않는다.
 - 액션·표정 변경은 왼쪽 캐릭터에 즉시 반영한다. 선택 UI는 [액션·표정 카탈로그 버전 1](../product-spec/action-emotion-catalog.md)의 한국어 표시명만 사용한다.
 - 양피지 아래에는 WZ 자산 없이 Canvas로 그린 금장 우드 패널을 두고 설치 명령 칸과 복사 버튼을 항상 표시한다. 생성 성공 후 서버가 반환한 설치 명령으로 칸을 갱신하고 복사 버튼을 활성화하며 별도 모달, 안내문, 삭제 요청 링크와 닫기 버튼은 제공하지 않는다.
-- 생성 후 액션·표정을 바꾸면 생성 결과와 설치 명령을 제거한다. 좌우 화살표로 상태 미리보기만 전환하면 결과를 유지하고, `Pet 만들기`를 다시 누르면 새 결과로 교체한다.
+- 생성 후 액션·표정을 바꾸거나 주사위로 전체 상태를 무작위화하면 생성 결과와 설치 명령을 제거한다. 좌우 화살표로 상태 미리보기만 전환하면 결과를 유지하고, `Pet 만들기`를 다시 누르면 새 결과로 교체한다.
 - 새로고침하거나 화면을 닫으면 생성 결과를 복원하지 않는다. 브라우저 저장소나 결과 재조회 API를 추가하지 않는다.
 - 별도 하단 바는 표시하지 않으며 개인정보 처리 안내는 `/privacy`에서 제공한다.
 
@@ -188,7 +188,7 @@ Canvas에는 MapLogin 장면임을 설명하는 접근 가능한 이름을 제�
 
 WZ 파일은 브라우저 번들에 포함하지 않는다. `extract.cjs`와 동일한 역할의 도구를 구현 작업 전에 명시적으로 실행해 scene, Notice manifest와 PNG를 만들고 승인된 결과만 `public/map-login/kms-v43/`에 커밋한다. Vercel 빌드 중에는 원본 WZ를 읽거나 자산을 다시 추출하지 않는다. Notice는 `backgrnd/1`과 `BtYes`의 `normal`, `mouseOver`, `pressed`만 추출하고 사용자 메시지는 PNG로 만들지 않는다.
 
-현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. `new-char.json` v5에는 `UI.wz/Login.img/Common/BtStart`의 네 상태(각 `125 × 52`)를 포함하며 Canvas 기반 액션·표정 선택기와 `Pet 만들기` 자산은 포함하지 않는다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
+현재 `extract.cjs`는 원본 로그인 패널 전체를 추출하지 않는다. 제품 자산에는 `UI.wz/Login.img/Common/frame`(`800 × 600`), `Title/MSTitle`(`397 × 219`)과 `Title/BtLogin`의 `normal`, `mouseOver`, `pressed`, `disabled`(각 `95 × 48`)를 유지한다. `new-char.json` v7에는 `UI.wz/Login.img/Common/BtStart`의 네 상태(각 `125 × 52`)와 `UI.wz/Login.img/NewChar/dice/0`~`3`을 포함하며 Canvas 기반 액션·표정 선택기와 `Pet 만들기` 자산은 포함하지 않는다. 화면 배치는 `MSTitle` 크기가 아니라 고정 `800 × 600` 뷰포트와 현재 scene의 첫 화면 `Title/signboard/0` bounds 및 카메라 변환을 기준으로 계산한다.
 
 scene, manifest와 PNG는 같은 버전 경로에서 원자적으로 갱신하고 `formatVersion` 호환성을 확인한다. 이 정적 WZ 자산은 Pet 생성 PNG용 Vercel Blob에 올리지 않는다.
 

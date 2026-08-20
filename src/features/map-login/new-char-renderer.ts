@@ -38,6 +38,7 @@ export type CanvasCreatorState = {
   installCommand: string | null;
   copyState: "idle" | "success" | "error";
   focused: NewCharTarget | null;
+  randomizeRevision: number;
 };
 
 export type CreatorPointerState = {
@@ -62,6 +63,7 @@ export function getNewCharAssetSources(manifest: NewCharManifest): string[] {
     ...manifest.scroll.close,
     ...Object.values(manifest.buttons.findCharacter),
     ...Object.values(manifest.tab).flatMap((tab) => Object.values(tab)),
+    ...manifest.dice,
     manifest.alert,
   ];
   return assets.map((asset) => asset.asset);
@@ -103,6 +105,49 @@ function drawWzButton(
 ) {
   const target = camera ? screenRect(rect, camera) : rect;
   context.drawImage(imageFor(images, button[state].asset), target.x, target.y);
+}
+
+export function getDiceFrameIndex(
+  elapsed: number,
+  animationStartedAt: number,
+  reducedMotion: boolean,
+): number {
+  if (reducedMotion || !Number.isFinite(animationStartedAt)) return 0;
+  const animationElapsed = elapsed - animationStartedAt;
+  if (animationElapsed < 0 || animationElapsed >= 400) return 0;
+  return Math.floor(animationElapsed / 100);
+}
+
+function drawRandomize(
+  context: CanvasRenderingContext2D,
+  images: Map<string, HTMLImageElement>,
+  manifest: NewCharManifest,
+  layout: NewCharLayout,
+  state: NewCharControlState,
+  camera: Camera,
+  elapsed: number,
+  animationStartedAt: number,
+  reducedMotion: boolean,
+) {
+  const target = screenRect(layout.randomize, camera);
+  const pressedOffset = state === "pressed" ? 1 : 0;
+  const restingFrame = manifest.dice[0]!;
+  const frame =
+    manifest.dice[
+      getDiceFrameIndex(elapsed, animationStartedAt, reducedMotion)
+    ] ?? restingFrame;
+  const anchor = {
+    x: target.x + restingFrame.origin.x,
+    y: target.y + restingFrame.origin.y,
+  };
+  context.save();
+  if (state === "disabled") context.globalAlpha = 0.45;
+  context.drawImage(
+    imageFor(images, frame.asset),
+    anchor.x - frame.origin.x + pressedOffset,
+    anchor.y - frame.origin.y + pressedOffset,
+  );
+  context.restore();
 }
 
 export function resolvePrimaryButtonVisual(input: {
@@ -666,6 +711,7 @@ export function drawNewCharEditor(input: {
   elapsed: number;
   transitionStartedAt: number;
   reducedMotion: boolean;
+  diceAnimationStartedAt: number;
 }): boolean {
   const {
     context,
@@ -680,6 +726,7 @@ export function drawNewCharEditor(input: {
     elapsed,
     transitionStartedAt,
     reducedMotion,
+    diceAnimationStartedAt,
   } = input;
   if (!state.visible || !state.character) return false;
 
@@ -767,6 +814,22 @@ export function drawNewCharEditor(input: {
     dropdown?.kind === "emotion" ? "selected" : emotionState,
     `표정  ${emotion.label}`,
     camera,
+  );
+  drawRandomize(
+    context,
+    images,
+    manifest,
+    layout,
+    resolveNewCharControlState({
+      disabled: state.createPending,
+      pressed: pointer.pressed === "randomize",
+      hovered: pointer.hovered === "randomize",
+      focused: state.focused === "randomize",
+    }),
+    camera,
+    elapsed,
+    diceAnimationStartedAt,
+    reducedMotion,
   );
 
   const primaryVisual = resolvePrimaryButtonVisual({

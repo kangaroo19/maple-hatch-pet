@@ -287,8 +287,18 @@ async function main() {
         );
       }
     }
+    const dice = [];
+    for (let frame = 0; frame < 4; frame += 1) {
+      dice.push(
+        await saveNewCharFrame(
+          loginImage,
+          `NewChar/dice/${frame}`,
+          `dice-${frame}.png`,
+        ),
+      );
+    }
     const newCharManifest = {
-      formatVersion: 5,
+      formatVersion: 7,
       source: {
         login: "UI.wz/Login.img",
         newChar: "UI.wz/Login.img/NewChar",
@@ -320,6 +330,7 @@ async function main() {
         ),
       },
       tab,
+      dice,
       alert: await saveNewCharCanvas(
         loginImage,
         "Login.img",
@@ -364,6 +375,22 @@ async function main() {
       assertAsset(parts.right, 12, 24);
       assertAsset(parts.fill, 1, 24);
     }
+    const diceContracts = [
+      [37, 26, 0, -30],
+      [25, 54, 0, -2],
+      [27, 56, 0, 0],
+      [28, 43, 0, -13],
+    ];
+    newCharManifest.dice.forEach((frame, index) => {
+      const [width, height, originX, originY] = diceContracts[index];
+      assertAsset(frame, width, height);
+      if (
+        frame.delay !== 100 ||
+        frame.origin.x !== originX ||
+        frame.origin.y !== originY
+      )
+        throw new Error(`${frame.source} frame metadata does not match.`);
+    });
     assertAsset(newCharManifest.alert, 187, 120);
 
     await fs.writeFile(

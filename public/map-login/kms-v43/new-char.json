@@ -1,5 +1,5 @@
 {
-  "formatVersion": 5,
+  "formatVersion": 7,
   "source": {
     "login": "UI.wz/Login.img",
     "newChar": "UI.wz/Login.img/NewChar",
@@ -237,6 +237,52 @@
       }
     }
   },
+  "dice": [
+    {
+      "asset": "/map-login/kms-v43/new-char/dice-0.png",
+      "width": 37,
+      "height": 26,
+      "source": "UI.wz/Login.img/NewChar/dice/0",
+      "delay": 100,
+      "origin": {
+        "x": 0,
+        "y": -30
+      }
+    },
+    {
+      "asset": "/map-login/kms-v43/new-char/dice-1.png",
+      "width": 25,
+      "height": 54,
+      "source": "UI.wz/Login.img/NewChar/dice/1",
+      "delay": 100,
+      "origin": {
+        "x": 0,
+        "y": -2
+      }
+    },
+    {
+      "asset": "/map-login/kms-v43/new-char/dice-2.png",
+      "width": 27,
+      "height": 56,
+      "source": "UI.wz/Login.img/NewChar/dice/2",
+      "delay": 100,
+      "origin": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "asset": "/map-login/kms-v43/new-char/dice-3.png",
+      "width": 28,
+      "height": 43,
+      "source": "UI.wz/Login.img/NewChar/dice/3",
+      "delay": 100,
+      "origin": {
+        "x": 0,
+        "y": -13
+      }
+    }
+  ],
   "alert": {
     "asset": "/map-login/kms-v43/new-char/char-alert.png",
     "width": 187,
