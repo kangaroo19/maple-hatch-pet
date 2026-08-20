@@ -265,7 +265,13 @@ describe("NewChar layout", () => {
       height: 38,
     });
     expect(layout.copyCommand).toEqual({
-      x: layout.scroll.x + 65,
+      x: layout.installCommand.x + 5,
+      y: layout.installCommand.y + 46,
+      width: 112,
+      height: 30,
+    });
+    expect(layout.installInCodex).toEqual({
+      x: layout.installCommand.x + 125,
       y: layout.installCommand.y + 46,
       width: 112,
       height: 30,
@@ -416,6 +422,9 @@ describe("NewChar state and dropdown navigation", () => {
     expect(hitTestNewChar(layout, points(center(layout.copyCommand)))).toBe(
       "copyCommand",
     );
+    expect(
+      hitTestNewChar(layout, points(center(layout.installInCodex))),
+    ).toBe("installInCodex");
   });
 });
 

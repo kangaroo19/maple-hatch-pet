@@ -118,8 +118,16 @@ describe("MapleHatchApp NewChar editor", () => {
 
     const copyButton = screen.getByRole("button", { name: "명령어 복사" });
     expect(copyButton).toBeDisabled();
+    const codexLink = screen.getByRole("link", { name: "Codex에서 설치" });
+    expect(codexLink).toHaveAttribute("aria-disabled", "true");
+    expect(codexLink).not.toHaveAttribute("href");
     await user.click(screen.getByRole("button", { name: "Pet 만들기" }));
     await waitFor(() => expect(copyButton).toBeEnabled());
+    expect(codexLink).toHaveAttribute(
+      "href",
+      "codex://new?prompt=Install%20this%20pet%3A%20npx%20maple-hatch-pet%20add%2012345678-1234-4234-9234-123456789abc",
+    );
+    expect(codexLink).toHaveAttribute("aria-disabled", "false");
     await user.click(copyButton);
     expect(screen.getByText("설치 명령을 복사했습니다.")).toBeInTheDocument();
 
@@ -127,6 +135,8 @@ describe("MapleHatchApp NewChar editor", () => {
       screen.getByRole("button", { name: "모든 상태 랜덤 설정" }),
     );
     expect(copyButton).toBeDisabled();
+    expect(codexLink).toHaveAttribute("aria-disabled", "true");
+    expect(codexLink).not.toHaveAttribute("href");
 
     await user.click(next);
     expect(screen.getByTestId("canvas-state")).toHaveTextContent(

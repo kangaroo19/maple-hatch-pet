@@ -94,6 +94,7 @@ type Props = {
   onPrimaryActivate: () => void;
   onSecondaryActivate: () => void;
   onCopyCommandActivate: () => void;
+  onInstallInCodexActivate: () => void;
 };
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -134,6 +135,7 @@ export function MapSceneCanvas({
   onPrimaryActivate,
   onSecondaryActivate,
   onCopyCommandActivate,
+  onInstallInCodexActivate,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<MapLoginScene | null>(null);
@@ -185,6 +187,7 @@ export function MapSceneCanvas({
     onPrimaryActivate,
     onSecondaryActivate,
     onCopyCommandActivate,
+    onInstallInCodexActivate,
   });
   const [failed, setFailed] = useState(false);
   const [creatorAssetsFailed, setCreatorAssetsFailed] = useState(false);
@@ -211,6 +214,7 @@ export function MapSceneCanvas({
       onPrimaryActivate,
       onSecondaryActivate,
       onCopyCommandActivate,
+      onInstallInCodexActivate,
     };
     if (!creatorState.visible || creatorState.closing) {
       dropdownRef.current = null;
@@ -223,6 +227,7 @@ export function MapSceneCanvas({
     onEmotionChange,
     onRandomize,
     onCopyCommandActivate,
+    onInstallInCodexActivate,
     onPrimaryActivate,
     onSecondaryActivate,
     onStateMove,
@@ -800,7 +805,8 @@ export function MapSceneCanvas({
     const state = creatorRef.current.state;
     const index = PET_STATES.indexOf(state.selectedState);
     if (state.createPending) return true;
-    if (target === "copyCommand") return !state.installCommand;
+    if (target === "copyCommand" || target === "installInCodex")
+      return !state.installCommand;
     if (target === "previous") return index === 0;
     if (target === "next") return index === PET_STATES.length - 1;
     if (target === "action")
@@ -866,7 +872,8 @@ export function MapSceneCanvas({
       callbacks.onRandomize();
     } else if (target === "primary") callbacks.onPrimaryActivate();
     else if (target === "secondary") callbacks.onSecondaryActivate();
-    else callbacks.onCopyCommandActivate();
+    else if (target === "copyCommand") callbacks.onCopyCommandActivate();
+    else callbacks.onInstallInCodexActivate();
   }
 
   if (failed)

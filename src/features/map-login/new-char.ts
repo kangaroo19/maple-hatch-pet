@@ -72,6 +72,7 @@ export type NewCharLayout = {
   installPanel: Rect;
   installCommand: Rect;
   copyCommand: Rect;
+  installInCodex: Rect;
 };
 
 export type NewCharTarget =
@@ -82,7 +83,8 @@ export type NewCharTarget =
   | "randomize"
   | "primary"
   | "secondary"
-  | "copyCommand";
+  | "copyCommand"
+  | "installInCodex";
 
 export type NewCharControlState =
   "normal" | "mouseOver" | "pressed" | "disabled";
@@ -310,7 +312,12 @@ export function getNewCharLayout(
     installPanel,
     installCommand,
     copyCommand: {
-      x: scroll.x + 65,
+      x: installCommand.x + 5,
+      y: installCommand.y + installCommand.height + 8,
+      ...PET_CREATE_BUTTON_SIZE,
+    },
+    installInCodex: {
+      x: installCommand.x + 5 + PET_CREATE_BUTTON_SIZE.width + 8,
       y: installCommand.y + installCommand.height + 8,
       ...PET_CREATE_BUTTON_SIZE,
     },
@@ -350,6 +357,7 @@ export function hitTestNewChar(
     "emotion",
     "randomize",
     "copyCommand",
+    "installInCodex",
     "secondary",
   ];
   return (

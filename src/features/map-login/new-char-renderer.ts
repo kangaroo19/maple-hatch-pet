@@ -696,6 +696,20 @@ function drawInstallControls(
     },
     camera,
   );
+  drawPrimaryButton(
+    context,
+    layout.installInCodex,
+    {
+      state: resolveNewCharControlState({
+        disabled: !state.installCommand || state.createPending,
+        pressed: pointer.pressed === "installInCodex",
+        hovered: pointer.hovered === "installInCodex",
+        focused: state.focused === "installInCodex",
+      }),
+      label: "Codex에서 설치",
+    },
+    camera,
+  );
 }
 
 export function drawNewCharEditor(input: {

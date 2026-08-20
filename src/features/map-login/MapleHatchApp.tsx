@@ -39,6 +39,12 @@ type Result = {
   expiresAt: string;
 };
 
+function codexInstallUrl(installCommand: string): string {
+  return `codex://new?prompt=${encodeURIComponent(
+    `Install this pet: ${installCommand}`,
+  )}`;
+}
+
 function initialStates(): StateInputs {
   return Object.fromEntries(
     PET_STATES.map((state) => [state, { ...DEFAULT_STATES[state] }]),
@@ -66,6 +72,7 @@ export function MapleHatchApp() {
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const resetButtonRef = useRef<HTMLButtonElement>(null);
   const copyButtonRef = useRef<HTMLButtonElement>(null);
+  const installInCodexRef = useRef<HTMLAnchorElement>(null);
   const resetTimerRef = useRef<number | null>(null);
   const copyTimerRef = useRef<number | null>(null);
   const lookupPendingRef = useRef(false);
@@ -346,6 +353,7 @@ export function MapleHatchApp() {
       primary: createButtonRef.current,
       secondary: resetButtonRef.current,
       copyCommand: copyButtonRef.current,
+      installInCodex: installInCodexRef.current,
     };
     focusNativeControl(controls[target] ?? null);
   }
@@ -491,6 +499,7 @@ export function MapleHatchApp() {
               onPrimaryActivate={() => void createPet()}
               onSecondaryActivate={reset}
               onCopyCommandActivate={() => copyButtonRef.current?.click()}
+              onInstallInCodexActivate={() => installInCodexRef.current?.click()}
             />
             {character && (
               <section className="native-creator-form" aria-label="Pet 편집">
@@ -647,6 +656,24 @@ export function MapleHatchApp() {
                   {copyButtonLabel}
                 </button>
                 <p aria-live="polite">{copyStatus}</p>
+                <a
+                  ref={installInCodexRef}
+                  role="link"
+                  href={
+                    result && !createPending && !creatorClosing
+                      ? codexInstallUrl(result.installCommand)
+                      : undefined
+                  }
+                  aria-disabled={!result || createPending || creatorClosing}
+                  onFocus={() => setCreatorFocused("installInCodex")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onClick={(event) => {
+                    if (!result || createPending || creatorClosing)
+                      event.preventDefault();
+                  }}
+                >
+                  Codex에서 설치
+                </a>
               </section>
             )}
           </div>
