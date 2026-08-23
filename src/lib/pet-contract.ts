@@ -60,6 +60,10 @@ export const ACTIONS = [
   lastFrame,
 })) as readonly CatalogEntry<ActionCode>[];
 
+export const RUNNING_ACTIONS = ACTIONS.filter(
+  (entry) => entry.code === "A02" || entry.code === "A03",
+);
+
 export const EMOTIONS = [
   ["E00", "default", "기본", 0],
   ["E01", "wink", "윙크", 0],
@@ -127,8 +131,8 @@ export const STATE_LABELS: Record<PetState, string> = {
 
 export const DEFAULT_STATES: StateInputs = {
   idle: { action: "A01", emotion: "E00" },
-  "running-right": { emotion: "E00" },
-  "running-left": { emotion: "E00" },
+  "running-right": { action: "A03", emotion: "E00" },
+  "running-left": { action: "A03", emotion: "E00" },
   waving: { action: "A00", emotion: "E02" },
   jumping: { action: "A06", emotion: "E00" },
   failed: { action: "A04", emotion: "E03" },
@@ -139,7 +143,8 @@ export const DEFAULT_STATES: StateInputs = {
 
 const actionByCode = new Map(ACTIONS.map((entry) => [entry.code, entry]));
 const emotionCodes = new Set(EMOTIONS.map((entry) => entry.code));
-const fixedRunning = new Set<PetState>(["running-right", "running-left"]);
+const runningActionCodes = new Set<ActionCode>(["A02", "A03"]);
+const runningStates = new Set<PetState>(["running-right", "running-left"]);
 
 function objectValue(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value))
@@ -169,10 +174,17 @@ export function normalizePetRequest(input: unknown): {
     ) {
       throw invalidRequest();
     }
-    if (fixedRunning.has(state)) {
-      if ("action" in selection) throw invalidRequest();
+    if (runningStates.has(state)) {
+      const hasAction = "action" in selection;
+      if (
+        hasAction &&
+        (typeof selection.action !== "string" ||
+          !runningActionCodes.has(selection.action as ActionCode))
+      ) {
+        throw invalidRequest();
+      }
       states[state] = {
-        action: "A03",
+        action: (hasAction ? selection.action : "A03") as ActionCode,
         emotion: `${selection.emotion}.0` as `${EmotionCode}.0`,
       };
       continue;

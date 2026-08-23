@@ -511,8 +511,8 @@ export function MapSceneCanvas({
           creatorPointerRef.current.optionHovered = null;
           return;
         }
-        const items = getDropdownItems(command.target);
         const state = creatorRef.current.state;
+        const items = getDropdownItems(command.target, state.selectedState);
         const selected =
           command.target === "action"
             ? state.selectedAction
@@ -776,7 +776,10 @@ export function MapSceneCanvas({
     const dropdown = dropdownRef.current;
     const layout = newCharLayoutRef.current;
     if (!dropdown || !layout) return null;
-    const items = getDropdownItems(dropdown.kind);
+    const items = getDropdownItems(
+      dropdown.kind,
+      creatorRef.current.state.selectedState,
+    );
     const count = Math.min(8, items.length - dropdown.start);
     for (let row = 0; row < count; row += 1) {
       if (pointInRect(getDropdownRowRect(layout[dropdown.kind], row), point)) {
@@ -809,11 +812,6 @@ export function MapSceneCanvas({
       return !state.installCommand;
     if (target === "previous") return index === 0;
     if (target === "next") return index === PET_STATES.length - 1;
-    if (target === "action")
-      return (
-        state.selectedState === "running-left" ||
-        state.selectedState === "running-right"
-      );
     return false;
   }
 
@@ -837,7 +835,7 @@ export function MapSceneCanvas({
 
   function showDropdown(kind: "action" | "emotion") {
     const state = creatorRef.current.state;
-    const items = getDropdownItems(kind);
+    const items = getDropdownItems(kind, state.selectedState);
     const selected =
       kind === "action" ? state.selectedAction : state.selectedEmotion;
     const selectedIndex = items.findIndex((item) => item.code === selected);
@@ -896,7 +894,10 @@ export function MapSceneCanvas({
           const dropdown = dropdownRef.current;
           if (!dropdown) return;
           event.preventDefault();
-          const total = getDropdownItems(dropdown.kind).length;
+          const total = getDropdownItems(
+            dropdown.kind,
+            creatorRef.current.state.selectedState,
+          ).length;
           dropdownRef.current = {
             ...dropdown,
             start: Math.min(
@@ -959,7 +960,10 @@ export function MapSceneCanvas({
           creatorPointerRef.current.optionPressed = null;
           if (option && option.index === pressedOption && dropdownRef.current) {
             const dropdown = dropdownRef.current;
-            const item = getDropdownItems(dropdown.kind)[option.index];
+            const item = getDropdownItems(
+              dropdown.kind,
+              creatorRef.current.state.selectedState,
+            )[option.index];
             if (item) {
               if (dropdown.kind === "action")
                 creatorRef.current.onActionChange(item.code as ActionCode);

@@ -8,6 +8,7 @@ import {
   DEFAULT_STATES,
   EMOTIONS,
   PET_STATES,
+  RUNNING_ACTIONS,
   STATE_LABELS,
   type ActionCode,
   type EmotionCode,
@@ -195,6 +196,10 @@ export function MapleHatchApp() {
 
   const selected = states[selectedState];
   const selectedAction = (selected.action ?? "A03") as ActionCode;
+  const actionOptions =
+    selectedState === "running-left" || selectedState === "running-right"
+      ? RUNNING_ACTIONS
+      : ACTIONS;
   const action =
     ACTIONS.find((entry) => entry.code === selectedAction) ?? ACTIONS[3]!;
   useEffect(() => {
@@ -545,8 +550,6 @@ export function MapleHatchApp() {
                   id="creator-action"
                   value={selectedAction}
                   disabled={
-                    selectedState === "running-left" ||
-                    selectedState === "running-right" ||
                     createPending ||
                     creatorClosing
                   }
@@ -570,7 +573,7 @@ export function MapleHatchApp() {
                     updateSelection("action", event.target.value)
                   }
                 >
-                  {ACTIONS.map((entry) => (
+                  {actionOptions.map((entry) => (
                     <option key={entry.code} value={entry.code}>
                       {entry.label}
                     </option>

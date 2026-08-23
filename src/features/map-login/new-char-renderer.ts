@@ -2,6 +2,7 @@ import {
   ACTIONS,
   EMOTIONS,
   PET_STATES,
+  RUNNING_ACTIONS,
   STATE_LABELS,
   type ActionCode,
   type EmotionCode,
@@ -69,7 +70,16 @@ export function getNewCharAssetSources(manifest: NewCharManifest): string[] {
   return assets.map((asset) => asset.asset);
 }
 
-export function getDropdownItems(kind: "action" | "emotion") {
+export function getDropdownItems(
+  kind: "action" | "emotion",
+  selectedState?: PetState,
+) {
+  if (
+    kind === "action" &&
+    (selectedState === "running-left" || selectedState === "running-right")
+  ) {
+    return RUNNING_ACTIONS;
+  }
   return kind === "action" ? ACTIONS : EMOTIONS;
 }
 
@@ -549,7 +559,7 @@ function drawDropdown(
 ) {
   if (!dropdown) return;
   const control = layout[dropdown.kind];
-  const items = getDropdownItems(dropdown.kind);
+  const items = getDropdownItems(dropdown.kind, state.selectedState);
   const selectedCode =
     dropdown.kind === "action" ? state.selectedAction : state.selectedEmotion;
   items.slice(dropdown.start, dropdown.start + 8).forEach((item, row) => {
@@ -766,9 +776,6 @@ export function drawNewCharEditor(input: {
   }
 
   const stateIndex = PET_STATES.indexOf(state.selectedState);
-  const actionDisabled =
-    state.selectedState === "running-left" ||
-    state.selectedState === "running-right";
   drawArrow(
     context,
     layout,
@@ -802,7 +809,7 @@ export function drawNewCharEditor(input: {
   context.restore();
 
   const actionState = resolveNewCharControlState({
-    disabled: actionDisabled || state.createPending,
+    disabled: state.createPending,
     pressed: pointer.pressed === "action",
     hovered: pointer.hovered === "action",
     focused: state.focused === "action",

@@ -19,6 +19,7 @@ import {
 import {
   getNewCharAssetSources,
   getDiceFrameIndex,
+  getDropdownItems,
   resolveFindCharacterOverlayState,
   resolvePrimaryButtonVisual,
 } from "@/features/map-login/new-char-renderer";
@@ -434,13 +435,27 @@ describe("NewChar randomization", () => {
     expect(getDiceFrameIndex(200, 0, true)).toBe(0);
   });
 
-  it("randomizes every editable field and keeps running actions fixed", () => {
+  it("randomizes every editable field and limits running actions to walking", () => {
     const states = randomizeStateInputs(() => 0.999999);
 
     expect(Object.keys(states)).toHaveLength(9);
     expect(states.idle).toEqual({ action: "A41", emotion: "E24" });
     expect(states.review).toEqual({ action: "A41", emotion: "E24" });
-    expect(states["running-left"]).toEqual({ emotion: "E24" });
-    expect(states["running-right"]).toEqual({ emotion: "E24" });
+    expect(states["running-left"]).toEqual({ action: "A03", emotion: "E24" });
+    expect(states["running-right"]).toEqual({ action: "A03", emotion: "E24" });
+
+    const lowest = randomizeStateInputs(() => 0);
+    expect(lowest["running-left"]?.action).toBe("A02");
+    expect(lowest["running-right"]?.action).toBe("A02");
+  });
+
+  it("shows only walking actions for the running states", () => {
+    expect(
+      getDropdownItems("action", "running-left").map((item) => item.code),
+    ).toEqual(["A02", "A03"]);
+    expect(
+      getDropdownItems("action", "running-right").map((item) => item.code),
+    ).toEqual(["A02", "A03"]);
+    expect(getDropdownItems("action", "idle")).toHaveLength(42);
   });
 });

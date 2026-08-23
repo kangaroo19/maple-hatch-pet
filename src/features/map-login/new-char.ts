@@ -2,6 +2,7 @@ import {
   ACTIONS,
   EMOTIONS,
   PET_STATES,
+  RUNNING_ACTIONS,
   type PetState,
   type StateInputs,
 } from "@/lib/pet-contract";
@@ -415,7 +416,7 @@ export function randomizeStateInputs(
     PET_STATES.map((state) => {
       const emotion = pick(EMOTIONS).code;
       if (state === "running-left" || state === "running-right")
-        return [state, { emotion }];
+        return [state, { action: pick(RUNNING_ACTIONS).code, emotion }];
       return [state, { action: pick(ACTIONS).code, emotion }];
     }),
   ) as StateInputs;

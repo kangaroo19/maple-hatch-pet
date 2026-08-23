@@ -4,6 +4,7 @@ import {
   ACTIONS,
   EMOTIONS,
   DEFAULT_STATES,
+  RUNNING_ACTIONS,
   normalizePetRequest,
   planFrames,
 } from "@/lib/pet-contract";
@@ -13,7 +14,7 @@ import {
 } from "@/lib/nexon-url";
 
 describe("pet contract", () => {
-  it("normalizes all nine rows and fixes both running actions to A03", () => {
+  it("normalizes all nine rows and keeps the default running action at A03", () => {
     const normalized = normalizePetRequest({
       characterName: "  천짱  ",
       catalogVersion: 1,
@@ -42,7 +43,30 @@ describe("pet contract", () => {
     });
   });
 
-  it("rejects unknown catalog codes and action input on fixed running rows", () => {
+  it("accepts running walk choices and rejects unsupported running actions", () => {
+    const normalized = normalizePetRequest({
+      characterName: "천짱",
+      catalogVersion: 1,
+      states: {
+        ...DEFAULT_STATES,
+        "running-right": { action: "A02", emotion: "E00" },
+        "running-left": { action: "A03", emotion: "E00" },
+      },
+    });
+    expect(normalized.states["running-right"].action).toBe("A02");
+    expect(normalized.states["running-left"].action).toBe("A03");
+
+    expect(
+      normalizePetRequest({
+        characterName: "천짱",
+        catalogVersion: 1,
+        states: {
+          ...DEFAULT_STATES,
+          "running-left": { emotion: "E00" },
+        },
+      }).states["running-left"].action,
+    ).toBe("A03");
+
     expect(() =>
       normalizePetRequest({
         characterName: "천짱",
@@ -60,7 +84,7 @@ describe("pet contract", () => {
         catalogVersion: 1,
         states: {
           ...DEFAULT_STATES,
-          "running-left": { action: "A03", emotion: "E00" },
+          "running-left": { action: "A01", emotion: "E00" },
         },
       }),
     ).toThrow("INVALID_REQUEST");
@@ -86,10 +110,25 @@ describe("pet contract", () => {
     expect(plan[1]).toMatchObject({ state: "running-right", flip: true });
     expect(plan[1].frames).toHaveLength(8);
     expect(plan[1].frames[0]?.emotionFrame).toBe("E00.0");
+
+    const selectedPlan = planFrames(
+      normalizePetRequest({
+        characterName: "천짱",
+        catalogVersion: 1,
+        states: {
+          ...DEFAULT_STATES,
+          "running-right": { action: "A02", emotion: "E00" },
+          "running-left": { action: "A03", emotion: "E00" },
+        },
+      }).states,
+    );
+    expect(selectedPlan[1]?.frames[0]?.actionFrame).toBe("A02.0");
+    expect(selectedPlan[2]?.frames[0]?.actionFrame).toBe("A03.0");
   });
 
   it("provides the complete v1 action and emotion choices to validation and UI", () => {
     expect(ACTIONS).toHaveLength(42);
+    expect(RUNNING_ACTIONS.map((entry) => entry.code)).toEqual(["A02", "A03"]);
     expect(ACTIONS[0]).toEqual({
       code: "A00",
       officialName: "stand1",
