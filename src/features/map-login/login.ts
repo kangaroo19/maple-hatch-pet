@@ -17,6 +17,9 @@ export type LoginLayout = {
 export type LoginTarget = "input" | "button";
 export type LoginButtonState = "normal" | "mouseOver" | "pressed" | "disabled";
 
+const LOGIN_FRAME_GUIDE = "메이플스토리 캐릭터 닉네임을 입력해 주세요";
+const CREATOR_FRAME_GUIDE = "설정값 지정 후 pet을 생성해 주세요";
+
 type LoginAsset = {
   asset: string;
   width: number;
@@ -116,6 +119,10 @@ export function resolveLoginButtonState(state: {
   if (state.pressed) return "pressed";
   if (state.hovered || state.focused) return "mouseOver";
   return "normal";
+}
+
+export function getFrameGuide(creatorVisible: boolean): string {
+  return creatorVisible ? CREATOR_FRAME_GUIDE : LOGIN_FRAME_GUIDE;
 }
 
 function validAsset(value: unknown, width: number, height: number): boolean {

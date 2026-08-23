@@ -11,6 +11,7 @@ import {
 
 import {
   getLoginLayout,
+  getFrameGuide,
   hitTestLogin,
   resolveLoginButtonState,
   validateLogin,
@@ -508,6 +509,22 @@ export function MapSceneCanvas({
         activeContext.restore();
       }
 
+      function drawFrameGuide() {
+        activeContext.save();
+        activeContext.fillStyle = "#ddddbb";
+        activeContext.fillRect(277, 4, 246, 16);
+        activeContext.font = '11px Dotum, "돋움", sans-serif';
+        activeContext.textAlign = "center";
+        activeContext.textBaseline = "middle";
+        activeContext.fillStyle = "#554433";
+        activeContext.fillText(
+          getFrameGuide(creatorRef.current.state.visible),
+          MAP_LOGIN_VIEWPORT.width / 2,
+          12,
+        );
+        activeContext.restore();
+      }
+
       function handleCreatorKeyboardCommand(
         command: NonNullable<CanvasCreatorKeyboardCommand>,
       ) {
@@ -701,6 +718,7 @@ export function MapSceneCanvas({
         }
         activeContext.globalAlpha = 1;
         activeContext.drawImage(images.get(login.frame.asset)!, 0, 0);
+        drawFrameGuide();
         if (newCharLayout && newChar) {
           drawNewCharViewportOverlay({
             context: activeContext,
