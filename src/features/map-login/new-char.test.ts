@@ -219,6 +219,7 @@ describe("NewChar layout", () => {
       layout.action,
       layout.emotion,
       layout.randomize,
+      layout.weapon,
       layout.primary,
     ]) {
       expect(rectContains(layout.scroll, control)).toBe(true);
@@ -247,11 +248,19 @@ describe("NewChar layout", () => {
       x: layout.action.x + 101 + (101 - fixture.dice[0]!.width) / 2,
       y:
         layout.action.y +
-        (layout.emotion.y + layout.emotion.height - layout.action.y -
+        (layout.emotion.y +
+          layout.emotion.height -
+          layout.action.y -
           fixture.dice[0]!.height) /
           2,
       width: fixture.dice[0]!.width,
       height: fixture.dice[0]!.height,
+    });
+    expect(layout.weapon).toEqual({
+      x: layout.emotion.x,
+      y: layout.emotion.y + layout.emotion.height + 6,
+      width: layout.emotion.width,
+      height: 12,
     });
     expect(layout.installPanel).toEqual({
       x: layout.scroll.x - 12,
@@ -417,21 +426,26 @@ describe("NewChar state and dropdown navigation", () => {
     expect(hitTestNewChar(layout, points(center(layout.randomize)))).toBe(
       "randomize",
     );
+    expect(hitTestNewChar(layout, points(center(layout.weapon)))).toBe(
+      "weapon",
+    );
     expect(
       hitTestNewChar(layout, points({ x: 0, y: 0 }, center(layout.secondary))),
     ).toBe("secondary");
     expect(hitTestNewChar(layout, points(center(layout.copyCommand)))).toBe(
       "copyCommand",
     );
-    expect(
-      hitTestNewChar(layout, points(center(layout.installInCodex))),
-    ).toBe("installInCodex");
+    expect(hitTestNewChar(layout, points(center(layout.installInCodex)))).toBe(
+      "installInCodex",
+    );
   });
 });
 
 describe("NewChar randomization", () => {
   it("plays all four dice frames once and returns to the resting frame", () => {
-    expect([0, 100, 200, 300, 400].map((time) => getDiceFrameIndex(time, 0, false))).toEqual([0, 1, 2, 3, 0]);
+    expect(
+      [0, 100, 200, 300, 400].map((time) => getDiceFrameIndex(time, 0, false)),
+    ).toEqual([0, 1, 2, 3, 0]);
     expect(getDiceFrameIndex(200, 0, true)).toBe(0);
   });
 

@@ -126,6 +126,7 @@ export async function generateSpritesheet(
   baseUrl: string,
   rows: PlannedRow[],
   signal: AbortSignal,
+  includeWeapon = false,
   fetchImpl: FetchImplementation = fetch,
 ): Promise<Buffer> {
   if (rows.length !== ROWS) throw unusableFrame();
@@ -137,6 +138,7 @@ export async function generateSpritesheet(
         baseUrl,
         frame.actionFrame,
         frame.emotionFrame,
+        includeWeapon,
       );
       urls.set(url.href, url);
     }
@@ -222,6 +224,7 @@ export async function generateSpritesheet(
         baseUrl,
         frame.actionFrame,
         frame.emotionFrame,
+        includeWeapon,
       ).href;
       const cell = rendered.get(href);
       if (!cell) throw upstreamError();

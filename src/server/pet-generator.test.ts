@@ -78,6 +78,7 @@ describe("Codex v1 PNG generator", () => {
       baseUrl,
       rows,
       new AbortController().signal,
+      false,
       async (input) => {
         requestCount += 1;
         requested.add(String(input));
@@ -112,6 +113,33 @@ describe("Codex v1 PNG generator", () => {
     expect(
       unusedCell.some((value, index) => index % 4 === 3 && value > 0),
     ).toBe(false);
+    expect(
+      [...requested].every(
+        (url) => new URL(url).searchParams.get("wmotion") === "W04",
+      ),
+    ).toBe(true);
+  });
+
+  it("uses the default weapon motion for every frame when requested", async () => {
+    const frame = await visibleFrame();
+    const requested = new Set<string>();
+    await generateSpritesheet(
+      baseUrl,
+      rows,
+      new AbortController().signal,
+      true,
+      async (input) => {
+        requested.add(String(input));
+        return new Response(Uint8Array.from(frame).buffer, { status: 200 });
+      },
+    );
+
+    expect(requested.size).toBeGreaterThan(0);
+    expect(
+      [...requested].every(
+        (url) => new URL(url).searchParams.get("wmotion") === "W00",
+      ),
+    ).toBe(true);
   });
 
   it("uses the consistent decoded size when the official server returns 300 by 300", async () => {
@@ -120,6 +148,7 @@ describe("Codex v1 PNG generator", () => {
       baseUrl,
       rows,
       new AbortController().signal,
+      false,
       async () =>
         new Response(Uint8Array.from(frame).buffer, {
           status: 200,
@@ -141,6 +170,7 @@ describe("Codex v1 PNG generator", () => {
       baseUrl,
       rows,
       new AbortController().signal,
+      false,
       async () =>
         new Response(Uint8Array.from(frame).buffer, {
           status: 200,
@@ -170,6 +200,7 @@ describe("Codex v1 PNG generator", () => {
         baseUrl,
         rows,
         new AbortController().signal,
+        false,
         async () => {
           requestCount += 1;
           const frame = requestCount === 1 ? smallFrame : requestedFrame;
@@ -199,6 +230,7 @@ describe("Codex v1 PNG generator", () => {
         baseUrl,
         rows,
         new AbortController().signal,
+        false,
         async () =>
           new Response(Uint8Array.from(transparent).buffer, {
             status: 200,
@@ -214,6 +246,7 @@ describe("Codex v1 PNG generator", () => {
         baseUrl,
         rows,
         new AbortController().signal,
+        false,
         async () =>
           new Response(null, {
             status: 302,

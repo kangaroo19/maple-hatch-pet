@@ -54,12 +54,13 @@ MVP 생성은 하나의 Node.js Route Handler가 동기 요청으로 처리한�
 
 ### 3.2 `POST /api/pets`
 
-브라우저는 생성 요청에 닉네임, 카탈로그 버전과 상태 설정만 보낸다.
+브라우저는 생성 요청에 닉네임, 카탈로그 버전, 전역 무기 표시 설정과 상태 설정만 보낸다.
 
 ```json
 {
   "characterName": "천짱",
   "catalogVersion": 1,
+  "includeWeapon": false,
   "states": {
     "idle": { "action": "A01", "emotion": "E00" },
     "running-right": { "action": "A03", "emotion": "E00" },
@@ -187,10 +188,11 @@ flowchart TD
 1. 닉네임의 앞뒤 공백을 제거한다.
 2. 9개 상태가 모두 존재하는지 확인한다.
 3. `catalogVersion`이 `1`인지 확인하고 [액션·표정 카탈로그](./action-emotion-catalog.md)에 정의된 액션과 표정만 허용한다.
-4. `running-left`와 `running-right`의 액션은 생략할 수 있으며, 생략하면 기존 기본값인 `A03`으로 정규화한다.
-5. 액션을 입력한 경우 두 달리기 상태에는 `A02` 또는 `A03`만 허용한다. 그 밖의 액션은 거부한다.
-6. 모든 표정 코드를 명시적인 0번 프레임으로 정규화한다. 예를 들어 `E06`은 `E06.0`이 된다.
-7. 상태 순서를 Codex v1 행 순서로 고정한다.
+4. `includeWeapon`은 생략하면 `false`로 정규화하고, 입력한 경우 boolean만 허용한다.
+5. `running-left`와 `running-right`의 액션은 생략할 수 있으며, 생략하면 기존 기본값인 `A03`으로 정규화한다.
+6. 액션을 입력한 경우 두 달리기 상태에는 `A02` 또는 `A03`만 허용한다. 그 밖의 액션은 거부한다.
+7. 모든 표정 코드를 명시적인 0번 프레임으로 정규화한다. 예를 들어 `E06`은 `E06.0`이 된다.
+8. 상태 순서를 Codex v1 행 순서로 고정한다.
 
 정규화 결과의 상태 순서는 다음과 같다.
 
@@ -259,14 +261,14 @@ running-right:
 ```text
 action=<action-and-frame>
 emotion=<emotion-code>.0
-wmotion=W04
+wmotion=<W00-or-W04>
 width=400
 height=400
 x=200
 y=280
 ```
 
-- `W04`를 사용해 무기를 제외한다.
+- `includeWeapon`이 `false`이면 `W04`로 무기를 제외하고, `true`이면 `W00`으로 장착 무기 타입의 기본 모션을 사용한다.
 - 동일한 최종 URL은 생성 시도 안에서 한 번만 다운로드한다.
 - 사용자가 전달한 임의 URL은 다운로드하지 않는다.
 - 이미지 요청이 실패하면 제한된 횟수만 재시도하고, 계속 실패하면 전체 생성을 중단한다.

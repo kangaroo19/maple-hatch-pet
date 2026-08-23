@@ -69,6 +69,7 @@ export function MapleHatchApp() {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const actionSelectRef = useRef<HTMLSelectElement>(null);
   const emotionSelectRef = useRef<HTMLSelectElement>(null);
+  const weaponCheckboxRef = useRef<HTMLInputElement>(null);
   const randomizeButtonRef = useRef<HTMLButtonElement>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
   const resetButtonRef = useRef<HTMLButtonElement>(null);
@@ -91,6 +92,7 @@ export function MapleHatchApp() {
   const [createPending, setCreatePending] = useState(false);
   const [selectedState, setSelectedState] = useState<PetState>("idle");
   const [states, setStates] = useState<StateInputs>(initialStates);
+  const [includeWeapon, setIncludeWeapon] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
   const [copyState, setCopyState] = useState<"idle" | "success" | "error">(
@@ -216,6 +218,7 @@ export function MapleHatchApp() {
       character.imageUrl,
       `${selectedAction}.${frameIndex % (action.lastFrame + 1)}`,
       `${selected.emotion}.0`,
+      includeWeapon,
     ).href;
   }, [
     action.lastFrame,
@@ -223,6 +226,7 @@ export function MapleHatchApp() {
     frameIndex,
     selected.emotion,
     selectedAction,
+    includeWeapon,
   ]);
 
   async function lookup(event: React.FormEvent) {
@@ -249,6 +253,7 @@ export function MapleHatchApp() {
       const found = (data as { character: Character }).character;
       setCharacter(found);
       setStates(initialStates());
+      setIncludeWeapon(false);
       setSelectedState("idle");
       setRandomizeRevision(0);
       setResult(null);
@@ -291,6 +296,12 @@ export function MapleHatchApp() {
     clearCopyFeedback();
   }
 
+  function updateIncludeWeapon(value: boolean) {
+    setIncludeWeapon(value);
+    setResult(null);
+    clearCopyFeedback();
+  }
+
   async function createPet() {
     if (!character || createPendingRef.current) return;
     clearCopyFeedback();
@@ -303,6 +314,7 @@ export function MapleHatchApp() {
         body: JSON.stringify({
           characterName: character.name,
           catalogVersion: 1,
+          includeWeapon,
           states,
         }),
       });
@@ -326,6 +338,7 @@ export function MapleHatchApp() {
     setNickname("");
     setSelection({ start: 0, end: 0 });
     setStates(initialStates());
+    setIncludeWeapon(false);
     setSelectedState("idle");
     setRandomizeRevision(0);
     setResult(null);
@@ -354,6 +367,7 @@ export function MapleHatchApp() {
       next: nextButtonRef.current,
       action: actionSelectRef.current,
       emotion: emotionSelectRef.current,
+      weapon: weaponCheckboxRef.current,
       randomize: randomizeButtonRef.current,
       primary: createButtonRef.current,
       secondary: resetButtonRef.current,
@@ -483,6 +497,7 @@ export function MapleHatchApp() {
                 selectedState,
                 selectedAction,
                 selectedEmotion: selected.emotion as EmotionCode,
+                includeWeapon,
                 createPending,
                 hasResult: Boolean(result),
                 installCommand: result?.installCommand ?? null,
@@ -501,6 +516,7 @@ export function MapleHatchApp() {
               onActionChange={(value) => updateSelection("action", value)}
               onEmotionChange={(value) => updateSelection("emotion", value)}
               onRandomize={randomizeAllStates}
+              onWeaponToggle={() => updateIncludeWeapon(!includeWeapon)}
               onPrimaryActivate={() => void createPet()}
               onSecondaryActivate={reset}
               onCopyCommandActivate={() => copyButtonRef.current?.click()}
@@ -614,6 +630,19 @@ export function MapleHatchApp() {
                     </option>
                   ))}
                 </select>
+                <label htmlFor="creator-weapon">무기 표시</label>
+                <input
+                  ref={weaponCheckboxRef}
+                  id="creator-weapon"
+                  type="checkbox"
+                  checked={includeWeapon}
+                  disabled={createPending || creatorClosing}
+                  onFocus={() => setCreatorFocused("weapon")}
+                  onBlur={() => setCreatorFocused(null)}
+                  onChange={(event) =>
+                    updateIncludeWeapon(event.target.checked)
+                  }
+                />
                 <button
                   ref={randomizeButtonRef}
                   type="button"

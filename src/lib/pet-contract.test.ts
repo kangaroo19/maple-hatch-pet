@@ -22,6 +22,7 @@ describe("pet contract", () => {
     });
 
     expect(normalized.characterName).toBe("천짱");
+    expect(normalized.includeWeapon).toBe(false);
     expect(Object.keys(normalized.states)).toEqual([
       "idle",
       "running-right",
@@ -126,6 +127,25 @@ describe("pet contract", () => {
     expect(selectedPlan[2]?.frames[0]?.actionFrame).toBe("A03.0");
   });
 
+  it("accepts the optional weapon setting and rejects non-boolean values", () => {
+    expect(
+      normalizePetRequest({
+        characterName: "천짱",
+        catalogVersion: 1,
+        includeWeapon: true,
+        states: DEFAULT_STATES,
+      }).includeWeapon,
+    ).toBe(true);
+    expect(() =>
+      normalizePetRequest({
+        characterName: "천짱",
+        catalogVersion: 1,
+        includeWeapon: "true",
+        states: DEFAULT_STATES,
+      }),
+    ).toThrow("INVALID_REQUEST");
+  });
+
   it("provides the complete v1 action and emotion choices to validation and UI", () => {
     expect(ACTIONS).toHaveLength(42);
     expect(RUNNING_ACTIONS.map((entry) => entry.code)).toEqual(["A02", "A03"]);
@@ -172,6 +192,9 @@ describe("NEXON image boundary", () => {
   it("rebuilds an official frame URL with only the allowed parameters", () => {
     expect(buildCharacterFrameUrl(base, "A03.2", "E06.0").href).toBe(
       "https://open.api.nexon.com/static/maplestory/character/look/abc123?action=A03.2&emotion=E06.0&wmotion=W04&width=400&height=400&x=200&y=280",
+    );
+    expect(buildCharacterFrameUrl(base, "A03.2", "E06.0", true).href).toBe(
+      "https://open.api.nexon.com/static/maplestory/character/look/abc123?action=A03.2&emotion=E06.0&wmotion=W00&width=400&height=400&x=200&y=280",
     );
   });
 });

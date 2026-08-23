@@ -38,11 +38,12 @@ export function buildCharacterFrameUrl(
   baseUrl: string,
   actionFrame: string,
   emotionFrame: string,
+  includeWeapon = false,
 ): URL {
   const url = assertAllowedCharacterImageUrl(baseUrl);
   url.searchParams.set("action", actionFrame);
   url.searchParams.set("emotion", emotionFrame);
-  url.searchParams.set("wmotion", "W04");
+  url.searchParams.set("wmotion", includeWeapon ? "W00" : "W04");
   url.searchParams.set("width", "400");
   url.searchParams.set("height", "400");
   url.searchParams.set("x", "200");

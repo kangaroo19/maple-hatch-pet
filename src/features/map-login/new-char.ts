@@ -68,6 +68,7 @@ export type NewCharLayout = {
   action: Rect;
   emotion: Rect;
   randomize: Rect;
+  weapon: Rect;
   primary: Rect;
   secondary: Rect;
   installPanel: Rect;
@@ -82,6 +83,7 @@ export type NewCharTarget =
   | "action"
   | "emotion"
   | "randomize"
+  | "weapon"
   | "primary"
   | "secondary"
   | "copyCommand"
@@ -267,8 +269,8 @@ export function getNewCharLayout(
   const characterSize = 360;
   const selectorWidth = 101;
   const selectorX = scroll.x + 20;
-  const actionY = scroll.y + 62;
-  const emotionY = scroll.y + 90;
+  const actionY = scroll.y + 52;
+  const emotionY = scroll.y + 80;
   const restingDice = manifest.dice[0]!;
   const randomizeArea = {
     x: selectorX + selectorWidth,
@@ -299,6 +301,12 @@ export function getNewCharLayout(
       y: randomizeArea.y + (randomizeArea.height - restingDice.height) / 2,
       width: restingDice.width,
       height: restingDice.height,
+    },
+    weapon: {
+      x: selectorX,
+      y: emotionY + 23,
+      width: selectorWidth,
+      height: 12,
     },
     primary: {
       x: scroll.x + 65,
@@ -357,6 +365,7 @@ export function hitTestNewChar(
     "action",
     "emotion",
     "randomize",
+    "weapon",
     "copyCommand",
     "installInCodex",
     "secondary",

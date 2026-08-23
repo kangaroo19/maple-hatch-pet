@@ -34,6 +34,7 @@ export type CanvasCreatorState = {
   selectedState: PetState;
   selectedAction: ActionCode;
   selectedEmotion: EmotionCode;
+  includeWeapon: boolean;
   createPending: boolean;
   hasResult: boolean;
   installCommand: string | null;
@@ -157,6 +158,41 @@ function drawRandomize(
     anchor.x - frame.origin.x + pressedOffset,
     anchor.y - frame.origin.y + pressedOffset,
   );
+  context.restore();
+}
+
+function drawWeaponToggle(
+  context: CanvasRenderingContext2D,
+  layout: NewCharLayout,
+  checked: boolean,
+  state: NewCharControlState,
+  camera: Camera,
+) {
+  const target = screenRect(layout.weapon, camera);
+  const boxSize = 12;
+  const boxY = target.y;
+  const active = state === "mouseOver" || state === "pressed";
+
+  context.save();
+  if (state === "disabled") context.globalAlpha = 0.55;
+  context.fillStyle = active ? "#fff0ba" : "#f5e4b8";
+  context.fillRect(target.x, boxY, boxSize, boxSize);
+  context.lineWidth = 1;
+  context.strokeStyle = active ? "#b87922" : "#68492c";
+  context.strokeRect(target.x + 0.5, boxY + 0.5, boxSize - 1, boxSize - 1);
+  if (checked) {
+    context.beginPath();
+    context.moveTo(target.x + 2.5, boxY + 6);
+    context.lineTo(target.x + 5, boxY + 8.5);
+    context.lineTo(target.x + 10, boxY + 3);
+    context.lineWidth = 2;
+    context.strokeStyle = "#5b3417";
+    context.stroke();
+  }
+  context.font = textFont;
+  context.textBaseline = "middle";
+  context.fillStyle = "#493622";
+  context.fillText("무기 표시", target.x + 17, target.y + target.height / 2);
   context.restore();
 }
 
@@ -851,6 +887,18 @@ export function drawNewCharEditor(input: {
     elapsed,
     diceAnimationStartedAt,
     reducedMotion,
+  );
+  drawWeaponToggle(
+    context,
+    layout,
+    state.includeWeapon,
+    resolveNewCharControlState({
+      disabled: state.createPending,
+      pressed: pointer.pressed === "weapon",
+      hovered: pointer.hovered === "weapon",
+      focused: state.focused === "weapon",
+    }),
+    camera,
   );
 
   const primaryVisual = resolvePrimaryButtonVisual({

@@ -140,12 +140,21 @@ describe("route handlers", () => {
 
   it("pet creation re-reads current character data and returns a fresh install result", async () => {
     let lookupName = "";
+    let includeWeapon: boolean | undefined;
     const handler = createPetHandler({
       fetchCharacter: async (name) => {
         lookupName = name;
         return character;
       },
-      generateSpritesheet: async () => Buffer.from("png"),
+      generateSpritesheet: async (
+        _imageUrl,
+        _rows,
+        _signal,
+        requestedWeapon,
+      ) => {
+        includeWeapon = requestedWeapon;
+        return Buffer.from("png");
+      },
       createPackage: () => Buffer.from("zip"),
       publishPackage: async () => undefined,
       randomUUID: () => "12345678-1234-4234-9234-123456789abc",
@@ -163,6 +172,7 @@ describe("route handlers", () => {
     );
 
     expect(lookupName).toBe("천짱");
+    expect(includeWeapon).toBe(false);
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({
       displayName: "천짱",
@@ -174,6 +184,39 @@ describe("route handlers", () => {
         "npx maple-hatch-pet add 12345678-1234-4234-9234-123456789abc",
       expiresAt: "2026-09-06T12:34:56.000Z",
     });
+  });
+
+  it("passes the requested weapon setting to sprite generation", async () => {
+    let includeWeapon: boolean | undefined;
+    const handler = createPetHandler({
+      fetchCharacter: async () => character,
+      generateSpritesheet: async (
+        _imageUrl,
+        _rows,
+        _signal,
+        requestedWeapon,
+      ) => {
+        includeWeapon = requestedWeapon;
+        return Buffer.from("png");
+      },
+      createPackage: () => Buffer.from("zip"),
+      publishPackage: async () => undefined,
+    });
+
+    const response = await handler(
+      new Request("http://localhost/api/pets", {
+        method: "POST",
+        body: JSON.stringify({
+          characterName: "천짱",
+          catalogVersion: 1,
+          includeWeapon: true,
+          states: DEFAULT_STATES,
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    expect(includeWeapon).toBe(true);
   });
 
   it("returns 503 at the internal limit even when generation never settles", async () => {

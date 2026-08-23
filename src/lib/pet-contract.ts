@@ -155,12 +155,16 @@ function objectValue(value: unknown): Record<string, unknown> {
 export function normalizePetRequest(input: unknown): {
   characterName: string;
   catalogVersion: 1;
+  includeWeapon: boolean;
   states: NormalizedStates;
 } {
   const body = objectValue(input);
   const characterName =
     typeof body.characterName === "string" ? body.characterName.trim() : "";
   if (!characterName || body.catalogVersion !== 1) throw invalidRequest();
+  const includeWeapon =
+    body.includeWeapon === undefined ? false : body.includeWeapon;
+  if (typeof includeWeapon !== "boolean") throw invalidRequest();
   const rawStates = objectValue(body.states);
   if (Object.keys(rawStates).length !== PET_STATES.length)
     throw invalidRequest();
@@ -200,7 +204,7 @@ export function normalizePetRequest(input: unknown): {
       emotion: `${selection.emotion}.0` as `${EmotionCode}.0`,
     };
   }
-  return { characterName, catalogVersion: 1, states };
+  return { characterName, catalogVersion: 1, includeWeapon, states };
 }
 
 const targetFrames: Record<PetState, number> = {

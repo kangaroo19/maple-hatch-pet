@@ -7,7 +7,12 @@ vi.mock("@/features/map-login/MapSceneCanvas", () => ({
     creatorState,
     creatorKeyboardCommand,
   }: {
-    creatorState: { selectedState: string; hasResult: boolean };
+    creatorState: {
+      selectedState: string;
+      hasResult: boolean;
+      includeWeapon: boolean;
+      previewUrl: string | null;
+    };
     creatorKeyboardCommand: {
       target: string;
       key: string;
@@ -15,7 +20,8 @@ vi.mock("@/features/map-login/MapSceneCanvas", () => ({
   }) => (
     <div data-testid="canvas-state">
       {creatorState.selectedState}:{String(creatorState.hasResult)}:
-      {creatorKeyboardCommand?.target}:{creatorKeyboardCommand?.key}
+      {creatorKeyboardCommand?.target}:{creatorKeyboardCommand?.key}: weapon:
+      {String(creatorState.includeWeapon)}:{creatorState.previewUrl}
     </div>
   ),
 }));
@@ -46,15 +52,20 @@ const petResult = {
   expiresAt: "2026-09-08T00:00:00.000Z",
 };
 
+let petRequest: unknown;
+
 beforeEach(() => {
+  petRequest = undefined;
   vi.stubGlobal(
     "fetch",
-    vi.fn(async (input: RequestInfo | URL) => {
+    vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (url.endsWith("/api/characters/lookup"))
         return new Response(JSON.stringify({ character }), { status: 200 });
-      if (url.endsWith("/api/pets"))
+      if (url.endsWith("/api/pets")) {
+        petRequest = JSON.parse(String(init?.body));
         return new Response(JSON.stringify(petResult), { status: 200 });
+      }
       throw new Error(`Unexpected fetch: ${url}`);
     }),
   );
@@ -107,8 +118,10 @@ describe("MapleHatchApp NewChar editor", () => {
     const next = screen.getByRole("button", { name: "다음 상태" });
     const action = screen.getByLabelText("액션") as HTMLSelectElement;
     const emotion = screen.getByLabelText("표정") as HTMLSelectElement;
+    const weapon = screen.getByRole("checkbox", { name: "무기 표시" });
     expect(editor).toHaveTextContent("기본 · 1/9");
     expect(previous).toBeDisabled();
+    expect(weapon).not.toBeChecked();
 
     await user.click(emotion);
     await user.keyboard("{Enter}");
@@ -131,18 +144,37 @@ describe("MapleHatchApp NewChar editor", () => {
     await user.click(copyButton);
     expect(screen.getByText("설치 명령을 복사했습니다.")).toBeInTheDocument();
 
+    await user.click(weapon);
+    expect(weapon).toBeChecked();
+    await waitFor(() =>
+      expect(screen.getByTestId("canvas-state")).toHaveTextContent(
+        "weapon:true",
+      ),
+    );
+    expect(screen.getByTestId("canvas-state")).toHaveTextContent("wmotion=W00");
+    expect(copyButton).toBeDisabled();
+
     await user.click(
       screen.getByRole("button", { name: "모든 상태 랜덤 설정" }),
     );
+    expect(weapon).toBeChecked();
     expect(copyButton).toBeDisabled();
     expect(codexLink).toHaveAttribute("aria-disabled", "true");
     expect(codexLink).not.toHaveAttribute("href");
 
+    await user.click(screen.getByRole("button", { name: "Pet 만들기" }));
+    await waitFor(() => expect(copyButton).toBeEnabled());
+    expect(petRequest).toMatchObject({ includeWeapon: true });
+
     await user.click(next);
     expect(screen.getByTestId("canvas-state")).toHaveTextContent(
-      "running-right:false",
+      "running-right:true",
     );
-    expect(action).toBeDisabled();
+    expect(action).toBeEnabled();
+    expect([...action.options].map((option) => option.value)).toEqual([
+      "A02",
+      "A03",
+    ]);
 
     await user.selectOptions(emotion, "E02");
     expect(screen.getByRole("button", { name: "Pet 만들기" })).toBeVisible();

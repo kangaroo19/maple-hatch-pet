@@ -91,6 +91,7 @@ type Props = {
   onActionChange: (value: ActionCode) => void;
   onEmotionChange: (value: EmotionCode) => void;
   onRandomize: () => void;
+  onWeaponToggle: () => void;
   onPrimaryActivate: () => void;
   onSecondaryActivate: () => void;
   onCopyCommandActivate: () => void;
@@ -132,6 +133,7 @@ export function MapSceneCanvas({
   onActionChange,
   onEmotionChange,
   onRandomize,
+  onWeaponToggle,
   onPrimaryActivate,
   onSecondaryActivate,
   onCopyCommandActivate,
@@ -184,6 +186,7 @@ export function MapSceneCanvas({
     onActionChange,
     onEmotionChange,
     onRandomize,
+    onWeaponToggle,
     onPrimaryActivate,
     onSecondaryActivate,
     onCopyCommandActivate,
@@ -211,6 +214,7 @@ export function MapSceneCanvas({
       onActionChange,
       onEmotionChange,
       onRandomize,
+      onWeaponToggle,
       onPrimaryActivate,
       onSecondaryActivate,
       onCopyCommandActivate,
@@ -226,6 +230,7 @@ export function MapSceneCanvas({
     onCreatorFocus,
     onEmotionChange,
     onRandomize,
+    onWeaponToggle,
     onCopyCommandActivate,
     onInstallInCodexActivate,
     onPrimaryActivate,
@@ -868,7 +873,8 @@ export function MapSceneCanvas({
     else if (target === "randomize") {
       dropdownRef.current = null;
       callbacks.onRandomize();
-    } else if (target === "primary") callbacks.onPrimaryActivate();
+    } else if (target === "weapon") callbacks.onWeaponToggle();
+    else if (target === "primary") callbacks.onPrimaryActivate();
     else if (target === "secondary") callbacks.onSecondaryActivate();
     else if (target === "copyCommand") callbacks.onCopyCommandActivate();
     else callbacks.onInstallInCodexActivate();

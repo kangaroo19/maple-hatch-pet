@@ -118,6 +118,7 @@ export function createPetHandler(dependencies: {
     imageUrl: string,
     rows: PlannedRow[],
     signal: AbortSignal,
+    includeWeapon: boolean,
   ) => Promise<Buffer>;
   createPackage: (input: {
     petId: string;
@@ -166,6 +167,7 @@ export function createPetHandler(dependencies: {
           currentCharacter.imageUrl,
           planFrames(normalized.states),
           controller.signal,
+          normalized.includeWeapon,
         );
         if (controller.signal.aborted) throw timeoutError;
         const description = `${currentCharacter.world} ${currentCharacter.class} 캐릭터`;
