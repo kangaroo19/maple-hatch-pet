@@ -131,14 +131,14 @@ export const STATE_LABELS: Record<PetState, string> = {
 
 export const DEFAULT_STATES: StateInputs = {
   idle: { action: "A01", emotion: "E00" },
-  "running-right": { action: "A03", emotion: "E00" },
-  "running-left": { action: "A03", emotion: "E00" },
+  "running-right": { action: "A02", emotion: "E01" },
+  "running-left": { action: "A02", emotion: "E01" },
   waving: { action: "A00", emotion: "E02" },
-  jumping: { action: "A06", emotion: "E00" },
-  failed: { action: "A04", emotion: "E03" },
-  waiting: { action: "A07", emotion: "E05" },
-  running: { action: "A00", emotion: "E00" },
-  review: { action: "A00", emotion: "E05" },
+  jumping: { action: "A06", emotion: "E10" },
+  failed: { action: "A34", emotion: "E03" },
+  waiting: { action: "A11", emotion: "E00" },
+  running: { action: "A14", emotion: "E15" },
+  review: { action: "A12", emotion: "E09" },
 };
 
 const actionByCode = new Map(ACTIONS.map((entry) => [entry.code, entry]));
@@ -188,7 +188,7 @@ export function normalizePetRequest(input: unknown): {
         throw invalidRequest();
       }
       states[state] = {
-        action: (hasAction ? selection.action : "A03") as ActionCode,
+        action: (hasAction ? selection.action : "A02") as ActionCode,
         emotion: `${selection.emotion}.0` as `${EmotionCode}.0`,
       };
       continue;

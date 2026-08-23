@@ -63,14 +63,14 @@ MVP 생성은 하나의 Node.js Route Handler가 동기 요청으로 처리한�
   "includeWeapon": false,
   "states": {
     "idle": { "action": "A01", "emotion": "E00" },
-    "running-right": { "action": "A03", "emotion": "E00" },
-    "running-left": { "action": "A03", "emotion": "E00" },
+    "running-right": { "action": "A02", "emotion": "E01" },
+    "running-left": { "action": "A02", "emotion": "E01" },
     "waving": { "action": "A00", "emotion": "E02" },
-    "jumping": { "action": "A06", "emotion": "E00" },
-    "failed": { "action": "A04", "emotion": "E03" },
-    "waiting": { "action": "A07", "emotion": "E05" },
-    "running": { "action": "A00", "emotion": "E00" },
-    "review": { "action": "A00", "emotion": "E05" }
+    "jumping": { "action": "A06", "emotion": "E10" },
+    "failed": { "action": "A34", "emotion": "E03" },
+    "waiting": { "action": "A11", "emotion": "E00" },
+    "running": { "action": "A14", "emotion": "E15" },
+    "review": { "action": "A12", "emotion": "E09" }
   }
 }
 ```
@@ -189,7 +189,7 @@ flowchart TD
 2. 9개 상태가 모두 존재하는지 확인한다.
 3. `catalogVersion`이 `1`인지 확인하고 [액션·표정 카탈로그](./action-emotion-catalog.md)에 정의된 액션과 표정만 허용한다.
 4. `includeWeapon`은 생략하면 `false`로 정규화하고, 입력한 경우 boolean만 허용한다.
-5. `running-left`와 `running-right`의 액션은 생략할 수 있으며, 생략하면 기존 기본값인 `A03`으로 정규화한다.
+5. `running-left`와 `running-right`의 액션은 생략할 수 있으며, 생략하면 기본값인 `A02`로 정규화한다.
 6. 액션을 입력한 경우 두 달리기 상태에는 `A02` 또는 `A03`만 허용한다. 그 밖의 액션은 거부한다.
 7. 모든 표정 코드를 명시적인 0번 프레임으로 정규화한다. 예를 들어 `E06`은 `E06.0`이 된다.
 8. 상태 순서를 Codex v1 행 순서로 고정한다.
@@ -228,8 +228,8 @@ review
 | 상태 | 목표 프레임 수 | 액션 결정 | 방향 처리 |
 |---|---:|---|---|
 | `idle` | 6 | 사용자 선택 | 원본 방향 |
-| `running-right` | 8 | 사용자 선택 `A02` 또는 `A03` (기본 `A03`) | 선택한 걷기 각 프레임 좌우 반전 |
-| `running-left` | 8 | 사용자 선택 `A02` 또는 `A03` (기본 `A03`) | 원본 방향 |
+| `running-right` | 8 | 사용자 선택 `A02` 또는 `A03` (기본 `A02`) | 선택한 걷기 각 프레임 좌우 반전 |
+| `running-left` | 8 | 사용자 선택 `A02` 또는 `A03` (기본 `A02`) | 원본 방향 |
 | `waving` | 4 | 사용자 선택 | 원본 방향 |
 | `jumping` | 5 | 사용자 선택 | 원본 방향 |
 | `failed` | 8 | 사용자 선택 | 원본 방향 |

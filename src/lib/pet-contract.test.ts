@@ -14,7 +14,7 @@ import {
 } from "@/lib/nexon-url";
 
 describe("pet contract", () => {
-  it("normalizes all nine rows and keeps the default running action at A03", () => {
+  it("normalizes all nine rows with the configured default states", () => {
     const normalized = normalizePetRequest({
       characterName: "  천짱  ",
       catalogVersion: 1,
@@ -35,12 +35,32 @@ describe("pet contract", () => {
       "review",
     ]);
     expect(normalized.states["running-right"]).toEqual({
-      action: "A03",
-      emotion: "E00.0",
+      action: "A02",
+      emotion: "E01.0",
     });
     expect(normalized.states["running-left"]).toEqual({
-      action: "A03",
+      action: "A02",
+      emotion: "E01.0",
+    });
+    expect(normalized.states.jumping).toEqual({
+      action: "A06",
+      emotion: "E10.0",
+    });
+    expect(normalized.states.failed).toEqual({
+      action: "A34",
+      emotion: "E03.0",
+    });
+    expect(normalized.states.waiting).toEqual({
+      action: "A11",
       emotion: "E00.0",
+    });
+    expect(normalized.states.running).toEqual({
+      action: "A14",
+      emotion: "E15.0",
+    });
+    expect(normalized.states.review).toEqual({
+      action: "A12",
+      emotion: "E09.0",
     });
   });
 
@@ -66,7 +86,7 @@ describe("pet contract", () => {
           "running-left": { emotion: "E00" },
         },
       }).states["running-left"].action,
-    ).toBe("A03");
+    ).toBe("A02");
 
     expect(() =>
       normalizePetRequest({
@@ -110,7 +130,7 @@ describe("pet contract", () => {
     ]);
     expect(plan[1]).toMatchObject({ state: "running-right", flip: true });
     expect(plan[1].frames).toHaveLength(8);
-    expect(plan[1].frames[0]?.emotionFrame).toBe("E00.0");
+    expect(plan[1].frames[0]?.emotionFrame).toBe("E01.0");
 
     const selectedPlan = planFrames(
       normalizePetRequest({
