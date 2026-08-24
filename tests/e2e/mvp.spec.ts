@@ -149,11 +149,6 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   await expect(
     page.getByText("이 설치 명령은 생성 후 28일 동안 사용할 수 있습니다."),
   ).toHaveCount(1);
-  const deletionLink = page.getByRole("link", {
-    name: "이미지 삭제 요청",
-  });
-  await expect(deletionLink).toHaveAttribute("href", /12345678-1234/);
-
   await clickCanvasCreatorTarget(page, "close");
   for (let index = 0; index < 8; index += 1)
     await clickCanvasCreatorTarget(page, "next");
@@ -170,13 +165,9 @@ test("lookup, edit, create, install, invalidate and refresh flow", async ({
   ).toHaveCount(0);
 });
 
-test("privacy and narrow viewport contracts", async ({ page }) => {
-  await page.goto("/privacy");
-  await expect(
-    page.getByRole("heading", { name: "개인정보 처리 안내" }),
-  ).toBeVisible();
-  await expect(page.getByText("28일간 유효")).toBeVisible();
-  await expect(page.getByText("최대 30일 이내")).toBeVisible();
+test("removed privacy route and narrow viewport contracts", async ({ page }) => {
+  const privacyResponse = await page.goto("/privacy");
+  expect(privacyResponse?.status()).toBe(404);
 
   await page.setViewportSize({ width: 900, height: 800 });
   await page.goto("/");
