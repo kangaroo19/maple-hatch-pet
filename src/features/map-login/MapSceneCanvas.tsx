@@ -847,13 +847,13 @@ export function MapSceneCanvas({
     creatorPointerRef.current.optionHovered = option?.row ?? null;
     creatorPointerRef.current.hovered = creatorTarget;
     event.currentTarget.style.cursor =
-      loginTarget === "input"
-        ? "text"
-        : loginTarget === "button" && !loginRef.current.state.disabled
-          ? "pointer"
-          : option || (creatorTarget && !creatorTargetDisabled(creatorTarget))
-            ? "pointer"
-            : "default";
+      loginPointerRef.current.pressed ||
+      creatorPointerRef.current.pressed !== null ||
+      creatorPointerRef.current.optionPressed !== null
+        ? "var(--maple-cursor-clicking)"
+        : loginTarget === "input"
+          ? "text"
+          : "var(--maple-cursor-default)";
   }
 
   function showDropdown(kind: "action" | "emotion") {
@@ -936,7 +936,12 @@ export function MapSceneCanvas({
           loginPointerRef.current.hovered = false;
           creatorPointerRef.current.hovered = null;
           creatorPointerRef.current.optionHovered = null;
-          event.currentTarget.style.cursor = "default";
+          event.currentTarget.style.cursor =
+            loginPointerRef.current.pressed ||
+            creatorPointerRef.current.pressed !== null ||
+            creatorPointerRef.current.optionPressed !== null
+              ? "var(--maple-cursor-clicking)"
+              : "var(--maple-cursor-default)";
         }}
         onPointerDown={(event) => {
           const loginTarget = loginTargetAt(event);
@@ -948,6 +953,7 @@ export function MapSceneCanvas({
           if (loginTarget === "button" && !loginRef.current.state.disabled) {
             event.preventDefault();
             loginPointerRef.current.pressed = true;
+            event.currentTarget.style.cursor = "var(--maple-cursor-clicking)";
             event.currentTarget.setPointerCapture(event.pointerId);
             loginRef.current.onButtonFocus();
             return;
@@ -957,6 +963,7 @@ export function MapSceneCanvas({
           if (option) {
             event.preventDefault();
             creatorPointerRef.current.optionPressed = option.index;
+            event.currentTarget.style.cursor = "var(--maple-cursor-clicking)";
             event.currentTarget.setPointerCapture(event.pointerId);
             return;
           }
@@ -967,6 +974,7 @@ export function MapSceneCanvas({
           }
           event.preventDefault();
           creatorPointerRef.current.pressed = target;
+          event.currentTarget.style.cursor = "var(--maple-cursor-clicking)";
           event.currentTarget.setPointerCapture(event.pointerId);
           creatorRef.current.onCreatorFocus(target);
         }}
@@ -1008,11 +1016,13 @@ export function MapSceneCanvas({
           }
           if (event.currentTarget.hasPointerCapture(event.pointerId))
             event.currentTarget.releasePointerCapture(event.pointerId);
+          updatePointer(event);
         }}
-        onPointerCancel={() => {
+        onPointerCancel={(event) => {
           loginPointerRef.current.pressed = false;
           creatorPointerRef.current.pressed = null;
           creatorPointerRef.current.optionPressed = null;
+          event.currentTarget.style.cursor = "var(--maple-cursor-default)";
         }}
       />
       {creatorFailure ? (

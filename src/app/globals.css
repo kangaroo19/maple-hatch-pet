@@ -5,6 +5,10 @@
   font-family: Arial, "Malgun Gothic", sans-serif;
   background: #070c14;
   color: #eef7ff;
+  --maple-cursor-default:
+    url("/map-login/kms-v43/cursor/default.png") 0 3, default;
+  --maple-cursor-clicking:
+    url("/map-login/kms-v43/cursor/clicking.png") 4 1, pointer;
 }
 * {
   box-sizing: border-box;
@@ -13,6 +17,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  cursor: var(--maple-cursor-default);
 }
 body {
   min-height: 100vh;
@@ -23,6 +28,14 @@ button,
 input,
 select {
   font: inherit;
+}
+button:not(:disabled):active,
+a[href]:active {
+  cursor: var(--maple-cursor-clicking);
+}
+input,
+textarea {
+  cursor: text;
 }
 a {
   color: inherit;
@@ -134,7 +147,7 @@ a {
   padding: 0;
   border: 0;
   background: transparent var(--normal) center no-repeat;
-  cursor: pointer;
+  cursor: var(--maple-cursor-default);
 }
 .notice-confirm:hover,
 .notice-confirm:focus-visible {

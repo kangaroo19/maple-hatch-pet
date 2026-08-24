@@ -27,6 +27,7 @@ const source = path.join(root, "poc", "map-login", "public", "generated");
 const target = path.join(root, "public", "map-login", "kms-v43");
 const loginTarget = path.join(target, "login");
 const newCharTarget = path.join(target, "new-char");
+const cursorTarget = path.join(target, "cursor");
 const wzDir = process.env.KMS_WZ_DIR;
 
 if (!wzDir) {
@@ -118,6 +119,17 @@ async function saveNewCharCanvas(image, imageName, resourcePath, filename) {
   );
 }
 
+async function saveCursorCanvas(basicImage, resourcePath, filename) {
+  return saveCanvas(
+    basicImage,
+    "Basic.img",
+    resourcePath,
+    cursorTarget,
+    "cursor",
+    filename,
+  );
+}
+
 async function saveNewCharFrame(loginImage, resourcePath, filename) {
   const resource = loginImage.getFromPath(resourcePath);
   if (!resource)
@@ -194,6 +206,7 @@ async function main() {
 
   await fs.mkdir(loginTarget, { recursive: true });
   await fs.mkdir(newCharTarget, { recursive: true });
+  await fs.mkdir(cursorTarget, { recursive: true });
   const uiPath = path.join(wzDir, "UI.wz");
   const wz = new WzFile(uiPath, WzMapleVersion.GETFROMZLZ, 43);
   const result = await wz.parseWzFile();
@@ -208,6 +221,18 @@ async function main() {
       throw new Error("Login.img or Basic.img was not found.");
     await loginImage.parseImage();
     await basicImage.parseImage();
+    const defaultCursor = await saveCursorCanvas(
+      basicImage,
+      "Cursor/0/0",
+      "default.png",
+    );
+    const clickingCursor = await saveCursorCanvas(
+      basicImage,
+      "Cursor/12/0",
+      "clicking.png",
+    );
+    assertAsset(defaultCursor, 24, 28);
+    assertAsset(clickingCursor, 25, 23);
     const manifest = {
       formatVersion: 1,
       source: {
