@@ -21,6 +21,8 @@ const rows = planFrames(
 );
 
 async function visibleFrame(size = 400): Promise<Buffer> {
+  const visibleWidth = Math.round(size * 0.1);
+  const visibleHeight = Math.round(size * 0.15);
   return sharp({
     create: {
       width: size,
@@ -33,17 +35,54 @@ async function visibleFrame(size = 400): Promise<Buffer> {
       {
         input: {
           create: {
-            width: 40,
-            height: 60,
+            width: visibleWidth,
+            height: visibleHeight,
             channels: 4,
             background: "#ff3366ff",
           },
         },
-        left: Math.floor((size - 40) / 2),
+        left: Math.round(size * 0.45),
         top: Math.floor(size * 0.55),
       },
     ])
     .png()
+    .toBuffer();
+}
+
+async function frameWithOversizedEffect(size = 400): Promise<Buffer> {
+  const character = await visibleFrame(size);
+  return sharp(character)
+    .composite([
+      {
+        input: {
+          create: {
+            width: Math.round(size * 0.25),
+            height: Math.round(size * 0.6),
+            channels: 4,
+            background: "#66ccffff",
+          },
+        },
+        left: Math.round(size * 0.25),
+        top: Math.round(size * 0.1),
+      },
+    ])
+    .png()
+    .toBuffer();
+}
+
+async function cellAt(
+  spritesheet: Buffer,
+  row: number,
+  column = 0,
+): Promise<Buffer> {
+  return sharp(spritesheet)
+    .extract({
+      left: column * 192,
+      top: row * 208,
+      width: 192,
+      height: 208,
+    })
+    .raw()
     .toBuffer();
 }
 
@@ -142,29 +181,38 @@ describe("Codex v1 PNG generator", () => {
     ).toBe(true);
   });
 
-  it("uses the consistent decoded size when the official server returns 300 by 300", async () => {
-    const frame = await visibleFrame(300);
-    const png = await generateSpritesheet(
-      baseUrl,
-      rows,
-      new AbortController().signal,
-      false,
-      async () =>
-        new Response(Uint8Array.from(frame).buffer, {
-          status: 200,
-          headers: { "content-type": "image/png" },
-        }),
-    );
+  it("normalizes equivalent 300 and 400 pixel source canvases to the same cell geometry", async () => {
+    const frame300 = await visibleFrame(300);
+    const frame400 = await visibleFrame(400);
+    const generate = (frame: Buffer) =>
+      generateSpritesheet(
+        baseUrl,
+        rows,
+        new AbortController().signal,
+        false,
+        async () =>
+          new Response(Uint8Array.from(frame).buffer, {
+            status: 200,
+            headers: { "content-type": "image/png" },
+          }),
+      );
+    const [png300, png400] = await Promise.all([
+      generate(frame300),
+      generate(frame400),
+    ]);
 
-    await expect(sharp(png).metadata()).resolves.toMatchObject({
+    await expect(sharp(png300).metadata()).resolves.toMatchObject({
       format: "png",
       width: 1536,
       height: 1872,
       hasAlpha: true,
     });
+    expect(visibleBounds(await cellAt(png300, 0))).toEqual(
+      visibleBounds(await cellAt(png400, 0)),
+    );
   });
 
-  it("upscales small character frames to the shared cell safe area", async () => {
+  it("uses the fixed source scale and anchor", async () => {
     const frame = await visibleFrame();
     const png = await generateSpritesheet(
       baseUrl,
@@ -177,17 +225,44 @@ describe("Codex v1 PNG generator", () => {
           headers: { "content-type": "image/png" },
         }),
     );
-    const cell = await sharp(png)
-      .extract({ left: 0, top: 0, width: 192, height: 208 })
-      .raw()
-      .toBuffer();
+    const cell = await cellAt(png, 0);
 
     expect(visibleBounds(cell)).toEqual({
-      left: 32,
-      top: 8,
-      right: 159,
-      bottom: 199,
+      left: 68,
+      top: 102,
+      right: 124,
+      bottom: 188,
     });
+  });
+
+  it("does not shrink ordinary frames when another action has an oversized effect", async () => {
+    const character = await visibleFrame();
+    const oversized = await frameWithOversizedEffect();
+    const generate = (withEffect: boolean) =>
+      generateSpritesheet(
+        baseUrl,
+        rows,
+        new AbortController().signal,
+        false,
+        async (input) => {
+          const action = new URL(String(input)).searchParams.get("action");
+          const frame =
+            withEffect && action === "A06.0" ? oversized : character;
+          return new Response(Uint8Array.from(frame).buffer, { status: 200 });
+        },
+      );
+    const [plain, withEffect] = await Promise.all([
+      generate(false),
+      generate(true),
+    ]);
+
+    expect(await cellAt(withEffect, 0)).toEqual(await cellAt(plain, 0));
+    const jumping = await cellAt(withEffect, 4);
+    expect(
+      Array.from({ length: 208 }, (_, y) => jumping[y * 192 * 4 + 3]).some(
+        (alpha) => alpha > 0,
+      ),
+    ).toBe(true);
   });
 
   it("rejects official frames with inconsistent decoded sizes", async () => {

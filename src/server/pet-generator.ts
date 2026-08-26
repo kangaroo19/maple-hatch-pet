@@ -13,7 +13,11 @@ const ROWS = 9;
 const SHEET_WIDTH = CELL_WIDTH * COLUMNS;
 const SHEET_HEIGHT = CELL_HEIGHT * ROWS;
 const MAX_PNG_BYTES = 20 * 1024 * 1024;
-const SAFE_MARGIN = 8;
+const NORMALIZED_CANVAS_WIDTH = 576;
+const SOURCE_ANCHOR_X_RATIO = 0.5;
+const SOURCE_ANCHOR_Y_RATIO = 0.7;
+const CELL_ANCHOR_X = 96;
+const CELL_ANCHOR_Y = 188;
 
 type FetchImplementation = (
   input: string | URL | Request,
@@ -23,7 +27,6 @@ type SourceFrame = {
   pixels: Buffer;
   width: number;
   height: number;
-  bounds: { left: number; top: number; right: number; bottom: number };
 };
 
 function upstreamError() {
@@ -98,21 +101,8 @@ async function downloadFrame(
     throw upstreamError();
   }
 
-  let left = width;
-  let top = height;
-  let right = -1;
-  let bottom = -1;
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      if (pixels[(y * width + x) * 4 + 3] === 0) continue;
-      left = Math.min(left, x);
-      top = Math.min(top, y);
-      right = Math.max(right, x);
-      bottom = Math.max(bottom, y);
-    }
-  }
-  if (right < left || bottom < top) throw unusableFrame();
-  return { pixels, width, height, bounds: { left, top, right, bottom } };
+  if (!alphaExists(pixels)) throw unusableFrame();
+  return { pixels, width, height };
 }
 
 function alphaExists(pixels: Buffer): boolean {
@@ -162,40 +152,43 @@ export async function generateSpritesheet(
   ) {
     throw upstreamError();
   }
-  const globalBounds = allFrames.reduce(
-    (bounds, frame) => ({
-      left: Math.min(bounds.left, frame.bounds.left),
-      top: Math.min(bounds.top, frame.bounds.top),
-      right: Math.max(bounds.right, frame.bounds.right),
-      bottom: Math.max(bounds.bottom, frame.bounds.bottom),
-    }),
-    { left: firstFrame.width, top: firstFrame.height, right: -1, bottom: -1 },
+  const scale = NORMALIZED_CANVAS_WIDTH / firstFrame.width;
+  const scaledWidth = NORMALIZED_CANVAS_WIDTH;
+  const scaledHeight = Math.max(1, Math.round(firstFrame.height * scale));
+  const left = Math.round(
+    CELL_ANCHOR_X - firstFrame.width * SOURCE_ANCHOR_X_RATIO * scale,
   );
-  const sourceWidth = globalBounds.right - globalBounds.left + 1;
-  const sourceHeight = globalBounds.bottom - globalBounds.top + 1;
-  const scale = Math.min(
-    (CELL_WIDTH - SAFE_MARGIN * 2) / sourceWidth,
-    (CELL_HEIGHT - SAFE_MARGIN * 2) / sourceHeight,
+  const top = Math.round(
+    CELL_ANCHOR_Y - firstFrame.height * SOURCE_ANCHOR_Y_RATIO * scale,
   );
-  const scaledWidth = Math.max(1, Math.round(sourceWidth * scale));
-  const scaledHeight = Math.max(1, Math.round(sourceHeight * scale));
-  const left = Math.floor((CELL_WIDTH - scaledWidth) / 2);
-  const top = Math.floor((CELL_HEIGHT - scaledHeight) / 2);
+  const sourceLeft = Math.max(0, -left);
+  const sourceTop = Math.max(0, -top);
+  const destinationLeft = Math.max(0, left);
+  const destinationTop = Math.max(0, top);
+  const visibleWidth = Math.min(
+    scaledWidth - sourceLeft,
+    CELL_WIDTH - destinationLeft,
+  );
+  const visibleHeight = Math.min(
+    scaledHeight - sourceTop,
+    CELL_HEIGHT - destinationTop,
+  );
+  if (visibleWidth <= 0 || visibleHeight <= 0) throw unusableFrame();
 
   const rendered = new Map<string, Buffer>();
   for (const [href, frame] of downloaded) {
     const input = await sharp(frame.pixels, {
       raw: { width: frame.width, height: frame.height, channels: 4 },
     })
-      .extract({
-        left: globalBounds.left,
-        top: globalBounds.top,
-        width: sourceWidth,
-        height: sourceHeight,
-      })
       .resize(scaledWidth, scaledHeight, {
         fit: "fill",
         kernel: sharp.kernel.nearest,
+      })
+      .extract({
+        left: sourceLeft,
+        top: sourceTop,
+        width: visibleWidth,
+        height: visibleHeight,
       })
       .png()
       .toBuffer();
@@ -209,7 +202,7 @@ export async function generateSpritesheet(
           background: { r: 0, g: 0, b: 0, alpha: 0 },
         },
       })
-        .composite([{ input, left, top }])
+        .composite([{ input, left: destinationLeft, top: destinationTop }])
         .png()
         .toBuffer(),
     );
