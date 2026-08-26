@@ -24,6 +24,7 @@ import {
   randomizeStateInputs,
   type NewCharTarget,
 } from "@/features/map-login/new-char";
+import { WEAPON_CLIPPING_GUIDE } from "@/features/map-login/login";
 import {
   NoticeDialog,
   type NoticeState,
@@ -630,12 +631,18 @@ export function MapleHatchApp() {
                     </option>
                   ))}
                 </select>
+                <p id="creator-weapon-clipping-hint" aria-live="polite">
+                  {includeWeapon ? WEAPON_CLIPPING_GUIDE : null}
+                </p>
                 <label htmlFor="creator-weapon">무기 표시</label>
                 <input
                   ref={weaponCheckboxRef}
                   id="creator-weapon"
                   type="checkbox"
                   checked={includeWeapon}
+                  aria-describedby={
+                    includeWeapon ? "creator-weapon-clipping-hint" : undefined
+                  }
                   disabled={createPending || creatorClosing}
                   onFocus={() => setCreatorFocused("weapon")}
                   onBlur={() => setCreatorFocused(null)}

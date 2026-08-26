@@ -136,13 +136,18 @@ describe("MapLogin login button state", () => {
 });
 
 describe("MapLogin frame guide", () => {
-  it("selects the guide for each screen and restores the login guide", () => {
-    expect(getFrameGuide(false)).toBe(
+  it("keeps the login guide ahead of the weapon warning", () => {
+    expect(getFrameGuide(false, true)).toBe(
       "메이플스토리 캐릭터 닉네임을 입력해 주세요",
     );
-    expect(getFrameGuide(true)).toBe("설정값 지정 후 pet을 생성해 주세요");
-    expect(getFrameGuide(false)).toBe(
-      "메이플스토리 캐릭터 닉네임을 입력해 주세요",
+  });
+
+  it("shows the weapon clipping warning only while weapon display is enabled", () => {
+    expect(getFrameGuide(true, false)).toBe(
+      "설정값 지정 후 pet을 생성해 주세요",
+    );
+    expect(getFrameGuide(true, true)).toBe(
+      "큰 무기나 이펙트는 Pet에서 잘릴 수 있어요",
     );
   });
 });

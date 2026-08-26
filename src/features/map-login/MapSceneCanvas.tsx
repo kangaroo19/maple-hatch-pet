@@ -518,7 +518,10 @@ export function MapSceneCanvas({
         activeContext.textBaseline = "middle";
         activeContext.fillStyle = "#554433";
         activeContext.fillText(
-          getFrameGuide(creatorRef.current.state.visible),
+          getFrameGuide(
+            creatorRef.current.state.visible,
+            creatorRef.current.state.includeWeapon,
+          ),
           MAP_LOGIN_VIEWPORT.width / 2,
           12,
         );

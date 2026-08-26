@@ -92,7 +92,7 @@ MVP 생성은 하나의 Node.js Route Handler가 동기 요청으로 처리한�
 
 `petId`는 생성마다 발급하는 소문자 UUID다. `packageUrl`은 같은 응답의 `petId`를 사용하는 Production 서비스의 절대 HTTPS 다운로드 URL이며 설치 UI에는 노출하지 않는다. `installCommand`는 정확히 `npx maple-hatch-pet add <petId>` 형식이다. `expiresAt`은 생성 시각부터 정확히 28일 뒤의 UTC ISO 8601 값이다. 같은 캐릭터와 같은 설정으로 다시 생성해도 새 `petId`와 패키지를 발행한다.
 
-경미한 잘림이나 상태 간 크기 차이는 생성을 막지 않으며 성공 응답과 설치 UI에는 포함하지 않는다.
+경미한 잘림이나 상태 간 크기 차이는 생성을 막지 않으며 성공 응답과 설치 UI에는 포함하지 않는다. 브라우저는 별도 픽셀 판정 없이 `무기 표시`가 켜진 동안에만 상단에 잘림 가능성 예방 안내를 표시한다.
 
 ### 3.3 `GET /api/pets/<petId>/package`
 

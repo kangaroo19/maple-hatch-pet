@@ -122,6 +122,7 @@ describe("MapleHatchApp NewChar editor", () => {
     expect(editor).toHaveTextContent("기본 · 1/9");
     expect(previous).toBeDisabled();
     expect(weapon).not.toBeChecked();
+    expect(weapon).not.toHaveAccessibleDescription();
 
     await user.click(emotion);
     await user.keyboard("{Enter}");
@@ -146,6 +147,9 @@ describe("MapleHatchApp NewChar editor", () => {
 
     await user.click(weapon);
     expect(weapon).toBeChecked();
+    expect(weapon).toHaveAccessibleDescription(
+      "큰 무기나 이펙트는 Pet에서 잘릴 수 있어요",
+    );
     await waitFor(() =>
       expect(screen.getByTestId("canvas-state")).toHaveTextContent(
         "weapon:true",
